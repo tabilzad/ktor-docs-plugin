@@ -1,0 +1,9 @@
+apply plugin: "com.vanniktech.maven.publish.base"
+
+if (project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+    apply plugin: 'org.jetbrains.dokka'
+
+    dokkaHtml {
+        outputDirectory = new File("$buildDir/dokka")
+    }
+}
