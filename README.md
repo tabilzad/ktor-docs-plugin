@@ -1,6 +1,6 @@
 # Ktor Swagger Plugin
 
-This plugin implements a plug and play solution to support OpenAPI (Swagger) for Ktor server with mininal effort. Annotate you route(s) definition with `@KtorDocs` and swagger.json will be generated at build time.
+This plugin implements a plug and play solution to support OpenAPI (Swagger) for Ktor server with mininal effort. Annotate your route(s) definition with `@KtorDocs` and swagger.json will be generated at build time.
 
 Take a look at `use-plugin` module as reference 
 
@@ -30,20 +30,26 @@ swagger {
 ```kotlin
 import io.github.tabilzad.ktor.KtorDocs
 
+data class RequestSample(
+    val string: String,
+    val int: Int,
+    val double: Double,
+    val `object`: More,
+    val collection: List<More>,
+)
+
+data class More(
+    val nested: List<List<String>>
+)
+
 @KtorDocs
 fun Route.ordersRouting() {
     route("/v1") {
         post("/order1") {
-            call.receive<Sample>()
+            call.receive<RequestSample>()
         }
         route("/order2") {
             route("/customOrder") {
-               
-            }
-            post {
-                call.receive<Sample>().let {
-
-                }
             }
         }
         route("/orders") {
