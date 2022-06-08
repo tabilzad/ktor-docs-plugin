@@ -66,8 +66,9 @@ fun Route.ordersRouting() {
         }
     }
 }
-
+```
 Which will produce the following spec
+
 ![image](https://user-images.githubusercontent.com/16094286/172687047-b102b577-b252-4e33-af52-7a89a639c131.png)
 
-```
+
