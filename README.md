@@ -48,10 +48,7 @@ fun Route.ordersRouting() {
         post("/order1") {
             call.receive<RequestSample>()
         }
-        route("/order2") {
-            route("/customOrder") {
-            }
-        }
+ 
         route("/orders") {
             get {
                 call.receive<String>().let {
