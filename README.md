@@ -1,5 +1,7 @@
 # Ktor Swagger Plugin
 
+This plugin implements a plug and play solution to support OpenAPI (Swagger) for Ktor server with mininal effort. Annotate you route(s) definition with `@KtorDocs` and swagger.json will be generated at build time.
+
 Take a look at `use-plugin` module as reference 
 
 ## How to apply plugin
