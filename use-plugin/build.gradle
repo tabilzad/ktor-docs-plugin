@@ -3,9 +3,10 @@ plugins {
 }
 apply plugin: 'io.github.tabilzad.ktor-docs-plugin-gradle'
 swagger {
-    docsTitle = "Ktor Server"
-    docsDescription = "Ktor Server Describtion"
-    docsVersion = "1.0"
+    title = "Ktor Server"
+    description = "Ktor Server Description"
+    version = "1.0"
+    requestFeature = true
 }
 repositories {
     mavenLocal()
@@ -15,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.6.10"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.0"
     implementation "com.squareup.moshi:moshi:1.13.0"
     implementation "io.ktor:ktor:1.6.7"
     implementation "io.ktor:ktor-server-netty:1.6.7"

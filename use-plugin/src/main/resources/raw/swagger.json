@@ -20,52 +20,7 @@
         "required" : true,
         "schema" : {
           "type" : "object",
-          "properties" : {
-            "a" : {
-              "type" : "string"
-            },
-            "b" : {
-              "type" : "object",
-              "properties" : {
-                "h" : {
-                  "type" : "object",
-                  "properties" : {
-                    "h" : {
-                      "type" : "array",
-                      "properties" : { },
-                      "items" : {
-                        "type" : "array",
-                        "properties" : { },
-                        "items" : {
-                          "type" : "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "c" : {
-              "type" : "array",
-              "properties" : { },
-              "items" : {
-                "type" : "object",
-                "properties" : {
-                  "h" : {
-                    "type" : "array",
-                    "properties" : { },
-                    "items" : {
-                      "type" : "array",
-                      "properties" : { },
-                      "items" : {
-                        "type" : "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          "$ref" : "#/definitions/Sample"
         }
       } ]
     },
@@ -90,53 +45,7 @@
         "in" : "body",
         "required" : true,
         "schema" : {
-          "type" : "object",
-          "properties" : {
-            "a" : {
-              "type" : "string"
-            },
-            "b" : {
-              "type" : "object",
-              "properties" : {
-                "h" : {
-                  "type" : "object",
-                  "properties" : {
-                    "h" : {
-                      "type" : "array",
-                      "properties" : { },
-                      "items" : {
-                        "type" : "array",
-                        "properties" : { },
-                        "items" : {
-                          "type" : "string"
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
-            "c" : {
-              "type" : "array",
-              "properties" : { },
-              "items" : {
-                "type" : "object",
-                "properties" : {
-                  "h" : {
-                    "type" : "array",
-                    "properties" : { },
-                    "items" : {
-                      "type" : "array",
-                      "properties" : { },
-                      "items" : {
-                        "type" : "string"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
+          "type" : "object"
         }
       } ]
     },
@@ -152,7 +61,7 @@
         "in" : "body",
         "required" : true,
         "schema" : {
-          "type" : "object"
+          "type" : "integer"
         }
       } ]
     },
@@ -168,7 +77,7 @@
         "in" : "body",
         "required" : true,
         "schema" : {
-          "type" : "object"
+          "type" : "string"
         }
       } ]
     },
@@ -194,6 +103,77 @@
         "required" : true,
         "type" : "string"
       } ]
+    }
+  },
+  "definitions" : {
+    "Sample" : {
+      "type" : "object",
+      "properties" : {
+        "a" : {
+          "type" : "string"
+        },
+        "b" : {
+          "type" : "object",
+          "properties" : {
+            "h" : {
+              "type" : "object",
+              "properties" : {
+                "h" : {
+                  "type" : "array",
+                  "properties" : { },
+                  "items" : {
+                    "type" : "array",
+                    "properties" : { },
+                    "items" : {
+                      "type" : "string"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "name" : "io.github.tabilzad.More"
+        },
+        "c" : {
+          "type" : "array",
+          "properties" : { },
+          "items" : {
+            "type" : "object",
+            "properties" : {
+              "h" : {
+                "type" : "array",
+                "properties" : { },
+                "items" : {
+                  "type" : "array",
+                  "properties" : { },
+                  "items" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            },
+            "name" : "io.github.tabilzad.More"
+          }
+        }
+      },
+      "name" : "io.github.tabilzad.Sample"
+    },
+    "More" : {
+      "type" : "object",
+      "properties" : {
+        "h" : {
+          "type" : "array",
+          "properties" : { },
+          "items" : {
+            "type" : "array",
+            "properties" : { },
+            "items" : {
+              "type" : "string"
+            }
+          }
+        }
+      },
+      "name" : "io.github.tabilzad.More"
     }
   }
 }

@@ -63,11 +63,12 @@ private fun addPathParams(it: KtorRouteSpec): List<PathParam> {
 
 private fun addPostBody(it: KtorRouteSpec): List<BodyParam> {
     return if (it.method == "post") {
+        val ref = it.body.name?.split(".")?.last()
         listOf(
             BodyParam(
                 name = "request",
                 `in` = "body",
-                schema = Schema("#/components/schemas/${it.body.name?.split(".")?.last()}")
+                schema = Schema(it.body.type, if(ref == null) null else "#/definitions/$ref")
             )
         )
     } else {
