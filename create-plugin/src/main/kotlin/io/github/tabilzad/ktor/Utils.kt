@@ -5,7 +5,7 @@ import java.io.OutputStream
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.jvmErasure
 
-
+val Iterable<ObjectType>.names get() = mapNotNull { it.name }
 fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { child ->
     when (child) {
         is DocRoute -> {
@@ -67,7 +67,7 @@ private fun addPostBody(it: KtorRouteSpec): List<BodyParam> {
             BodyParam(
                 name = "request",
                 `in` = "body",
-                schema = it.body
+                schema = Schema("#/components/schemas/${it.body.name?.split(".")?.last()}")
             )
         )
     } else {

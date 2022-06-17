@@ -1,11 +1,9 @@
 package io.github.tabilzad.ktor.visitors
 
-import io.github.tabilzad.ktor.DocRoute
-import io.github.tabilzad.ktor.EndPoint
-import io.github.tabilzad.ktor.ExpType
-import io.github.tabilzad.ktor.KtorElement
+import io.github.tabilzad.ktor.*
 import io.github.tabilzad.ktor.OpenApiSpec.ObjectType
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
+import org.jetbrains.kotlin.js.descriptorUtils.getJetTypeFqName
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
 import org.jetbrains.kotlin.resolve.BindingContext
@@ -19,6 +17,11 @@ internal class ExpressionsVisitor(
 ) : KtVisitor<List<KtorElement>, KtorElement?>() {
     init {
         println("BeginVisitor")
+    }
+
+    val classNames = mutableListOf<ObjectType>()
+    override fun visitProperty(property: KtProperty, data: KtorElement?): List<KtorElement> {
+        return property.children.filterIsInstance<KtDotQualifiedExpression>().flatMap { it.accept(this, data) }
     }
 
     override fun visitDeclaration(dcl: KtDeclaration, data: KtorElement?): List<KtorElement> {
@@ -48,9 +51,14 @@ internal class ExpressionsVisitor(
         }
     }
 
-//    override fun visitProperty(property: KtProperty, data: KtorElement?): List<KtorElement> {
-//        return property.children.filterIsInstance<KtDotQualifiedExpression>().flatMap { it.accept(this, data) }
-//    }
+    private fun KtExpression.findCallExpression(): KtExpression?{
+        val firstChild = firstChild as? KtExpression
+        return if (firstChild?.text != "call") {
+            firstChild?.findCallExpression()
+        } else {
+            firstChild.parent as KtExpression
+        }
+    }
 
     override fun visitDotQualifiedExpression(
         expression: KtDotQualifiedExpression,
@@ -61,17 +69,27 @@ internal class ExpressionsVisitor(
             if (parent is EndPoint) {
                 val kotlinType = BindingContextUtils.getTypeNotNull(
                     context,
-                    expression.children.find { it.text.contains("receive") } as KtExpression)
+                    expression.receiverExpression.findCallExpression() ?: expression)
                 if (!(KotlinBuiltIns.isPrimitiveType(kotlinType) || KotlinBuiltIns.isString(kotlinType))) {
-                    val r = ObjectType("object", mutableMapOf())
-                    if (requestBodyFeature) {
+
+                    val jetTypeFqName = kotlinType.getJetTypeFqName(false)
+                    if (!classNames.names.contains(jetTypeFqName)) {
+
+                        val r = ObjectType("object",
+                            mutableMapOf(),
+                            name = jetTypeFqName
+                        )
+                        classNames.add(r)
+
                         kotlinType.memberScope
                             .getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
                             .forEach { d ->
-                                d.accept(ClassDescriptorVisitor(context), r)
+                                val classDescriptorVisitor = ClassDescriptorVisitor(context)
+                                d.accept(classDescriptorVisitor, r)
+                                classNames.addAll(classDescriptorVisitor.classNames)
                             }
+                        parent.body = r
                     }
-                    parent.body = r
                 }
             }
         }
