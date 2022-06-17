@@ -41,18 +41,27 @@ val Meta.ktorDocs: CliPlugin
                     configuration?.get(ARG_REQUEST_FEATURE),
                 ).let { (title, description, version, jsonPath, requestBody) ->
 
-                    val routes = resolveSwaggerPaths(
-                        ktDeclaration,
-                        requestBody,
+                    val expressionsVisitor = ExpressionsVisitor(
+                        requestBody?.toBoolean() ?: false,
                         declarationCheckerContext
+                            .trace.bindingContext
                     )
+                    val routes = ktDeclaration.accept(
+                        expressionsVisitor, null
+                    ).first() as DocRoute
+
+
+                    val components = expressionsVisitor.classNames
+                        .associateBy { it.name?.split(".")?.last() ?: "UNKNOWN" }
+
                     saveToFile(
                         containingDirectory = containingDirectory,
                         routes = routes,
                         description = description,
                         version = version,
                         title = title,
-                        jsonPath = jsonPath
+                        jsonPath = jsonPath,
+                        components
                     )
                 }
             }
@@ -65,14 +74,18 @@ private fun saveToFile(
     description: String?,
     version: String?,
     title: String?,
-    jsonPath: String?
+    jsonPath: String?,
+    map: Map<String, OpenApiSpec.ObjectType>
 ) {
     val spec = OpenApiSpec(
         info = OpenApiSpec.Info(
             title = title ?: "Server",
             description = description ?: "",
             version = version ?: "1.0"
-        ), paths = reduce(routes).convertToSpec()
+        ), paths = reduce(routes).convertToSpec(),
+        components = OpenApiSpec.Components(
+            map
+        )
     )
     val filePath = containingDirectory.virtualFile.path.split("/main").first() + "/main"
     val resourcesDir = File(filePath).listFiles()?.firstNotNullOf {
@@ -94,26 +107,16 @@ private fun saveToFile(
         val new = try {
             val existingSpec = mapper.readValue<OpenApiSpec>(file)
             existingSpec.copy(
-                paths = existingSpec.paths.plus(spec.paths)
+                paths = existingSpec.paths.plus(spec.paths),
+                components = existingSpec.components.copy(
+                    schemas = existingSpec.components.schemas.plus(spec.components.schemas)
+                )
             )
         } catch (ex: Exception) {
             spec
         }
         file.writeText(mapper.writeValueAsString(new))
     }
-}
-
-private fun resolveSwaggerPaths(
-    ktDeclaration: KtDeclaration,
-    requestBody: String?,
-    declarationCheckerContext: DeclarationCheckerContext
-): DocRoute {
-    return ktDeclaration.accept(
-        ExpressionsVisitor(
-            requestBody?.toBoolean() ?: false,
-            declarationCheckerContext.trace.bindingContext
-        ), null
-    ).first() as DocRoute
 }
 
 fun KtAnnotated.hasAnnotation(

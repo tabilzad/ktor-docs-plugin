@@ -15,7 +15,6 @@ data class KtorRouteSpec(
 interface KtorElement {
     var path: String?
 }
-
 enum class ExpType(val labels: List<String>) {
     ROUTE(listOf("route")),
     METHOD(listOf("get", "post", "put", "patch")),
@@ -37,8 +36,11 @@ data class OpenApiSpec(
     val swagger: String = "2.0",
     val info: Info,
     val servers: List<Server> = emptyList(),
-    val paths: Map<String, Map<String, Any>>
+    val paths: Map<String, Map<String, Any>>,
+    val components: Components
 ) {
+
+    data class Components(val schemas: Map<String, ObjectType>)
 
     data class Info(
         val title: String,
@@ -67,7 +69,8 @@ data class OpenApiSpec(
         var type: String,
         var properties: MutableMap<String, ObjectType>? = null,
         var items: ObjectType? = null,
-        var enum: List<String>? = null
+        var enum: List<String>? = null,
+        var name: String? = null
     )
 
     data class PathParam(
@@ -81,11 +84,11 @@ data class OpenApiSpec(
         override val name: String,
         override val `in`: String = "body",
         override val required: Boolean = true,
-        val schema: ObjectType
+        val schema: Schema
     ) : OpenApiSpecParam
 
     data class Schema(
-        val type: String,
+        val `$ref`: String,
     )
 
     data class Response(
