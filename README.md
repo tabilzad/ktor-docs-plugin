@@ -12,7 +12,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.1.51-alpha")
+        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.1.60-alpha")
     }
 }
 
