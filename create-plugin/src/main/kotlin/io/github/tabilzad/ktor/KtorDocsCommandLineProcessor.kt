@@ -21,13 +21,13 @@ object SwaggerConfigurationKeys {
     const val OPTION_DESCR = "description"
     const val OPTION_VER = "version"
     const val OPTION_PATH = "jsonPath"
-    const val OPTION_REQUEST_BODY = "requestBody"
+    const val OPTION_REQUEST_BODY = "requestFeature"
 
     val ARG_TITLE = CompilerConfigurationKey.create<String>(OPTION_TITLE)
     val ARG_DESCR = CompilerConfigurationKey.create<String>(OPTION_DESCR)
     val ARG_VER = CompilerConfigurationKey.create<String>(OPTION_VER)
     val ARG_PATH = CompilerConfigurationKey.create<String>(OPTION_PATH)
-    val ARG_REQUEST_FEATURE = CompilerConfigurationKey.create<String>(OPTION_PATH)
+    val ARG_REQUEST_FEATURE = CompilerConfigurationKey.create<String>(OPTION_REQUEST_BODY)
 }
 
 class KtorDocsCommandLineProcessor : CommandLineProcessor {
@@ -68,7 +68,7 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
         get() = "io.github.tabilzad.ktor-docs-plugin-gradle"
 
     override val pluginOptions: Collection<AbstractCliOption>
-        get() = listOf(titleOption, descOption, versionOption)
+        get() = listOf(titleOption, descOption, versionOption, pathOption, requestSchema)
 
     override fun processOption(
         option: AbstractCliOption,

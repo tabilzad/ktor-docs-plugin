@@ -12,8 +12,8 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 
 internal class ExpressionsVisitor(
-    val requestBodyFeature: Boolean,
-    val context: BindingContext
+    private val requestBodyFeature: Boolean,
+    private val context: BindingContext
 ) : KtVisitor<List<KtorElement>, KtorElement?>() {
     init {
         println("BeginVisitor")
@@ -51,7 +51,7 @@ internal class ExpressionsVisitor(
         }
     }
 
-    private fun KtExpression.findCallExpression(): KtExpression?{
+    private fun KtExpression.findCallExpression(): KtExpression? {
         val firstChild = firstChild as? KtExpression
         return if (firstChild?.text != "call") {
             firstChild?.findCallExpression()
@@ -69,27 +69,34 @@ internal class ExpressionsVisitor(
             if (parent is EndPoint) {
                 val kotlinType = BindingContextUtils.getTypeNotNull(
                     context,
-                    expression.receiverExpression.findCallExpression() ?: expression)
+                    expression.receiverExpression.findCallExpression() ?: expression
+                )
                 if (!(KotlinBuiltIns.isPrimitiveType(kotlinType) || KotlinBuiltIns.isString(kotlinType))) {
 
                     val jetTypeFqName = kotlinType.getJetTypeFqName(false)
+                    val r = ObjectType(
+                        "object",
+                        mutableMapOf(),
+                        name = jetTypeFqName
+                    )
+
                     if (!classNames.names.contains(jetTypeFqName)) {
 
-                        val r = ObjectType("object",
-                            mutableMapOf(),
-                            name = jetTypeFqName
-                        )
-                        classNames.add(r)
+                        if (requestBodyFeature) {
+                            classNames.add(r)
+                            kotlinType.memberScope
+                                .getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
+                                .forEach { d ->
+                                    val classDescriptorVisitor = ClassDescriptorVisitor(context)
+                                    d.accept(classDescriptorVisitor, r)
+                                    classNames.addAll(classDescriptorVisitor.classNames)
+                                }
 
-                        kotlinType.memberScope
-                            .getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
-                            .forEach { d ->
-                                val classDescriptorVisitor = ClassDescriptorVisitor(context)
-                                d.accept(classDescriptorVisitor, r)
-                                classNames.addAll(classDescriptorVisitor.classNames)
-                            }
-                        parent.body = r
+                            parent.body = r
+                        }
                     }
+                } else {
+                    parent.body = ObjectType(kotlinType.toString().toSwaggerType())
                 }
             }
         }
@@ -108,7 +115,6 @@ internal class ExpressionsVisitor(
             expression.valueArguments.firstOrNull { it !is KtLambdaArgument }?.text?.replace("\"", "")
         if (ExpType.ROUTE.labels.contains(expName)) {
             if (parent == null) {
-                println("Adding new route")
                 resultElement = routePathArg?.let {
                     DocRoute(routePathArg)
                 } ?: run {
@@ -148,9 +154,8 @@ internal class ExpressionsVisitor(
 
     override fun visitLambdaExpression(lambdaExpression: KtLambdaExpression, parent: KtorElement?): List<KtorElement> {
         println("visitLambdaExpression $parent")
-        return lambdaExpression.bodyExpression?.accept(this, parent).also {
-            println("Returning $it from LambdaExpres")
-        } ?: parent?.let { listOf(parent) } ?: emptyList()
+        return lambdaExpression.bodyExpression?.accept(this, parent)
+            ?: parent?.let { listOf(parent) } ?: emptyList()
     }
 
 }

@@ -276,7 +276,7 @@ fun KotlinType.unfoldNestedParameters(params: List<TypeProjection> = this.argume
 
 }
 
-private fun String.toSwaggerType(): String {
+fun String.toSwaggerType(): String {
     return when (this.lowercase()) {
         "int" -> "integer"
         "double" -> "number"

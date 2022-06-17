@@ -36,14 +36,18 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             listOf(
                 SubpluginOption(
                     key = "title",
-                    value = ex.docsTitle
+                    value = ex.title
                 ), SubpluginOption(
                     key = "description",
-                    value = ex.docsDescription
+                    value = ex.description
                 ),
                 SubpluginOption(
                     key = "version",
-                    value = ex.docsVersion
+                    value = ex.version
+                ),
+                SubpluginOption(
+                    key = "requestFeature",
+                    value = ex.requestFeature.toString()
                 )
             ).apply {
                 ex.swaggerJsonPath?.let {

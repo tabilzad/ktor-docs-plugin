@@ -37,11 +37,8 @@ data class OpenApiSpec(
     val info: Info,
     val servers: List<Server> = emptyList(),
     val paths: Map<String, Map<String, Any>>,
-    val components: Components
+    val definitions: Map<String, ObjectType>
 ) {
-
-    data class Components(val schemas: Map<String, ObjectType>)
-
     data class Info(
         val title: String,
         val description: String,
@@ -88,7 +85,8 @@ data class OpenApiSpec(
     ) : OpenApiSpecParam
 
     data class Schema(
-        val `$ref`: String,
+        val type: String,
+        val `$ref`: String?,
     )
 
     data class Response(

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_DESCR
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_REQUEST_FEATURE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_TITLE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_VER
@@ -37,8 +38,8 @@ val Meta.ktorDocs: CliPlugin
                     configuration?.get(ARG_TITLE),
                     configuration?.get(ARG_DESCR),
                     configuration?.get(ARG_VER),
-                    configuration?.get(ARG_VER),
-                    configuration?.get(ARG_REQUEST_FEATURE),
+                    configuration?.get(ARG_PATH),
+                    configuration?.get(ARG_REQUEST_FEATURE)
                 ).let { (title, description, version, jsonPath, requestBody) ->
 
                     val expressionsVisitor = ExpressionsVisitor(
@@ -83,9 +84,7 @@ private fun saveToFile(
             description = description ?: "",
             version = version ?: "1.0"
         ), paths = reduce(routes).convertToSpec(),
-        components = OpenApiSpec.Components(
-            map
-        )
+        definitions = map
     )
     val filePath = containingDirectory.virtualFile.path.split("/main").first() + "/main"
     val resourcesDir = File(filePath).listFiles()?.firstNotNullOf {
@@ -108,9 +107,7 @@ private fun saveToFile(
             val existingSpec = mapper.readValue<OpenApiSpec>(file)
             existingSpec.copy(
                 paths = existingSpec.paths.plus(spec.paths),
-                components = existingSpec.components.copy(
-                    schemas = existingSpec.components.schemas.plus(spec.components.schemas)
-                )
+                definitions = existingSpec.definitions.plus(spec.definitions)
             )
         } catch (ex: Exception) {
             spec
