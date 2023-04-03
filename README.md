@@ -12,7 +12,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.1.60-alpha")
+        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.2.1-alpha")
     }
 }
 
@@ -22,7 +22,7 @@ swagger {
     docsTitle = "Ktor Server"
     docsDescription = "Ktor Server Description"
     docsVersion = "1.0"
-    enableRequestSchemas = true // experimental!
+    requestFeature = true // experimental!
 }
 ```
 
