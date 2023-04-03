@@ -1,4 +1,4 @@
-import com.android.build.gradle.internal.tasks.factory.dependsOn
+//import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
     kotlin("jvm")
@@ -10,8 +10,8 @@ plugins {
 apply("../gradle/signing.gradle.kts")
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.6.10")
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.8.10")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
 }
 gradlePlugin {
     plugins {
@@ -54,9 +54,10 @@ tasks {
             )
         }
     }
-    named("compileKotlin").dependsOn("pluginVersion")
 }
-
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+    dependsOn("pluginVersion")
+}
 
 publishing {
     repositories {

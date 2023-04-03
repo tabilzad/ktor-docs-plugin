@@ -1,19 +1,19 @@
-package io.github.tabilzad.ktor.visitors
 
 import arrow.meta.phases.resolve.unwrappedNotNullableType
 import io.github.tabilzad.ktor.OpenApiSpec.ObjectType
+import io.github.tabilzad.ktor.forEachVariable
 import io.github.tabilzad.ktor.names
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
-import org.jetbrains.kotlin.descriptors.*
+import org.jetbrains.kotlin.descriptors.ClassDescriptor
+import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
+import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
 import org.jetbrains.kotlin.js.descriptorUtils.getJetTypeFqName
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.lazy.ForceResolveUtil
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
-import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 import org.jetbrains.kotlin.resolve.source.getPsi
 import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.TypeProjection
@@ -22,6 +22,7 @@ import org.jetbrains.kotlin.types.typeUtil.asTypeProjection
 import org.jetbrains.kotlin.types.typeUtil.isAny
 import org.jetbrains.kotlin.types.typeUtil.isEnum
 import org.jetbrains.kotlin.types.typeUtil.supertypes
+import org.jetbrains.kotlin.util.removeSuffixIfPresent
 
 class ClassDescriptorVisitor(val context: BindingContext) :
     DeclarationDescriptorVisitorEmptyBodies<ObjectType, ObjectType>() {
@@ -37,22 +38,24 @@ class ClassDescriptorVisitor(val context: BindingContext) :
 
             DescriptorUtils.getClassDescriptorForType(type).let { descr ->
                 parent.type = "array"
-                //parent.properties = null
                 parent.items = ObjectType("object", mutableMapOf())
             }
             parent
         } else {
             parent.type = "object"
             val jetTypeFqName = type.getJetTypeFqName(false)
+            parent.name = jetTypeFqName
             if (!classNames.names.contains(jetTypeFqName)) {
-                parent.name = jetTypeFqName
                 classNames.add(parent)
                 type.memberScope
-                    .getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
-                    .forEach { nestedDescr: DeclarationDescriptor ->
+                    .forEachVariable { nestedDescr: DeclarationDescriptor ->
                         nestedDescr.accept(this, parent)
                     }
             }
+            parent.apply {
+                ref = "#/definitions/$jetTypeFqName"
+            }
+
             parent
         }
     }
@@ -62,11 +65,11 @@ class ClassDescriptorVisitor(val context: BindingContext) :
         parent: ObjectType
     ): ObjectType {
 
-        ForceResolveUtil.forceResolveAllContents(descriptor.annotations);
+        ForceResolveUtil.forceResolveAllContents(descriptor.annotations)
         val type = descriptor.type
         val propertyName = descriptor.resolvePropertyName()
 
-        val h = when {
+        return when {
             KotlinBuiltIns.isPrimitiveType(type.unwrappedNotNullableType) || KotlinBuiltIns.isString(type.unwrappedNotNullableType) -> {
                 var result = parent
                 if (parent.type == "object") {
@@ -92,7 +95,6 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                         val types = type.unfoldNestedParameters().reversed().map {
                             DescriptorUtils.getClassDescriptorForType(it.type)
                         }
-
                         parent.properties?.put(
                             propertyName,
                             types.fold(ObjectType("object", mutableMapOf())) { acc: ObjectType, d: ClassDescriptor ->
@@ -106,22 +108,45 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                                     t.properties = null
                                 } else if (classType.isIterable() || classType.isArrayOrNullableArray()) {
                                     t.type = "array"
-                                    //parent.properties = null
                                     t.items = ObjectType("object", mutableMapOf())
                                 } else if (classType.isEnum()) {
                                     t.type = "string"
-                                    t.enum = classType.memberScope.getClassifierNames()?.map { it.asString() }?.minus("Companion")
+                                    t.enum =
+                                        classType.memberScope.getContributedDescriptors(DescriptorKindFilter.VALUES)
+                                            .map { it.name.asString() }
+                                            .filterNot {
+                                                listOf(
+                                                    "name",
+                                                    "ordinal",
+                                                    "clone",
+                                                    "compareTo",
+                                                    "describeConstable",
+                                                    "equals",
+                                                    "finalize",
+                                                    "getDeclaringClass",
+                                                    "hashCode",
+                                                    "toString"
+                                                ).contains(it)
+                                            }
                                 } else {
                                     t.type = "object"
                                     val jetTypeFqName = classType.getJetTypeFqName(false)
                                     if (!classNames.names.contains(jetTypeFqName)) {
-                                        t.name = jetTypeFqName
-                                        classNames.add(t)
+
+                                        val q = ObjectType(
+                                            "object",
+                                            mutableMapOf(),
+                                            name = jetTypeFqName,
+                                        )
+                                        classNames.add(q)
                                         classType.memberScope
-                                            .getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
-                                            .forEach { nestedDescr: DeclarationDescriptor ->
-                                                nestedDescr.accept(this, t)
+                                            .forEachVariable { nestedDescr: DeclarationDescriptor ->
+                                                nestedDescr.accept(this, q)
                                             }
+                                    }
+                                    t.apply<ObjectType> {
+                                        ref = "#/definitions/$jetTypeFqName"
+                                        properties = null
                                     }
                                 }
                                 acc
@@ -130,18 +155,18 @@ class ClassDescriptorVisitor(val context: BindingContext) :
 
                         parent
                     }
-                    type.isEnum() -> {
-                        val test = type.memberScope.getClassifierNames()?.map { it.asString() }?.minus("Companion")?.toMutableList()
-                            ?: mutableListOf()
 
+                    type.isEnum() -> {
                         val enum =
-                            type.memberScope.getContributedDescriptors(DescriptorKindFilter.VALUES).map { it.name.asString() }
+                            type.memberScope.getContributedDescriptors(DescriptorKindFilter.VALUES)
+                                .map { it.name.asString() }
                                 .filterNot {
                                     listOf(
                                         "name",
                                         "ordinal",
                                         "clone",
                                         "compareTo",
+                                        "describeConstable",
                                         "equals",
                                         "finalize",
                                         "getDeclaringClass",
@@ -150,103 +175,105 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                                     ).contains(it)
                                 }
 
-                        // if (enum.isEmpty()) {
-                        //                enum.add(type.memberScope.getContributedDescriptors(DescriptorKindFilter.VALUES).map { it.name }
-                        //                    .toString())
-                        // }
                         parent.properties?.put(
                             propertyName, ObjectType(
                                 "string", enum =
-                                enum.plus(test)
+                                enum
                             )
                         )
                         parent
                     }
+
                     type.isMap() -> {
                         val types = type.arguments.map {
                             DescriptorUtils.getClassDescriptorForType(it.type)
                         }
-
-                        types.forEach { d ->
-                            val o = ObjectType("object", mutableMapOf()).let { acc: ObjectType ->
-                                val classType = d.defaultType
-                                var t = acc
-                                while (t.items != null) {
-                                    t = t.items!!
-                                }
+                        parent.properties?.put(
+                            propertyName,
+                            types.fold(ObjectType("object", mutableMapOf())) { acc, d ->
+                                val valueClassType = d.defaultType
                                 when {
-                                    KotlinBuiltIns.isPrimitiveType(classType) || KotlinBuiltIns.isString(classType) -> {
-                                        t.type = d.name.asString().toSwaggerType()
-                                        t.properties = null
+                                    KotlinBuiltIns.isPrimitiveType(valueClassType) || KotlinBuiltIns.isString(
+                                        valueClassType
+                                    ) -> {
+                                        acc.additionalProperties = ObjectType(d.name.asString().toSwaggerType())
                                     }
-                                    classType.isIterable() || classType.isArrayOrNullableArray() -> {
-                                        t.type = "array"
-                                        //parent.properties = null
-                                        t.items = ObjectType("object", mutableMapOf())
+
+                                    valueClassType.isIterable() || valueClassType.isArrayOrNullableArray() -> {
+                                        acc.type = "array"
+                                        acc.items = ObjectType("object", mutableMapOf())
+                                        parent.properties?.put(propertyName, acc)
                                     }
-                                    classType.isEnum() -> {
-                                        t.type = "string"
-                                        t.enum = classType.memberScope.getClassifierNames()?.map { it.asString() }?.minus("Companion")
+
+                                    valueClassType.isEnum() -> {
+                                        acc.type = "string"
+                                        acc.enum =
+                                            valueClassType.memberScope.getClassifierNames()?.map { it.asString() }
+                                                ?.minus("Companion")
+                                        parent.properties?.put(propertyName, acc)
                                     }
-                                    KotlinBuiltIns.isAny(classType) -> {
-                                        t.type = "object"
+
+                                    KotlinBuiltIns.isAny(valueClassType) -> {
+                                        acc.type = "object"
                                     }
+
                                     else -> {
-                                        t.type = "object"
+                                        val gName = valueClassType.getJetTypeFqName(false)
+                                        if (!classNames.names.contains(gName)) {
+                                            val q = ObjectType(
+                                                "object",
+                                                mutableMapOf(),
+                                                name = gName,
+                                            )
+                                            classNames.add(q)
 
-                                        if (!classNames.names.contains(name)) {
-                                            t.name = name
-                                            classNames.add(t)
-
-                                            classType.memberScope
-                                                .getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
-                                                .forEach { nestedDescr: DeclarationDescriptor ->
-                                                    nestedDescr.accept(this, t)
+                                            valueClassType.memberScope
+                                                .forEachVariable { nestedDescr: DeclarationDescriptor ->
+                                                    nestedDescr.accept(this, q)
                                                 }
                                         }
+                                        acc.additionalProperties = ObjectType(
+                                            "object",
+                                            ref = "#/definitions/$gName"
+                                        )
                                     }
                                 }
                                 acc
-                            }
-                            parent.properties?.put(propertyName, o)
-                        }
+                            })
                         parent
                     }
-                    type.isAny() ->{
+
+                    type.isAny() -> {
                         parent
                     }
+
                     else -> {
-
-                        val kotlinJsonName = descriptor.annotations
-                            .firstNotNullOfOrNull { it.allValueArguments[Name.identifier("name")]?.value }
-                            ?.toString()
-
                         if (!classNames.names.contains(name)) {
-
-                            val internal = ObjectType("object",
+                            val internal = ObjectType(
+                                "object",
                                 mutableMapOf(),
                                 name = name
                             )
                             classNames.add(internal)
-                            parent.properties?.put(
-                                descriptor.name.asString(),
-                                internal
-                            )
                             type.memberScope
-                                .getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
-                                .forEach { nestedDescr ->
-                                    internal.properties?.put(
-                                        nestedDescr.name.asString(),
-                                        nestedDescr.accept(this, ObjectType("object", mutableMapOf()))
-                                    )
+                                .forEachVariable { nestedDescr ->
+                                    nestedDescr.accept(this, internal)
                                 }
                         }
+
+                        parent.properties?.put(
+                            descriptor.name.asString(),
+                            ObjectType(
+                                "object",
+                                name = name,
+                                ref = "#/definitions/$name"
+                            )
+                        )
                         parent
                     }
                 }
             }
         }
-        return h
     }
 
     private fun PropertyDescriptor.resolvePropertyName(): String =
@@ -268,18 +295,19 @@ fun KotlinType.isMap(): Boolean {
         DefaultBuiltIns.Instance.mutableMap.defaultType.getJetTypeFqName(false)
     ).any { it == jetTypeFqName }
 }
-fun KotlinType.unfoldNestedParameters(params: List<TypeProjection> = this.arguments): List<TypeProjection> {
 
+fun KotlinType.unfoldNestedParameters(params: List<TypeProjection> = this.arguments): List<TypeProjection> {
     return arguments.flatMap {
         it.type.unfoldNestedParameters()
     }.plus(asTypeProjection())
-
 }
 
 fun String.toSwaggerType(): String {
-    return when (this.lowercase()) {
+    return when (val type = this.lowercase().removeSuffixIfPresent("?")) {
         "int" -> "integer"
         "double" -> "number"
-        else -> this.lowercase()
+        "float" -> "number"
+        "long" -> "integer"
+        else -> type
     }
 }

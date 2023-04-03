@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.0"
+    kotlin("jvm") version "1.8.10"
     `maven-publish`
     `java-library`
     signing
@@ -16,11 +16,10 @@ buildscript {
         google()
     }
     dependencies {
-        classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.0")
-        classpath ("com.android.tools.build:gradle:7.0.0")
+        classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
         classpath ("com.vanniktech:gradle-maven-publish-plugin:0.15.0")
         classpath ("org.jetbrains.dokka:dokka-gradle-plugin:1.5.30")
-        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.1.66-alpha")
+        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.2.1-alpha")
     }
 }
 

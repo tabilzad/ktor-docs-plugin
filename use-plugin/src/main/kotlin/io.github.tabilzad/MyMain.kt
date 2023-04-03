@@ -2,9 +2,9 @@ package io.github.tabilzad
 
 import com.squareup.moshi.Json
 import io.github.tabilzad.ktor.KtorDocs
-import io.ktor.application.*
-import io.ktor.request.*
-import io.ktor.routing.*
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
 
 data class Sample(
     val a: Map<String, String>,

@@ -5,12 +5,15 @@
     "description" : "Ktor Server Description",
     "version" : "1.0"
   },
-  "servers" : [ ],
   "paths" : {
     "/v1/digitalOrder" : {
       "post" : {
         "description" : "",
-        "responses" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "TBD"
+          }
+        },
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ]
       },
@@ -20,14 +23,18 @@
         "required" : true,
         "schema" : {
           "type" : "object",
-          "$ref" : "#/definitions/Sample"
+          "$ref" : "#/definitions/io.github.tabilzad.Sample"
         }
       } ]
     },
     "/v1/order/myOrder" : {
       "get" : {
         "description" : "",
-        "responses" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "TBD"
+          }
+        },
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ]
       },
@@ -36,7 +43,11 @@
     "/v1/order" : {
       "post" : {
         "description" : "",
-        "responses" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "TBD"
+          }
+        },
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ]
       },
@@ -45,14 +56,19 @@
         "in" : "body",
         "required" : true,
         "schema" : {
-          "type" : "object"
+          "type" : "object",
+          "$ref" : "#/definitions/io.github.tabilzad.Sample"
         }
       } ]
     },
     "/v1/order/localsave" : {
       "post" : {
         "description" : "",
-        "responses" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "TBD"
+          }
+        },
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ]
       },
@@ -61,14 +77,18 @@
         "in" : "body",
         "required" : true,
         "schema" : {
-          "type" : "integer"
+          "type" : "string"
         }
       } ]
     },
     "/v1/order/print" : {
       "post" : {
         "description" : "",
-        "responses" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "TBD"
+          }
+        },
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ]
       },
@@ -84,7 +104,11 @@
     "/v1/orders" : {
       "get" : {
         "description" : "",
-        "responses" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "TBD"
+          }
+        },
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ]
       },
@@ -93,7 +117,11 @@
     "/v1/orders/{order_id}" : {
       "get" : {
         "description" : "",
-        "responses" : [ ],
+        "responses" : {
+          "200" : {
+            "description" : "TBD"
+          }
+        },
         "consumes" : [ "application/json" ],
         "produces" : [ "application/json" ]
       },
@@ -106,59 +134,31 @@
     }
   },
   "definitions" : {
-    "Sample" : {
+    "io.github.tabilzad.Sample" : {
       "type" : "object",
       "properties" : {
         "a" : {
-          "type" : "string"
+          "type" : "object",
+          "properties" : { },
+          "additionalProperties" : {
+            "type" : "string"
+          }
         },
         "b" : {
           "type" : "object",
-          "properties" : {
-            "h" : {
-              "type" : "object",
-              "properties" : {
-                "h" : {
-                  "type" : "array",
-                  "properties" : { },
-                  "items" : {
-                    "type" : "array",
-                    "properties" : { },
-                    "items" : {
-                      "type" : "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "name" : "io.github.tabilzad.More"
+          "$ref" : "#/definitions/io.github.tabilzad.More"
         },
         "c" : {
           "type" : "array",
           "properties" : { },
           "items" : {
             "type" : "object",
-            "properties" : {
-              "h" : {
-                "type" : "array",
-                "properties" : { },
-                "items" : {
-                  "type" : "array",
-                  "properties" : { },
-                  "items" : {
-                    "type" : "string"
-                  }
-                }
-              }
-            },
-            "name" : "io.github.tabilzad.More"
+            "$ref" : "#/definitions/io.github.tabilzad.More"
           }
         }
-      },
-      "name" : "io.github.tabilzad.Sample"
+      }
     },
-    "More" : {
+    "io.github.tabilzad.More" : {
       "type" : "object",
       "properties" : {
         "h" : {
@@ -172,8 +172,7 @@
             }
           }
         }
-      },
-      "name" : "io.github.tabilzad.More"
+      }
     }
   }
 }
