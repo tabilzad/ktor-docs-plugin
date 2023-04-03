@@ -47,13 +47,28 @@ val Meta.ktorDocs: CliPlugin
                         declarationCheckerContext
                             .trace.bindingContext
                     )
-                    val routes = ktDeclaration.accept(
+                    val rawRoutes = ktDeclaration.accept(
                         expressionsVisitor, null
-                    ).first() as DocRoute
+                    ) as List<DocRoute>
 
+
+                    val routes: List<DocRoute> = if (rawRoutes.any { it !is DocRoute }) {
+                        val p = rawRoutes.partition { it is DocRoute }
+                        val docRoutes = p.first as List<DocRoute>
+                        docRoutes.plus(DocRoute("/", p.second.toMutableList()))
+                    } else {
+                        rawRoutes as List<DocRoute>
+                    }
 
                     val components = expressionsVisitor.classNames
-                        .associateBy { it.name?.split(".")?.last() ?: "UNKNOWN" }
+                        .associateBy { it.name ?: "UNKNOWN" }
+                        .mapValues { (k, v) ->
+                            if (v.properties.isNullOrEmpty()) {
+                                v.copy(properties = null)
+                            } else {
+                                v
+                            }
+                        }
 
                     saveToFile(
                         containingDirectory = containingDirectory,
@@ -71,19 +86,29 @@ val Meta.ktorDocs: CliPlugin
 
 private fun saveToFile(
     containingDirectory: PsiDirectory,
-    routes: DocRoute,
+    routes: List<DocRoute>,
     description: String?,
     version: String?,
     title: String?,
     jsonPath: String?,
     map: Map<String, OpenApiSpec.ObjectType>
 ) {
+    val reducedRoutes = routes
+        .map {
+            reduce(it)
+                .cleanPaths()
+                .convertToSpec()
+        }
+        .reduce { acc, route ->
+            acc.plus(route)
+        }
+
     val spec = OpenApiSpec(
         info = OpenApiSpec.Info(
             title = title ?: "Server",
             description = description ?: "",
             version = version ?: "1.0"
-        ), paths = reduce(routes).convertToSpec(),
+        ), paths = reducedRoutes,
         definitions = map
     )
     val filePath = containingDirectory.virtualFile.path.split("/main").first() + "/main"

@@ -13,6 +13,7 @@ import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_VER
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
@@ -30,6 +31,7 @@ object SwaggerConfigurationKeys {
     val ARG_REQUEST_FEATURE = CompilerConfigurationKey.create<String>(OPTION_REQUEST_BODY)
 }
 
+@OptIn(ExperimentalCompilerApi::class)
 class KtorDocsCommandLineProcessor : CommandLineProcessor {
     companion object {
         private val titleOption = CliOption(

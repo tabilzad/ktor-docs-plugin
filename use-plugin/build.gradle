@@ -16,10 +16,10 @@ repositories {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.7.0"
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10'
     implementation "com.squareup.moshi:moshi:1.13.0"
-    implementation "io.ktor:ktor:1.6.7"
-    implementation "io.ktor:ktor-server-netty:1.6.7"
+    implementation 'io.ktor:ktor:2.2.4'
+    implementation 'io.ktor:ktor-server-netty:2.2.4'
 }
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"

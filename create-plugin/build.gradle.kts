@@ -5,20 +5,23 @@ plugins {
 }
 apply("../gradle/signing.gradle.kts")
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.6.10")
-    implementation("io.arrow-kt:arrow-meta:1.6.1-alpha.5")
-    implementation("com.squareup.moshi:moshi:1.13.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
-    testImplementation("io.arrow-kt:arrow-meta-test:1.6.1-SNAPSHOT")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.4.9")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.4.9")
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.8.10")
+    implementation("io.arrow-kt:arrow-meta:1.6.1")
+    implementation("com.squareup.moshi:moshi:1.14.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
+    testImplementation("io.arrow-kt:arrow-meta-test:1.6.1")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.5.0")
     testImplementation("junit:junit:4.13.2")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.10")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
 }
 
 java {
     withSourcesJar()
     withJavadocJar()
+}
+repositories {
+    mavenCentral()
 }
 signing {
     sign(publishing.publications)
