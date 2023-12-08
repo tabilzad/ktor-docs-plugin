@@ -1,7 +1,7 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm'
+    id 'io.github.tabilzad.ktor-docs-plugin-gradle'
 }
-apply plugin: 'io.github.tabilzad.ktor-docs-plugin-gradle'
 
 swagger {
     title = "Ktor Server Title"
@@ -21,9 +21,4 @@ dependencies {
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.10'
     implementation 'io.ktor:ktor:2.2.4'
     implementation 'io.ktor:ktor-server-netty:2.2.4'
-}
-compileKotlin {
-    kotlinOptions.jvmTarget = "1.8"
-    kotlinOptions.freeCompilerArgs = ["-verbose"]
-    println(kotlinOptions.freeCompilerArgs)
 }
