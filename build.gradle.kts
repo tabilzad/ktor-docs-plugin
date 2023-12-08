@@ -14,8 +14,8 @@ buildscript {
         mavenCentral()
         gradlePluginPortal()
         google()
-        flatDir {
-            dirs("use-plugin/libs")
+        maven {
+            url = uri("file://${project.rootDir}/use-plugin/libs")
         }
     }
     dependencies {

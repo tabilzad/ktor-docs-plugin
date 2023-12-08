@@ -11,16 +11,16 @@ dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.10")
     compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
 }
-gradlePlugin {
-    plugins {
-        create("simplePlugin") {
-            id = "io.github.tabilzad.ktor-docs-plugin-gradle"
-            displayName = "Ktor Docs Generator"
-            description = "Ktor Docs Generator plugin"
-            implementationClass = "io.github.tabilzad.ktor.KtorMetaPlugin"
-        }
-    }
-}
+//gradlePlugin {
+//    plugins {
+//        create("simplePlugin") {
+//            id = "io.github.tabilzad.ktor-docs-plugin-gradle"
+//            displayName = "Ktor Docs Generator"
+//            description = "Ktor Docs Generator plugin"
+//            implementationClass = "io.github.tabilzad.ktor.KtorMetaPlugin"
+//        }
+//    }
+//}
 
 java {
     withSourcesJar()
