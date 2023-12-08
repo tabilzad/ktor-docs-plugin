@@ -19,7 +19,7 @@ buildscript {
         classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
         classpath ("com.vanniktech:gradle-maven-publish-plugin:0.15.0")
         classpath ("org.jetbrains.dokka:dokka-gradle-plugin:1.5.30")
-        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.3.0-alpha")
+        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.2.1-alpha")
     }
 }
 
