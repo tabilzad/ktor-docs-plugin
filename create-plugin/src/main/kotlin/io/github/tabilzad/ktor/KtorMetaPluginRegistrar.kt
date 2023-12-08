@@ -122,11 +122,6 @@ private fun saveToFile(
             schemas = map
         )
     )
-
-// jacksonObjectMapper().apply {
-//        enable(SerializationFeature.INDENT_OUTPUT)
-//        setSerializationInclusion(JsonInclude.Include.NON_NULL)
-//    }.writeValueAsString(spec)
     writeToFile(containingDirectory, jsonPath, spec)
 }
 
@@ -141,8 +136,8 @@ fun PsiDirectory.locateOrCreateSwaggerFile(customPath: String?): File {
             } else {
                 null
             }
-        } ?: throw IllegalAccessException("error")
-        val dir = File("$filePath/$resourcesDir/raw/")
+        } ?: throw IllegalAccessException("Can't find resources directory to save openapi.json")
+        val dir = File("$filePath/$resourcesDir/docs/")
         dir.mkdir()
         File(dir.path + "/openapi.json")
     }
