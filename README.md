@@ -3,9 +3,9 @@
 This plugin implements a plug and play solution to support OpenAPI (Swagger) for Ktor server with minimal effort.
 Annotate your route(s) definition with `@KtorDocs` and `openapi.json` will be generated at build time.
 
-Take a look at `use-plugin` module to reference the plugin gradle set and `StabilityTests` to see all the supported features.
+Take a look at `use-plugin` module to reference the plugin gradle setup and `StabilityTests` to see all the supported features.
 
-## How to apply plugin
+## How to apply the plugin
 
 ```groovy
 buildscript {
@@ -28,7 +28,7 @@ swagger {
 }
 ```
 
-## How to use
+## How to use the plugin
 
 ### Generating endpoint specifications
 Annotate the specific route definitions you want the OpenAPI specification to be generated for. 
@@ -45,7 +45,7 @@ fun Route.ordersRouting() {
 
 ```
 
-You could also annotate the entire `Application` module with multiple route definitions. The plugin will recursively visit each `Route`. extension and generate their documentation. 
+You could also annotate the entire `Application` module with multiple/nested route definitions. The plugin will recursively visit each `Route`. extension and generate its documentation. 
 ```kotlin
 
 @KtorDocs
