@@ -1,5 +1,3 @@
-//import com.android.build.gradle.internal.tasks.factory.dependsOn
-
 plugins {
     kotlin("jvm")
     id("java-gradle-plugin")

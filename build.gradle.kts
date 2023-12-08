@@ -29,12 +29,11 @@ subprojects {
     repositories {
         mavenCentral()
         gradlePluginPortal()
-        //maven { url ("https://jitpack.io") }
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
-            jvmTarget = "1.8"
+            jvmTarget = "11"
         }
     }
 
