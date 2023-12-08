@@ -24,21 +24,30 @@ fun MemberScope.forEachVariable(predicate: (PropertyDescriptor) -> Unit) {
         }
 }
 
-val Iterable<OpenApiSpec.ObjectType>.names get() = mapNotNull { it.name }
+val Iterable<OpenApiSpec.ObjectType>.names get() = mapNotNull { it.fqName }
+
+fun String?.addLeadingSlash() = when {
+    this == null -> null
+    else -> if (this.startsWith("/")) this else "/$this"
+}
+
 fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { child ->
     when (child) {
         is DocRoute -> {
             reduce(
-                child.copy(path = e.path + child.path)
+                child.copy(path = e.path + child.path.addLeadingSlash())
             )
         }
 
         is EndPoint -> {
             listOf(
                 KtorRouteSpec(
-                    path = e.path + (child.path ?: ""),
+                    path = e.path + (child.path.addLeadingSlash() ?: ""),
                     method = child.method,
-                    body = child.body
+                    body = child.body,
+                    summary = child.summary,
+                    description = child.description,
+                    queryParameters = child.queryParameters
                 )
             )
         }
@@ -50,58 +59,78 @@ fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { child ->
 }
 
 fun List<KtorRouteSpec>.cleanPaths() = map {
-    it.copy(path = it.path.replace("//", "/"))
+    it.copy(
+        path = it.path
+            .replace("//", "/")
+            .replace("?", "")
+    )
 }
 
 fun List<KtorRouteSpec>.convertToSpec() = associate {
     it.path to mapOf(
-        it.method to Path()
-    ).run {
-        compute(
-            { addPathParams(it) },
-            { addPostBody(it) }
+        it.method to Path(
+            summary = it.summary,
+            description = it.description,
+            parameters = addPathParams(it) merge addQueryParams(it),
+            requestBody = addPostBody(it)
         )
-    }
+    )
 }
 
-fun Map<String, Path>.compute(
-    vararg modifiers: () -> List<OpenApiSpecParam>
-) = modifiers.flatMap { it() }.let {
-    this.plus(mapOf("parameters" to it))
-}
+infix fun <T> List<T>?.merge(params: List<T>?): List<T>? = this?.plus(params ?: emptyList()) ?: params
+//fun compute(
+//    vararg modifiers: () -> List<OpenApiSpecParam>
+//) = modifiers.flatMap { it() }
 
-private fun addPathParams(it: KtorRouteSpec): List<PathParam> {
+private fun addPathParams(it: KtorRouteSpec): List<PathParam>? {
     val params = "\\{([^}]*)}".toRegex().findAll(it.path).toList()
     return if (params.isNotEmpty()) {
-        params.map {
-            PathParam(
-                name = it.groups[1]?.value ?: "",
-                `in` = "path",
-                required = true,
-                type = "string"
-            )
+        params.mapNotNull {
+            val pathParamName = it.groups[1]?.value
+            if (pathParamName.isNullOrBlank()) {
+                null
+            } else {
+                PathParam(
+                    name = pathParamName.replace("?", ""),
+                    `in` = "path",
+                    required = true,
+                    schema = SchemaType("string")
+                )
+            }
         }
     } else {
-        emptyList()
+        null
     }
 }
 
-private fun addPostBody(it: KtorRouteSpec): List<BodyParam> {
-    return if (it.method == "post") {
-        val ref = it.body.name
-        listOf(
-            BodyParam(
-                name = "request",
-                `in` = "body",
-                schema = Schema(
-                    it.body.type, if (ref == null) {
-                        it.body.ref
-                    } else "#/definitions/$ref"
+private fun addQueryParams(it: KtorRouteSpec): List<PathParam>? {
+    return it.queryParameters?.map {
+        PathParam(
+            name = it,
+            `in` = "query",
+            required = false,
+            schema = SchemaType("string")
+        )
+
+    }
+}
+
+private fun addPostBody(it: KtorRouteSpec): RequestBody? {
+    return if (it.method == "post" && it.body.contentBodyRef != null) {
+
+        //val ref = it.body.name
+        RequestBody(
+            required = true,
+            content = mapOf(
+                ContentType.APPLICATION_JSON to mapOf(
+                    "schema" to SchemaRef(
+                        "${it.body.contentBodyRef}"
+                    )
                 )
             )
         )
     } else {
-        emptyList()
+        null
     }
 }
 
@@ -132,7 +161,7 @@ operator fun OutputStream.plusAssign(str: String) {
     this.write(str.toByteArray())
 }
 
-object HttpCodeResolver{
+object HttpCodeResolver {
     fun resolve(code: String?): String = codes[code] ?: "200"
     private val codes = mapOf(
         "Continue" to "100",

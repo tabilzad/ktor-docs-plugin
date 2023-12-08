@@ -13,16 +13,22 @@ import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_REQUEST_FEATURE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_TITLE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_VER
-import io.github.tabilzad.ktor.visitors.ExpressionsVisitor
+import io.github.tabilzad.ktor.visitors.ExpressionVisitor
 import org.jetbrains.kotlin.com.intellij.psi.PsiDirectory
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
+import org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
 
-open class KtorMetaPluginRegistrar : Meta {
+open class KtorMetaPluginRegistrar : Meta() {
     override fun intercept(ctx: CompilerContext): List<CliPlugin> = listOf(ktorDocs)
+}
+
+object PluginLifeCycle {
+    val started: AtomicBoolean = AtomicBoolean(false)
 }
 
 val Meta.ktorDocs: CliPlugin
@@ -30,10 +36,8 @@ val Meta.ktorDocs: CliPlugin
         meta(declarationChecker { ktDeclaration: KtDeclaration,
                                   declarationDescriptor: DeclarationDescriptor,
                                   declarationCheckerContext: DeclarationCheckerContext ->
-            if (ktDeclaration.hasAnnotation(KtorDocs::class.simpleName!!)) {
-                val function = ktDeclaration as KtNamedFunction
-                val containingDirectory = function.containingFile.containingDirectory
 
+            if (ktDeclaration.hasAnnotation(KtorDocs::class.simpleName!!)) {
                 listOf(
                     configuration?.get(ARG_TITLE),
                     configuration?.get(ARG_DESCR),
@@ -42,15 +46,20 @@ val Meta.ktorDocs: CliPlugin
                     configuration?.get(ARG_REQUEST_FEATURE)
                 ).let { (title, description, version, jsonPath, requestBody) ->
 
-                    val expressionsVisitor = ExpressionsVisitor(
-                        requestBody?.toBoolean() ?: false,
-                        declarationCheckerContext
-                            .trace.bindingContext
-                    )
+                    val containingDirectory = ktDeclaration.containingFile.containingDirectory
+                    if (PluginLifeCycle.started.compareAndSet(false, true)) {
+                        //clear the existing swagger spec at plugin startup
+                        containingDirectory.locateOrCreateSwaggerFile(jsonPath).apply {
+                            writeText("")
+                        }
+                    }
+
+                    val context = declarationCheckerContext.trace.bindingContext
+
+                    val expressionsVisitor = ExpressionVisitor(requestBody?.toBoolean() ?: false, context)
                     val rawRoutes = ktDeclaration.accept(
                         expressionsVisitor, null
-                    ) as List<DocRoute>
-
+                    )
 
                     val routes: List<DocRoute> = if (rawRoutes.any { it !is DocRoute }) {
                         val p = rawRoutes.partition { it is DocRoute }
@@ -61,15 +70,15 @@ val Meta.ktorDocs: CliPlugin
                     }
 
                     val components = expressionsVisitor.classNames
-                        .associateBy { it.name ?: "UNKNOWN" }
+                        .associateBy { it.fqName ?: "UNKNOWN" }
                         .mapValues { (k, v) ->
-                            if (v.properties.isNullOrEmpty()) {
+                            val objectDefinition = if (v.properties.isNullOrEmpty()) {
                                 v.copy(properties = null)
                             } else {
                                 v
                             }
+                            objectDefinition
                         }
-
                     saveToFile(
                         containingDirectory = containingDirectory,
                         routes = routes,
@@ -109,21 +118,42 @@ private fun saveToFile(
             description = description ?: "",
             version = version ?: "1.0"
         ), paths = reducedRoutes,
-        definitions = map
+        components = OpenApiComponents(
+            schemas = map
+        )
     )
-    val filePath = containingDirectory.virtualFile.path.split("/main").first() + "/main"
-    val resourcesDir = File(filePath).listFiles()?.firstNotNullOf {
-        if (listOf("res", "resources").contains(it.name)) {
-            it.name
-        } else {
-            null
-        }
-    } ?: throw IllegalAccessException("error")
-    val customDir = jsonPath ?: "raw"
-    val dir = File("$filePath/$resourcesDir/$customDir/")
-    dir.mkdir()
-    val file = File(dir.path + "/swagger.json")
 
+// jacksonObjectMapper().apply {
+//        enable(SerializationFeature.INDENT_OUTPUT)
+//        setSerializationInclusion(JsonInclude.Include.NON_NULL)
+//    }.writeValueAsString(spec)
+    writeToFile(containingDirectory, jsonPath, spec)
+}
+
+fun PsiDirectory.locateOrCreateSwaggerFile(customPath: String?): File {
+    return if (customPath != null) {
+        File("$customPath/openapi.json")
+    } else {
+        val filePath = virtualFile.path.split("/main").first() + "/main"
+        val resourcesDir = File(filePath).listFiles()?.firstNotNullOf {
+            if (listOf("res", "resources").contains(it.name)) {
+                it.name
+            } else {
+                null
+            }
+        } ?: throw IllegalAccessException("error")
+        val dir = File("$filePath/$resourcesDir/raw/")
+        dir.mkdir()
+        File(dir.path + "/openapi.json")
+    }
+}
+
+private fun writeToFile(
+    containingDirectory: PsiDirectory,
+    jsonPath: String?,
+    spec: OpenApiSpec
+) {
+    val file = containingDirectory.locateOrCreateSwaggerFile(jsonPath)
     jacksonObjectMapper().apply {
         enable(SerializationFeature.INDENT_OUTPUT)
         setSerializationInclusion(JsonInclude.Include.NON_NULL)
@@ -132,7 +162,7 @@ private fun saveToFile(
             val existingSpec = mapper.readValue<OpenApiSpec>(file)
             existingSpec.copy(
                 paths = existingSpec.paths.plus(spec.paths),
-                definitions = existingSpec.definitions.plus(spec.definitions)
+                components = OpenApiComponents(existingSpec.components.schemas.plus(spec.components.schemas))
             )
         } catch (ex: Exception) {
             spec
@@ -141,6 +171,7 @@ private fun saveToFile(
     }
 }
 
+@OptIn(UnsafeCastFunction::class)
 fun KtAnnotated.hasAnnotation(
     vararg annotationNames: String
 ): Boolean {
@@ -149,4 +180,11 @@ fun KtAnnotated.hasAnnotation(
         it.typeReference?.typeElement?.safeAs<KtUserType>()?.referencedName in names
     }
     return annotationEntries.any(predicate)
+}
+
+@OptIn(UnsafeCastFunction::class)
+fun KtAnnotated.findAnnotation(
+    annotationName: String
+): KtAnnotationEntry? = annotationEntries.find {
+    it.typeReference?.typeElement?.safeAs<KtUserType>()?.referencedName == annotationName
 }

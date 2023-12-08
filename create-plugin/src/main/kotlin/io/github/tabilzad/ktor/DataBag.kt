@@ -11,8 +11,11 @@ interface OpenApiSpecParam {
 
 data class KtorRouteSpec(
     val path: String,
+    val queryParameters: List<String>?,
     val method: String,
-    val body: OpenApiSpec.ObjectType
+    val body: OpenApiSpec.ObjectType,
+    val summary: String?,
+    val description: String?
 )
 
 interface KtorElement {
@@ -21,14 +24,17 @@ interface KtorElement {
 
 enum class ExpType(val labels: List<String>) {
     ROUTE(listOf("route")),
-    METHOD(listOf("get", "post", "put", "patch")),
+    METHOD(listOf("get", "post", "put", "patch", "delete")),
     RECEIVE(listOf("receive"))
 }
 
 data class EndPoint(
     override var path: String?,
     val method: String = "",
-    var body: OpenApiSpec.ObjectType = OpenApiSpec.ObjectType("object"),
+    var body: OpenApiSpec.ObjectType = OpenApiSpec.ObjectType(type = "object"),
+    var queryParameters: List<String>? = null,
+    var description: String? = null,
+    var summary: String? = null
     //var responses: OpenApiSpec.Response = OpenApiSpec.Response(emptyMap())
 ) : KtorElement
 
@@ -37,11 +43,22 @@ data class DocRoute(
     val children: MutableList<KtorElement> = mutableListOf()
 ) : KtorElement
 
+enum class ContentType{
+    @JsonProperty("application/json")
+    APPLICATION_JSON;
+}
+
+typealias ContentSchema = Map<String, OpenApiSpec.SchemaRef>
+
+typealias RequestBodyContent = Map<ContentType, ContentSchema>
+data class OpenApiComponents(
+    val schemas: Map<String, OpenApiSpec.ObjectType>
+)
 data class OpenApiSpec(
-    val swagger: String = "2.0",
+    val openapi: String = "3.1.0",
     val info: Info,
     val paths: Map<String, Map<String, Any>>,
-    val definitions: Map<String, ObjectType>
+    val components: OpenApiComponents
 ) {
     data class Info(
         val title: String,
@@ -55,47 +72,51 @@ data class OpenApiSpec(
     )
 
     data class Path(
-        val description: String = "",
+        val summary: String? = "",
+        val description: String? = "",
         val responses: Map<String, ResponseDetails> = mapOf("200" to ResponseDetails("TBD")),
-        val consumes: List<String> = listOf("application/json"),
-        val produces: List<String> = listOf("application/json")
+        val parameters: List<PathParam>? = null,
+        val requestBody: RequestBody? = null
     )
 
     data class RequestBody(
-        val required: List<String>,
-        val properties: Map<String, Schema>
+        val required: Boolean,
+        val content: RequestBodyContent
     )
 
+    interface AnyObject{
+        var fqName: String?
+    }
     data class ObjectType(
-        var type: String,
+        var type: String?,
         var properties: MutableMap<String, ObjectType>? = null,
         var items: ObjectType? = null,
         var enum: List<String>? = null,
         @JsonIgnore
-        var name: String? = null,
+        override var fqName: String? = null,
+        var description: String? = null,
         @JsonProperty("\$ref")
         var ref: String? = null,
-        var additionalProperties: ObjectType? = null
-    )
 
+        @JsonIgnore
+        var contentBodyRef: String? = null,
+        // var discriminator: InternalDiscriminator? = null,
+        var additionalProperties: ObjectType? = null
+    ): AnyObject
 
     data class PathParam(
         override val name: String,
         override val `in`: String,
         override val required: Boolean = true,
+        val schema: SchemaType,
+    ) : OpenApiSpecParam
+
+    data class SchemaRef(
+        val `$ref`: String,
+    )
+
+    data class SchemaType(
         val type: String
-    ) : OpenApiSpecParam
-
-    data class BodyParam(
-        override val name: String,
-        override val `in`: String = "body",
-        override val required: Boolean = true,
-        val schema: Schema
-    ) : OpenApiSpecParam
-
-    data class Schema(
-        val type: String,
-        val `$ref`: String?,
     )
 
     data class ResponseDetails(
