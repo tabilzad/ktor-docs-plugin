@@ -110,8 +110,9 @@ fun Route.ordersRouting() {
 }
 ```
 
-Sample
+Sample Specification
 
-![image](https://user-images.githubusercontent.com/16094286/172687047-b102b577-b252-4e33-af52-7a89a639c131.png)
+![image](https://github.com/tabilzad/ktor-docs-plugin/assets/16094286/84f94b0c-8064-4314-ac27-afc422a7f5a0)
+
 
 
