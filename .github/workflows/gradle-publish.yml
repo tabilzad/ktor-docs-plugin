@@ -1,8 +1,6 @@
 name: Publish to SonarType
 
-on:
-  release:
-    types: [created]
+on: workflow_dispatch
 
 jobs:
   build:
