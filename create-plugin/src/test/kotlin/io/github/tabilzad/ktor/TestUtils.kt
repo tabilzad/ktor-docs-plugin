@@ -71,6 +71,11 @@ fun getTestConfig(testFilePath: String): List<Config> {
             ),
             PluginOption(
                 clp.pluginId,
+                KtorDocsCommandLineProcessor.titleOption.optionName,
+                "Server"
+            ),
+            PluginOption(
+                clp.pluginId,
                 KtorDocsCommandLineProcessor.descOption.optionName,
                 "test"
             ),

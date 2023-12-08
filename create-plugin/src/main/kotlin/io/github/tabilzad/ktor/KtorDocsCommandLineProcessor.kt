@@ -34,7 +34,7 @@ object SwaggerConfigurationKeys {
 @OptIn(ExperimentalCompilerApi::class)
 class KtorDocsCommandLineProcessor : CommandLineProcessor {
     companion object {
-        private val titleOption = CliOption(
+        val titleOption = CliOption(
             OPTION_TITLE,
             "Server title/name",
             "Ktor Swagger page title",
@@ -46,11 +46,11 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             "Description of Ktor Server",
             false
         )
-        private val versionOption = CliOption(
+        val versionOption = CliOption(
             OPTION_VER,
             "Server version",
             "Ktor Server version",
-            true
+            false
         )
         val pathOption = CliOption(
             OPTION_PATH,
