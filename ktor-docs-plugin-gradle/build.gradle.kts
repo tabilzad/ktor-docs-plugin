@@ -10,8 +10,8 @@ plugins {
 apply("../gradle/signing.gradle.kts")
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.8.10")
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.10")
+    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
 }
 gradlePlugin {
     plugins {

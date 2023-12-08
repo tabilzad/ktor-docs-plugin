@@ -4,24 +4,34 @@ plugins {
     signing
 }
 apply("../gradle/signing.gradle.kts")
+repositories {
+    mavenCentral()
+}
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.8.10")
-    implementation("io.arrow-kt:arrow-meta:1.6.1")
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.10")
+
+    implementation("io.arrow-kt:arrow-meta:1.6.2") // test debug
     implementation("com.squareup.moshi:moshi:1.14.0")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
-    testImplementation("io.arrow-kt:arrow-meta-test:1.6.1")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.5.0")
-    testImplementation("junit:junit:4.13.2")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.8.10")
-}
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
 
+
+    testImplementation ("io.arrow-kt:arrow-meta-test:1.6.2")
+    testImplementation ("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
+    testImplementation ("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.5.0")
+    testImplementation ("io.ktor:ktor:2.2.4")
+    testImplementation ("io.ktor:ktor-server-netty:2.2.4")
+
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation(platform("org.junit:junit-bom:5.10.0"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+}
 java {
     withSourcesJar()
     withJavadocJar()
 }
-repositories {
-    mavenCentral()
+tasks.test {
+    useJUnitPlatform()
 }
 signing {
     sign(publishing.publications)

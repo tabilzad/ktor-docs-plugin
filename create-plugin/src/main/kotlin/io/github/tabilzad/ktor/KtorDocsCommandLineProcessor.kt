@@ -52,13 +52,13 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             "Ktor Server version",
             true
         )
-        private val pathOption = CliOption(
+        val pathOption = CliOption(
             OPTION_PATH,
             "Server version",
             "Ktor Server version",
             false
         )
-        private val requestSchema = CliOption(
+        val requestSchema = CliOption(
             OPTION_REQUEST_BODY,
             "Request Schema",
             "Enable request body definitions",
