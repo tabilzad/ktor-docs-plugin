@@ -19,7 +19,6 @@ jobs:
         server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
         settings-path: ${{ github.workspace }} # location for the settings.xml file
 
-          # Base64 decodes and pipes the GPG key content into the secret file
     - name: Import GPG Key
       uses: crazy-max/ghaction-import-gpg@v1
       env:
@@ -35,6 +34,12 @@ jobs:
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
         arguments: :create-plugin:publishSonartypePublicationToSonartypeRepository
+      env:
+        OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        SIGNING_KEY_ID: ${{ secrets.SIGNING_KEY_ID }}
+        SIGNING_PASSWORD: ${{ secrets.SIGNING_PASSWORD }}
+        SIGNING_SECRET_KEY_RING_FILE: ${{ secrets.SIGNING_SECRET_KEY_RING_FILE }}
 
     - name: Publish Ktor Gradle Plugin to Maven Central
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
