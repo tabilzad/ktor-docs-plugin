@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <groupId>io.github.tabilzad</groupId>
+  <artifactId>ktor-docs-plugin</artifactId>
+  <versioning>
+    <latest>0.3.0-alpha</latest>
+    <release>0.3.0-alpha</release>
+    <versions>
+      <version>0.3.0-alpha</version>
+    </versions>
+    <lastUpdated>20231208015322</lastUpdated>
+  </versioning>
+</metadata>
