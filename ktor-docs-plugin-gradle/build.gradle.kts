@@ -27,9 +27,10 @@ java {
     withJavadocJar()
 }
 signing {
-    val signingKey = extra["signing.keyId"].toString()
+    val signingKeId = extra["signing.keyId"].toString()
+    val signingKey = extra["signing.secretKey"].toString()
     val signingPassword = extra["signing.password"].toString()
-    useInMemoryPgpKeys(signingKey, signingPassword)
+    useInMemoryPgpKeys(signingKeId, signingKey, signingPassword)
     sign(publishing.publications)
 }
 val versionDirectory = "$buildDir/generated/version/"
