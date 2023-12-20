@@ -34,6 +34,9 @@ tasks.test {
     useJUnitPlatform()
 }
 signing {
+    val signingKey = extra["signing.keyId"].toString()
+    val signingPassword = extra["signing.password"].toString()
+    useInMemoryPgpKeys(signingKey, signingPassword)
     sign(publishing.publications)
 }
 publishing {
