@@ -21,9 +21,9 @@ jobs:
 
     - name: Import GPG Key
       uses: crazy-max/ghaction-import-gpg@v1
-      env:
-        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
-        PASSPHRASE: ${{ secrets.SIGNING_PASSWORD }}
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
+        passphrase: ${{ secrets.SIGNING_PASSWORD }}
 
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
