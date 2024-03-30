@@ -1,6 +1,6 @@
 package sources
 
-import io.ktor.server.application.*
+import io.ktor.server.application.Application
 import io.ktor.server.routing.*
 import sources.annotations.KtorDescription
 import sources.annotations.KtorDocs

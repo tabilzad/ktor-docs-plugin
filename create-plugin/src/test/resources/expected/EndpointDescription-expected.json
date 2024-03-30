@@ -1,42 +1,27 @@
 {
   "openapi" : "3.1.0",
   "info" : {
-    "title" : "Server",
+    "title" : "Open API Specification",
     "description" : "test",
-    "version" : "1.0"
+    "version" : "1.0.0"
   },
   "paths" : {
     "/base/moreBase/getMixedExplicitParamName" : {
       "get" : {
         "summary" : "My Summary",
-        "description" : "My Description",
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        }
+        "description" : "My Description"
       }
     },
     "/base/moreBase/getExplicitParamName" : {
       "get" : {
         "summary" : "My Description multi lined",
-        "description" : "1 2 34",
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        }
+        "description" : "1 2 34"
       }
     },
     "/base/moreBase/getImplicitParamName" : {
       "get" : {
         "summary" : "My Summarymulti lined",
-        "description" : "1 2 34",
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        }
+        "description" : "1 2 34"
       }
     }
   },

@@ -1,11 +1,9 @@
 package io.github.tabilzad.ktor
 
-import arrow.meta.plugin.testing.*
 import io.github.tabilzad.ktor.TestSourceUtil.loadSourceAndExpected
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -19,14 +17,15 @@ class StabilityTests {
     lateinit var tempDir: Path
 
     @BeforeEach
-    fun beforeEach(){
-        val existingFile = File(tempDir.toAbsolutePath().pathString+"/openapi.json")
+    fun beforeEach() {
+        val existingFile = File(tempDir.toAbsolutePath().pathString + "/openapi.json")
 
-        if(existingFile.exists()){
+        if (existingFile.exists()) {
             // clear file before each test
             existingFile.writeText("")
         }
     }
+
     @Test
     fun `should generate correct swagger when KtorDocs annotation is applied to Application`() {
         val testFile = File(tempDir.toAbsolutePath().pathString)
@@ -34,10 +33,7 @@ class StabilityTests {
         generateArrowTest(testFile, source)
 
         testFile.findSwagger()?.readText().let { generatedSwagger ->
-            assertThat(generatedSwagger).isNotNull.withFailMessage {
-                "swagger file was not generated"
-            }
-            assertThat(generatedSwagger).isEqualTo(expected)
+            generatedSwagger.assertWith(expected)
         }
     }
 
@@ -48,10 +44,7 @@ class StabilityTests {
         generateArrowTest(testFile, source)
 
         testFile.findSwagger()?.readText().let { generatedSwagger ->
-            assertThat(generatedSwagger).isNotNull.withFailMessage {
-                "swagger file was not generated"
-            }
-            assertThat(generatedSwagger).isEqualTo(expected)
+            generatedSwagger.assertWith(expected)
         }
     }
 
@@ -62,10 +55,18 @@ class StabilityTests {
         generateArrowTest(testFile, source)
 
         testFile.findSwagger()?.readText().let { generatedSwagger ->
-            assertThat(generatedSwagger).isNotNull.withFailMessage {
-                "swagger file was not generated"
-            }
-            assertThat(generatedSwagger).isEqualTo(expected)
+            generatedSwagger.assertWith(expected)
+        }
+    }
+
+    @Test
+    fun `should generate correct swagger when Route definitions have same path but different endpoint method`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("Paths4")
+        generateArrowTest(testFile, source)
+
+        testFile.findSwagger()?.readText().let { generatedSwagger ->
+            generatedSwagger.assertWith(expected)
         }
     }
 
@@ -76,10 +77,18 @@ class StabilityTests {
         generateArrowTest(testFile, source)
 
         testFile.findSwagger()?.readText().let { generatedSwagger ->
-            assertThat(generatedSwagger).isNotNull.withFailMessage {
-                "swagger file was not generated"
-            }
-            assertThat(generatedSwagger).isEqualTo(expected)
+            generatedSwagger.assertWith(expected)
+        }
+    }
+
+    @Test
+    fun `should generate correct post request body 2`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("RequestBody2")
+        generateArrowTest(testFile, source)
+
+        testFile.findSwagger()?.readText().let { generatedSwagger ->
+            generatedSwagger.assertWith(expected)
         }
     }
 
@@ -89,43 +98,34 @@ class StabilityTests {
         val (source, expected) = loadSourceAndExpected("EndpointDescription")
         generateArrowTest(testFile, source)
         val result = testFile.findSwagger()?.readText()
-
-        assertThat(result).isNotNull.withFailMessage {
-            "swagger file was not generated"
-        }
-        assertThat(result).isEqualTo(expected)
+        result.assertWith(expected)
     }
 
-    @Test
-    @Disabled("not working yet")
-    fun `should generate correct post request body with polymorphic types`() {
-        val testFile = File(tempDir.toAbsolutePath().pathString)
-        val (source, expected) = loadSourceAndExpected("PolymorphicRequest")
-        assertThis(
-            CompilerTest(
-                config = { getTestConfig(testFile.path) },
-                assert = { compiles },
-                code = { loadBaseSources(source) })
-        )
-
-        testFile.findSwagger()?.readText().let { generatedSwagger ->
-            assertThat(generatedSwagger).isNotNull.withFailMessage {
-                "swagger file was not generated"
-            }
-            assertThat(generatedSwagger).isEqualTo(expected)
-        }
-    }
     @Test
     fun `should generate correct swagger definitions for endpoint with path parameters`() {
         val testFile = File(tempDir.toAbsolutePath().pathString)
         val (source, expected) = loadSourceAndExpected("PathParameters")
         generateArrowTest(testFile, source)
         val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
 
-        assertThat(result).isNotNull.withFailMessage {
-            "swagger file was not generated"
-        }
-        assertThat(result).isEqualTo(expected)
+    @Test
+    fun `should generate correct swagger definitions for endpoint with path parameters 2`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("PathParameters2")
+        generateArrowTest(testFile, source)
+        val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should generate correct swagger definitions for endpoint with path parameters and a body`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("ParamsWithBody")
+        generateArrowTest(testFile, source)
+        val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
     }
 
     @Test
@@ -134,10 +134,58 @@ class StabilityTests {
         val (source, expected) = loadSourceAndExpected("QueryParameters")
         generateArrowTest(testFile, source)
         val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
 
-        assertThat(result).isNotNull.withFailMessage {
+    @Test
+    fun `should generate correct swagger definitions for endpoint with query parameters 2`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("QueryParameters2")
+        generateArrowTest(testFile, source)
+        val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should break down endpoints by tag when tags are specified in annotation`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("EndpointDescriptionTags")
+        generateArrowTest(testFile, source)
+        val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should ignore private fields or ones annotated with @Transient`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("PrivateFields")
+        generateArrowTest(testFile, source)
+        val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should include private fields or ones annotated with @Transient`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("PrivateFieldsNegation")
+        generateArrowTest(testFile, source, hideTransient = false, hidePrivate = false)
+        val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should generate response correct response bodies when explicitly specified`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("ResponseBody")
+        generateArrowTest(testFile, source, hideTransient = false, hidePrivate = false)
+        val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
+
+    private fun String?.assertWith(expected: String){
+        assertThat(this).isNotNull.withFailMessage {
             "swagger file was not generated"
         }
-        assertThat(result).isEqualTo(expected)
+        assertThat(this).isEqualTo(expected)
     }
 }

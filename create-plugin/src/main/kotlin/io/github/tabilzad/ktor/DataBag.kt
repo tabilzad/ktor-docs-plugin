@@ -3,6 +3,21 @@ package io.github.tabilzad.ktor
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
 
+// Internal
+data class PluginConfiguration(
+    val isEnabled: Boolean,
+    val buildPath: String,
+    val saveInBuild: Boolean,
+    val modulePath: String,
+    val format: String,
+    val title: String,
+    val description: String,
+    val version: String,
+    val filePath: String?,
+    val requestBody: Boolean,
+    val hideTransients: Boolean,
+    val hidePrivateFields: Boolean,
+)
 interface OpenApiSpecParam {
     val name: String
     val `in`: String
@@ -15,11 +30,14 @@ data class KtorRouteSpec(
     val method: String,
     val body: OpenApiSpec.ObjectType,
     val summary: String?,
-    val description: String?
+    val description: String?,
+    val tags: Set<String>?,
+    val responses: Map<String, OpenApiSpec.ResponseDetails>?
 )
 
 interface KtorElement {
     var path: String?
+    var tags: Set<String>?
 }
 
 enum class ExpType(val labels: List<String>) {
@@ -32,15 +50,17 @@ data class EndPoint(
     override var path: String?,
     val method: String = "",
     var body: OpenApiSpec.ObjectType = OpenApiSpec.ObjectType(type = "object"),
-    var queryParameters: List<String>? = null,
+    var queryParameters: Set<String>? = null,
     var description: String? = null,
-    var summary: String? = null
-    //var responses: OpenApiSpec.Response = OpenApiSpec.Response(emptyMap())
+    var summary: String? = null,
+    override var tags: Set<String>? = null,
+    var responses: Map<String, OpenApiSpec.ResponseDetails>? = null
 ) : KtorElement
 
 data class DocRoute(
     override var path: String? = "/",
-    val children: MutableList<KtorElement> = mutableListOf()
+    val children: MutableList<KtorElement> = mutableListOf(),
+    override var tags: Set<String>?= null,
 ) : KtorElement
 
 enum class ContentType{
@@ -48,16 +68,21 @@ enum class ContentType{
     APPLICATION_JSON;
 }
 
-typealias ContentSchema = Map<String, OpenApiSpec.SchemaRef>
+typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
 
-typealias RequestBodyContent = Map<ContentType, ContentSchema>
+typealias BodyContent = Map<ContentType, ContentSchema>
 data class OpenApiComponents(
     val schemas: Map<String, OpenApiSpec.ObjectType>
+)
+
+// External
+data class OpenSpecPath(
+    val path: String,
 )
 data class OpenApiSpec(
     val openapi: String = "3.1.0",
     val info: Info,
-    val paths: Map<String, Map<String, Any>>,
+    val paths: Map<String, Map<String, Path>>,
     val components: OpenApiComponents
 ) {
     data class Info(
@@ -72,16 +97,17 @@ data class OpenApiSpec(
     )
 
     data class Path(
-        val summary: String? = "",
-        val description: String? = "",
-        val responses: Map<String, ResponseDetails> = mapOf("200" to ResponseDetails("TBD")),
+        val summary: String? = null,
+        val description: String? = null,
+        val tags: List<String>? = null,
+        val responses: Map<String, ResponseDetails>? = null,
         val parameters: List<PathParam>? = null,
         val requestBody: RequestBody? = null
     )
 
     data class RequestBody(
         val required: Boolean,
-        val content: RequestBodyContent
+        val content: BodyContent
     )
 
     interface AnyObject{
@@ -100,7 +126,6 @@ data class OpenApiSpec(
 
         @JsonIgnore
         var contentBodyRef: String? = null,
-        // var discriminator: InternalDiscriminator? = null,
         var additionalProperties: ObjectType? = null
     ): AnyObject
 
@@ -111,15 +136,19 @@ data class OpenApiSpec(
         val schema: SchemaType,
     ) : OpenApiSpecParam
 
+
     data class SchemaRef(
         val `$ref`: String,
     )
 
     data class SchemaType(
-        val type: String
+        val type: String? = null,
+        val items: SchemaRef? = null,
+        val `$ref`: String? = null,
     )
 
     data class ResponseDetails(
-        val description: String
+        val description: String,
+        val content: BodyContent
     )
 }

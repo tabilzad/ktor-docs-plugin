@@ -1,0 +1,119 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/constantResolution" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "employeeId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/fullConstantResolution" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "employeeId2",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/multipleQueryParams" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "employeeId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "employeeId2",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "employeeId3",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/multipleNestedQueryParams" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "employeeId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "employeeId2",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/queryWithNestedReceive" : {
+      "post" : {
+        "parameters" : [ {
+          "name" : "employeeId",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.requests.SimpleRequest" : {
+        "type" : "object",
+        "properties" : {
+          "string" : {
+            "type" : "string"
+          },
+          "integer" : {
+            "type" : "integer"
+          },
+          "float" : {
+            "type" : "number"
+          }
+        }
+      }
+    }
+  }
+}

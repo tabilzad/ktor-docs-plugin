@@ -1,11 +1,16 @@
 package sources.requests
 
-import sources.annotations.KtorDiscriminator
-
 data class SimpleRequest(
     val string: String,
     val integer: Int,
     val float: Float
+)
+
+data class PrivateBodyRequest(
+    val visible: Boolean,
+    private val invisible: String,
+    @Transient
+    val transientFieldInvisible: Int,
 )
 
 data class NestedRequest(
@@ -49,19 +54,7 @@ enum class PolyDiscriminator {
 }
 
 data class SimplePolymorphicRequest(
-    val req: PolyRequest
+    val polyParam: PolyRequest
 )
-sealed interface PolyRequest{
-    @KtorDiscriminator(["IMPL1", "IMPL2"], [PolyRequestImpl::class, PolyRequestImpl2::class])
-    val discriminator: PolyDiscriminator
-}
 
-data class PolyRequestImpl(
-    override val discriminator: PolyDiscriminator,
-    val string: String
-): PolyRequest
-
-data class PolyRequestImpl2(
-    override val discriminator: PolyDiscriminator,
-    val integer: Int
-): PolyRequest
+interface PolyRequest
