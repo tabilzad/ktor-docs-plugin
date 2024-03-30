@@ -1,24 +1,10 @@
-package sources.annotations
+package io.github.tabilzad.ktor
 
 import kotlin.reflect.KClass
-
 
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.EXPRESSION)
 annotation class KtorDocs(val tags: Array<String> = [])
-
-@Retention(AnnotationRetention.SOURCE)
-@Target(
-    AnnotationTarget.FUNCTION,
-    AnnotationTarget.EXPRESSION,
-    AnnotationTarget.FIELD,
-    AnnotationTarget.CLASS
-)
-annotation class KtorDescription(val summary: String = "", val description: String = "", val tags: Array<String> = [])
-
-@Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.PROPERTY)
-annotation class KtorDiscriminator(val name: String = "")
 
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.EXPRESSION)
@@ -34,3 +20,16 @@ annotation class ResponseEntry(
     val isCollection: Boolean = false,
     val description: String = ""
 )
+
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.FIELD,
+    AnnotationTarget.CLASS,
+    AnnotationTarget.FUNCTION,
+    AnnotationTarget.EXPRESSION)
+annotation class KtorDescription(val summary: String = "", val description: String = "", val tags: Array<String> = [])
+
+
+@Retention(AnnotationRetention.SOURCE)
+@Target(AnnotationTarget.CLASS)
+@Repeatable
+annotation class PolymorphicRelationship(val key: String, val value: KClass<*>)

@@ -1,18 +1,13 @@
 {
   "openapi" : "3.1.0",
   "info" : {
-    "title" : "Server",
+    "title" : "Open API Specification",
     "description" : "test",
-    "version" : "1.0"
+    "version" : "1.0.0"
   },
   "paths" : {
     "/v1/order/{order_id}" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "order_id",
           "in" : "path",
@@ -25,11 +20,6 @@
     },
     "/v1/orders/{optional_order_id}" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "optional_order_id",
           "in" : "path",

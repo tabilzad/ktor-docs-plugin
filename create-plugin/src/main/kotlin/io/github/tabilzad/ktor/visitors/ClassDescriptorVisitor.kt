@@ -1,7 +1,9 @@
+package io.github.tabilzad.ktor.visitors
 
 import arrow.meta.phases.resolve.unwrappedNotNullableType
 import io.github.tabilzad.ktor.KtorDescription
 import io.github.tabilzad.ktor.OpenApiSpec.ObjectType
+import io.github.tabilzad.ktor.PluginConfiguration
 import io.github.tabilzad.ktor.forEachVariable
 import io.github.tabilzad.ktor.names
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
@@ -10,6 +12,7 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
+import org.jetbrains.kotlin.js.descriptorUtils.getJetTypeFqName
 import org.jetbrains.kotlin.js.descriptorUtils.getKotlinTypeFqName
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -27,41 +30,10 @@ import org.jetbrains.kotlin.types.typeUtil.isEnum
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 import org.jetbrains.kotlin.util.removeSuffixIfPresent
 
-class ClassDescriptorVisitor(val context: BindingContext) :
+class ClassDescriptorVisitor(val config: PluginConfiguration, val context: BindingContext) :
     DeclarationDescriptorVisitorEmptyBodies<ObjectType, ObjectType>() {
+
     val classNames = mutableListOf<ObjectType>()
-
-    // class Descriptors will not have generic type parameters information available.
-    override fun visitClassDescriptor(descriptor: ClassDescriptor?, parent: ObjectType): ObjectType {
-        val type = descriptor?.defaultType!!
-        return if (KotlinBuiltIns.isPrimitiveType(type.unwrappedNotNullableType) || KotlinBuiltIns.isString(type.unwrappedNotNullableType)) {
-            ObjectType(descriptor.name.asString().toSwaggerType())
-        } else if (KotlinBuiltIns.isListOrNullableList(type)) {
-            ObjectType("array")
-        } else {
-            val jetTypeFqName = type.getKotlinTypeFqName(false)
-
-            val result = ObjectType(null).apply {
-                fqName = jetTypeFqName
-                ref = "#/components/schemas/${jetTypeFqName}"
-            }
-            if (!classNames.names.contains(jetTypeFqName)) {
-                val q = ObjectType(
-                    "object",
-                    fqName = jetTypeFqName,
-                    properties = mutableMapOf()
-                )
-                classNames.add(q)
-
-                type.memberScope
-                    .forEachVariable { nestedDescr: DeclarationDescriptor ->
-                        nestedDescr.accept(this, q)
-                    }
-            }
-
-            result
-        }
-    }
 
     override fun visitPropertyDescriptor(
         descriptor: PropertyDescriptor,
@@ -172,7 +144,7 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                                         classNames.add(q)
 
                                         valueClassType.memberScope
-                                            .forEachVariable { nestedDescr: DeclarationDescriptor ->
+                                            .forEachVariable(config) { nestedDescr: DeclarationDescriptor ->
                                                 nestedDescr.accept(this@ClassDescriptorVisitor, q)
                                             }
                                     }
@@ -188,7 +160,10 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                         }
 
                         val item = valueType.createMapDefinition()
-                        parent.properties?.put(propertyName, item)
+                        parent.properties?.put(
+                            propertyName,
+                            item
+                        )
                         parent
                     }
 
@@ -199,7 +174,6 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                     else -> {
 
                         if (!classNames.names.contains(fqClassName)) {
-
                             val internal = ObjectType(
                                 "object",
                                 mutableMapOf(),
@@ -207,9 +181,11 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                             )
                             classNames.add(internal)
                             type.memberScope
-                                .forEachVariable { nestedDescr ->
+                                .forEachVariable(config) { nestedDescr ->
                                     nestedDescr.accept(this, internal)
                                 }
+                        }
+                        if (parent.properties != null) {
                             parent.properties?.put(
                                 propertyName,
                                 ObjectType(
@@ -219,8 +195,17 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                                     ref = "#/components/schemas/${fqClassName}"
                                 )
                             )
+                        } else {
+                            parent.properties = mutableMapOf(
+                                propertyName to
+                                        ObjectType(
+                                            type = null,
+                                            fqName = fqClassName,
+                                            description = docsDescription,
+                                            ref = "#/components/schemas/${fqClassName}"
+                                        )
+                            )
                         }
-
                         parent
                     }
                 }
@@ -254,7 +239,7 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                 t.properties = null
             } else if (classType.isIterable() || classType.isArrayOrNullableArray()) {
                 t.type = "array"
-                t.items = ObjectType(null,  mutableMapOf())
+                t.items = ObjectType(null, mutableMapOf())
             } else if (classType.isEnum()) {
                 t.type = "string"
                 t.enum = classType.memberScope.resolveEnumValues()
@@ -272,7 +257,7 @@ class ClassDescriptorVisitor(val context: BindingContext) :
                     )
                     classNames.add(q)
                     classType.memberScope
-                        .forEachVariable { nestedDescr: DeclarationDescriptor ->
+                        .forEachVariable(config) { nestedDescr: DeclarationDescriptor ->
                             nestedDescr.accept(this, q)
                         }
                 }
@@ -318,8 +303,8 @@ private fun PropertyDescriptor.findDocsDescription(): String? {
 }
 
 fun KotlinType.isIterable(): Boolean {
-    return supertypes().map { it.getKotlinTypeFqName(false) }
-        .contains(DefaultBuiltIns.Instance.iterableType.getKotlinTypeFqName(false))
+    return supertypes().map { it.getJetTypeFqName(false) }
+        .contains(DefaultBuiltIns.Instance.iterableType.getJetTypeFqName(false))
 }
 
 fun KotlinType.isMap(): Boolean {

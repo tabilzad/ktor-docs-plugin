@@ -1,18 +1,13 @@
 {
   "openapi" : "3.1.0",
   "info" : {
-    "title" : "Server",
+    "title" : "Open API Specification",
     "description" : "test",
-    "version" : "1.0"
+    "version" : "1.0.0"
   },
   "paths" : {
     "/v1/postBodyRequestSimple" : {
       "post" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "requestBody" : {
           "required" : true,
           "content" : {
@@ -27,11 +22,6 @@
     },
     "/v1/postBodyRequestWithVariableDeclaration" : {
       "post" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "requestBody" : {
           "required" : true,
           "content" : {
@@ -46,11 +36,6 @@
     },
     "/v1/postBodyRequestWithLambda" : {
       "post" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "requestBody" : {
           "required" : true,
           "content" : {
@@ -65,11 +50,6 @@
     },
     "/v2/postBodyNestedRequest" : {
       "post" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "requestBody" : {
           "required" : true,
           "content" : {
@@ -84,11 +64,6 @@
     },
     "/v2/postBodyComplexRequest" : {
       "post" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "requestBody" : {
           "required" : true,
           "content" : {
@@ -104,25 +79,11 @@
   },
   "components" : {
     "schemas" : {
-      "sources.requests.SimpleRequest" : {
+      "sources.requests.ComplexMapValue" : {
         "type" : "object",
         "properties" : {
-          "string" : {
+          "something" : {
             "type" : "string"
-          },
-          "integer" : {
-            "type" : "integer"
-          },
-          "float" : {
-            "type" : "number"
-          }
-        }
-      },
-      "sources.requests.NestedRequest" : {
-        "type" : "object",
-        "properties" : {
-          "nestedObject" : {
-            "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
           }
         }
       },
@@ -268,11 +229,25 @@
           }
         }
       },
-      "sources.requests.ComplexMapValue" : {
+      "sources.requests.NestedRequest" : {
         "type" : "object",
         "properties" : {
-          "something" : {
+          "nestedObject" : {
+            "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
+          }
+        }
+      },
+      "sources.requests.SimpleRequest" : {
+        "type" : "object",
+        "properties" : {
+          "string" : {
             "type" : "string"
+          },
+          "integer" : {
+            "type" : "integer"
+          },
+          "float" : {
+            "type" : "number"
           }
         }
       }

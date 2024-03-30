@@ -24,20 +24,27 @@ object TestSourceUtil {
         this.javaClass.getResource("/sources/requests/RequestDataClasses.kt")
             ?: throw FileNotFoundException("annotations don't exist")
     }
+
     private fun loadExpectation(fileName: String): String =
         this.javaClass.getResource("/expected/$fileName.json")?.readText()
             ?: throw FileNotFoundException("$fileName does not exist")
 }
 
 @OptIn(ExperimentalCompilerApi::class)
-fun generateArrowTest(testFile: File, source: String){
+fun generateArrowTest(
+    testFile: File,
+    source: String,
+    hideTransient: Boolean = true,
+    hidePrivate: Boolean = true,
+) {
     assertThis(
         CompilerTest(
-            config = { getTestConfig(testFile.path) },
+            config = { getTestConfig(testFile.path, hideTransient, hidePrivate) },
             assert = { compiles },
             code = { loadBaseSources(source) })
     )
 }
+
 fun File.findSwagger() = listFiles()?.find { it.name.contains("openapi.json") }
 fun CompilerTest.Companion.loadBaseSources(source: String): Code {
     val annotationsFile = TestSourceUtil.loadAnnotations
@@ -50,7 +57,11 @@ fun CompilerTest.Companion.loadBaseSources(source: String): Code {
 }
 
 @ExperimentalCompilerApi
-fun getTestConfig(testFilePath: String): List<Config> {
+fun getTestConfig(
+    testFilePath: String,
+    hideTransient: Boolean = true,
+    hidePrivate: Boolean = true,
+): List<Config> {
     val clp = KtorDocsCommandLineProcessor()
     return listOf(
         CompilerTest.addMetaPlugins(KtorMetaPluginRegistrar()),
@@ -66,13 +77,13 @@ fun getTestConfig(testFilePath: String): List<Config> {
         CompilerTest.addPluginOptions(
             PluginOption(
                 clp.pluginId,
-                KtorDocsCommandLineProcessor.requestSchema.optionName,
+                KtorDocsCommandLineProcessor.isEnabled.optionName,
                 "true"
             ),
             PluginOption(
                 clp.pluginId,
-                KtorDocsCommandLineProcessor.titleOption.optionName,
-                "Server"
+                KtorDocsCommandLineProcessor.requestSchema.optionName,
+                "true"
             ),
             PluginOption(
                 clp.pluginId,
@@ -81,8 +92,33 @@ fun getTestConfig(testFilePath: String): List<Config> {
             ),
             PluginOption(
                 clp.pluginId,
+                KtorDocsCommandLineProcessor.formatOption.optionName,
+                "json"
+            ),
+            PluginOption(
+                clp.pluginId,
                 KtorDocsCommandLineProcessor.pathOption.optionName,
                 testFilePath
+            ),
+            PluginOption(
+                clp.pluginId,
+                KtorDocsCommandLineProcessor.buildPath.optionName,
+                testFilePath
+            ),
+            PluginOption(
+                clp.pluginId,
+                KtorDocsCommandLineProcessor.modulePath.optionName,
+                testFilePath
+            ),
+            PluginOption(
+                clp.pluginId,
+                KtorDocsCommandLineProcessor.hideTransientFields.optionName,
+                hideTransient.toString()
+            ),
+            PluginOption(
+                clp.pluginId,
+                KtorDocsCommandLineProcessor.hidePrivateAndInternalFields.optionName,
+                hidePrivate.toString()
             )
         )
     )

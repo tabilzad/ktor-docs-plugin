@@ -8,31 +8,34 @@ repositories {
     mavenCentral()
 }
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.10")
+    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.22")
 
-    implementation("io.arrow-kt:arrow-meta:1.6.2") // test debug
+    implementation("io.arrow-kt:arrow-meta:1.6.2")
     implementation("com.squareup.moshi:moshi:1.14.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.2")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.22")
 
 
-    testImplementation ("io.arrow-kt:arrow-meta-test:1.6.2")
-    testImplementation ("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
-    testImplementation ("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.5.0")
-    testImplementation ("io.ktor:ktor:2.2.4")
-    testImplementation ("io.ktor:ktor-server-netty:2.2.4")
-
+    testImplementation("io.arrow-kt:arrow-meta-test:1.6.2")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
+    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.5.0")
+    testImplementation("io.ktor:ktor:2.2.4")
+    testImplementation("io.ktor:ktor-server-netty:2.2.4")
     testImplementation("org.assertj:assertj-core:3.24.2")
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
+
 java {
     withSourcesJar()
     withJavadocJar()
 }
+
 tasks.test {
     useJUnitPlatform()
 }
+
 signing {
     val signingKeId = extra["signing.keyId"].toString()
     val signingKey = extra["signing.secretKey"].toString()

@@ -1,0 +1,65 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/tagged1" : {
+      "get" : {
+        "summary" : "My Summary",
+        "description" : "My Description",
+        "tags" : [ "module1", "tag1" ]
+      }
+    },
+    "/v1/tagged1and2" : {
+      "get" : {
+        "summary" : "My Description multi lined",
+        "description" : "1 2 34",
+        "tags" : [ "module1", "tag1", "tag2" ]
+      }
+    },
+    "/v1/tagged5and6" : {
+      "get" : {
+        "summary" : "My Summarymulti lined",
+        "description" : "1 2 34",
+        "tags" : [ "module1", "tag5", "tag6" ]
+      }
+    },
+    "/v1/noTagsUnderModule1" : {
+      "get" : {
+        "tags" : [ "module1" ]
+      }
+    },
+    "/v2/subRoute2/tagged1AndSubModule" : {
+      "get" : {
+        "summary" : "My Summary",
+        "description" : "My Description",
+        "tags" : [ "module2", "tag1", "subModule" ]
+      }
+    },
+    "/v2/subRoute1/tagged1AndModule2" : {
+      "get" : {
+        "summary" : "My Summary",
+        "description" : "My Description",
+        "tags" : [ "module2", "tag1" ]
+      }
+    },
+    "/v2/subRoute1/noTagsUnderModule2" : {
+      "get" : {
+        "tags" : [ "module2" ]
+      }
+    },
+    "/subRoute2/tagged1AndSubModule" : {
+      "get" : {
+        "summary" : "My Summary",
+        "description" : "My Description",
+        "tags" : [ "tag1" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : { }
+  }
+}

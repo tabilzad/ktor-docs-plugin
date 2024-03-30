@@ -21,7 +21,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.10'
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.22'
     implementation 'io.ktor:ktor:2.2.4'
     implementation 'io.ktor:ktor-server-netty:2.2.4'
 }

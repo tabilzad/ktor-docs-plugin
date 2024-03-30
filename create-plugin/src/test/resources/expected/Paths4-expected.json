@@ -7,10 +7,20 @@
   },
   "paths" : {
     "/v1/getRequest1" : {
-      "get" : { }
+      "get" : { },
+      "post" : { }
     },
     "/v2/getRequest2" : {
-      "get" : { }
+      "get" : { },
+      "post" : { }
+    },
+    "/v3/v3a/getRequest3" : {
+      "get" : { },
+      "post" : { }
+    },
+    "/v3/getRequest3" : {
+      "get" : { },
+      "post" : { }
     }
   },
   "components" : {

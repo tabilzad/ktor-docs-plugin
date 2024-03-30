@@ -1,18 +1,13 @@
 {
   "openapi" : "3.1.0",
   "info" : {
-    "title" : "Server",
+    "title" : "Open API Specification",
     "description" : "test",
-    "version" : "1.0"
+    "version" : "1.0.0"
   },
   "paths" : {
     "/v1/order" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "my_query_param",
           "in" : "query",
@@ -25,11 +20,6 @@
     },
     "/v1/orderWithPath/{myPathParameter}" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "myPathParameter",
           "in" : "path",
@@ -49,11 +39,6 @@
     },
     "/v1/order2" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "my_query_param",
           "in" : "query",
@@ -66,11 +51,6 @@
     },
     "/v1/order3" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "my_query_param",
           "in" : "query",
@@ -90,11 +70,6 @@
     },
     "/v1/order3WIthPath/{pathParameter}" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "pathParameter",
           "in" : "path",
@@ -121,11 +96,6 @@
     },
     "/v1/order4" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "my_query_param",
           "in" : "query",
@@ -138,11 +108,6 @@
     },
     "/v1/order5" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "orderId",
           "in" : "query",
@@ -155,11 +120,6 @@
     },
     "/v1/order6" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "my_string_query_param",
           "in" : "query",
@@ -172,11 +132,6 @@
     },
     "/v1/order7" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "param_part1param_part2",
           "in" : "query",
@@ -189,11 +144,6 @@
     },
     "/v1/order8" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "param_part1_my_string_query_param",
           "in" : "query",
@@ -206,11 +156,6 @@
     },
     "/v1/order9" : {
       "get" : {
-        "responses" : {
-          "200" : {
-            "description" : "TBD"
-          }
-        },
         "parameters" : [ {
           "name" : "param_part1_my_string_query_param",
           "in" : "query",
