@@ -24,7 +24,7 @@ gradlePlugin {
     }
 }
 
-val versionDirectory = "${layout.buildDirectory}/generated/version/"
+val versionDirectory = "${layout.buildDirectory.asFile.get().path}/generated/version/"
 
 sourceSets {
     main {
