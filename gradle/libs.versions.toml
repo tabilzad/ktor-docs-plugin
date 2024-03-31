@@ -1,0 +1,36 @@
+[versions]
+jvmTarget = "11"
+kotlinVersion = "1.9.22"
+arrowVersion = "1.6.2"
+jacksonVersion = "2.15.2"
+ktorVersion = "2.2.4"
+compilerTestingVersion = "1.5.0"
+assertJVerison = "3.24.2"
+
+[plugins]
+dokka = { id = "org.jetbrains.dokka", version.ref = "kotlinVersion" }
+mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.28.0" }
+
+
+[bundles]
+jackson = ["jacksonKotlin", "jacksonYaml"]
+ktor = ["ktor", "ktorNetty"]
+kotlinGradle = ["kotlinGradleApi","kotlinGradle"]
+
+[libraries]
+arrowMeta = { module = "io.arrow-kt:arrow-meta", version.ref = "arrowVersion" }
+kotlinCompiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlinVersion" }
+assertJ = {module = "org.assertj:assertj-core", version.ref = "assertJVerison"}
+junit = {module = "org.junit:junit-bom", version = "5.10.0"}
+junitJupiter = {module = "org.junit.jupiter:junit-jupiter"}
+compilerTest = {module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "compilerTestingVersion"}
+jacksonKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonVersion" }
+jacksonYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jacksonVersion" }
+ktor = { module = "io.ktor:ktor", version.ref = "ktorVersion" }
+ktorNetty = { module = "io.ktor:ktor", version.ref = "ktorVersion" }
+kotlinGradleApi = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion"}
+kotlinGradle = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion"}
+arrowTest = { module = "io.arrow-kt:arrow-meta", version.ref = "arrowVersion" }
+kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinVersion" }
+
+

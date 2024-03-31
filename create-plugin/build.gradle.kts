@@ -1,89 +1,63 @@
+
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.KotlinJvm
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     kotlin("jvm")
-    `maven-publish`
-    signing
+    id("com.vanniktech.maven.publish.base")
 }
-apply("../gradle/signing.gradle.kts")
-repositories {
-    mavenCentral()
-}
+
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-compiler-embeddable:1.9.22")
+    compileOnly(libs.kotlinCompiler)
 
-    implementation("io.arrow-kt:arrow-meta:1.6.2")
-    implementation("com.squareup.moshi:moshi:1.14.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.15.2")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.22")
+    implementation(libs.arrowMeta)
+    implementation(libs.bundles.jackson)
+    implementation(libs.kotlinReflect)
 
-
-    testImplementation("io.arrow-kt:arrow-meta-test:1.6.2")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing:1.5.0")
-    testImplementation("com.github.tschuchortdev:kotlin-compile-testing-ksp:1.5.0")
-    testImplementation("io.ktor:ktor:2.2.4")
-    testImplementation("io.ktor:ktor-server-netty:2.2.4")
-    testImplementation("org.assertj:assertj-core:3.24.2")
-    testImplementation(platform("org.junit:junit-bom:5.10.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-}
-
-java {
-    withSourcesJar()
-    withJavadocJar()
+    testImplementation(libs.arrowTest)
+    testImplementation(libs.compilerTest)
+    testImplementation(libs.bundles.ktor)
+    testImplementation(libs.assertJ)
+    testImplementation(platform(libs.junit))
+    testImplementation(libs.junitJupiter)
 }
 
 tasks.test {
     useJUnitPlatform()
 }
 
-signing {
-    val signingKeId = extra["signing.keyId"].toString()
-    val signingKey = extra["signing.secretKey"].toString()
-    val signingPassword = extra["signing.password"].toString()
-    useInMemoryPgpKeys(signingKeId, signingKey, signingPassword)
-    sign(publishing.publications)
-}
-publishing {
-    repositories {
-        maven {
-            name = "sonartype"
-            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            val snapshotRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            setUrl { if (version.toString().endsWith("SNAPSHOT")) snapshotRepoUrl else releasesRepoUrl }
-            credentials {
-                username = extra["ossrhUsername"]?.toString()
-                password = extra["ossrhPassword"]?.toString()
+mavenPublishing {
+    configure(KotlinJvm(
+        javadocJar = JavadocJar.Javadoc(),
+        sourcesJar = true
+    ))
+    publishToMavenCentral(SonatypeHost.S01, automaticRelease = false)
+    coordinates(
+        project.group.toString(),
+        project.properties["POM_ARTIFACT_ID"].toString(),
+        project.version.toString()
+    )
+    signAllPublications()
+    pom {
+        name.set("Ktor Open API specification generator")
+        description.set("Open API (Swagger) specification Generator for Ktor")
+        url.set("https://github.com/tabilzad/ktor-docs-plugin")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-    }
-
-    publications {
-        create<MavenPublication>("sonartype") {
-            groupId = project.group.toString()
-            version = project.version.toString()
-            artifactId = project.properties["POM_ARTIFACT_ID"].toString()
-
-            from(components["java"])
-            pom {
-                name.set("Ktor Swagger Plugin")
-                description.set("Provides Swagger support to Ktor")
-                url.set("https://github.com/tabilzad/ktor-docs-plugin")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("tabilzad")
-                        email.set("tim.abilzade@gmail.com")
-                    }
-                }
-                scm {
-                    url.set("https://github.com/tabilzad/ktor-docs-plugin")
-                }
+        developers {
+            developer {
+                id.set("tabilzad")
+                email.set("tim.abilzade@gmail.com")
+                url.set("https://github.com/tabilzad")
             }
+        }
+        scm {
+            url.set("https://github.com/tabilzad/ktor-docs-plugin")
         }
     }
 }

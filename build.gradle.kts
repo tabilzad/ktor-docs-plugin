@@ -1,26 +1,18 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.10"
-    `maven-publish`
-    `java-library`
-    signing
+    kotlin("jvm") version "1.9.22"
 }
 
 buildscript {
-    apply("gradle/dependencies.gradle")
     repositories {
-      // mavenLocal()
         mavenCentral()
         gradlePluginPortal()
         google()
-        maven {
-            url = uri("file://${project.rootDir}/use-plugin/libs")
-        }
     }
     dependencies {
-        classpath ("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10")
-        classpath ("com.vanniktech:gradle-maven-publish-plugin:0.15.0")
+        classpath(kotlin("gradle-plugin", version = libs.versions.kotlinVersion.get()))
+        classpath ("com.vanniktech:gradle-maven-publish-plugin:0.28.0")
         classpath ("org.jetbrains.dokka:dokka-gradle-plugin:1.5.30")
         classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.3.0-alpha")
     }
@@ -36,13 +28,18 @@ subprojects {
     }
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
-            jvmTarget = "11"
+            jvmTarget = libs.versions.jvmTarget.get()
         }
     }
 
     tasks.withType<JavaCompile>().configureEach {
         sourceCompatibility = JavaVersion.VERSION_11.toString()
         targetCompatibility = JavaVersion.VERSION_11.toString()
+        javaCompiler.set(
+            javaToolchains.compilerFor {
+                languageVersion.set(JavaLanguageVersion.of(11))
+            }
+        )
     }
 }
 
