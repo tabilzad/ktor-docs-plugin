@@ -25,6 +25,7 @@ gradlePlugin {
 }
 
 val versionDirectory = "$buildDir/generated/version/"
+
 sourceSets {
     main {
         java.srcDir(versionDirectory)
@@ -33,6 +34,7 @@ sourceSets {
 
 tasks {
     register("pluginVersion") {
+        mustRunAfter("sourcesJar")
         val outputDir = file(versionDirectory)
         inputs.property("version", project.version)
         outputs.dir(outputDir)
@@ -48,10 +50,6 @@ tasks {
             )
         }
     }
-}
-
-tasks.named("sourcesJar").configure {
-    dependsOn("pluginVersion")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
