@@ -50,6 +50,10 @@ tasks {
     }
 }
 
+tasks.named("sourcesJar").configure {
+    dependsOn("pluginVersion")
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     dependsOn("pluginVersion")
 }
