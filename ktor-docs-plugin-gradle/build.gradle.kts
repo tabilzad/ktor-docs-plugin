@@ -1,44 +1,36 @@
+
+import com.vanniktech.maven.publish.GradlePlugin
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SonatypeHost
+
 plugins {
     kotlin("jvm")
     id("java-gradle-plugin")
-    `maven-publish`
-    signing
+    id("com.vanniktech.maven.publish.base")
 }
-
-apply("../gradle/signing.gradle.kts")
 
 dependencies {
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin-api:1.9.22")
-    compileOnly("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22")
+    compileOnly(libs.bundles.kotlinGradle)
 }
-//gradlePlugin {
-//    plugins {
-//        create("simplePlugin") {
-//            id = "io.github.tabilzad.ktor-docs-plugin-gradle"
-//            displayName = "Ktor Docs Generator"
-//            description = "Ktor Docs Generator plugin"
-//            implementationClass = "io.github.tabilzad.ktor.KtorMetaPlugin"
-//        }
-//    }
-//}
 
-java {
-    withSourcesJar()
-    withJavadocJar()
+gradlePlugin {
+    plugins {
+        create("gradlePlugin") {
+            id = "io.github.tabilzad.ktor-docs-plugin-gradle"
+            displayName = "Ktor Open API specification Generator"
+            description = "Open API (Swagger) specification Generator for Ktor"
+            implementationClass = "io.github.tabilzad.ktor.KtorMetaPlugin"
+        }
+    }
 }
-signing {
-    val signingKeId = extra["signing.keyId"].toString()
-    val signingKey = extra["signing.secretKey"].toString()
-    val signingPassword = extra["signing.password"].toString()
-    useInMemoryPgpKeys(signingKeId, signingKey, signingPassword)
-    sign(publishing.publications)
-}
+
 val versionDirectory = "$buildDir/generated/version/"
 sourceSets {
-    main{
+    main {
         java.srcDir(versionDirectory)
     }
 }
+
 tasks {
     register("pluginVersion") {
         val outputDir = file(versionDirectory)
@@ -57,50 +49,43 @@ tasks {
         }
     }
 }
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     dependsOn("pluginVersion")
 }
 
-publishing {
-    repositories {
-        maven {
-            name = "sonartype"
-            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            val snapshotRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            setUrl { if (version.toString().endsWith("SNAPSHOT")) snapshotRepoUrl else releasesRepoUrl }
-            credentials {
-                username = extra["ossrhUsername"]?.toString()
-                password = extra["ossrhPassword"]?.toString()
+mavenPublishing {
+    configure(GradlePlugin(
+        javadocJar = JavadocJar.Javadoc(),
+        sourcesJar = true
+    ))
+    publishToMavenCentral(SonatypeHost.S01, automaticRelease = false)
+    coordinates(
+        groupId = project.group.toString(),
+        artifactId = project.properties["POM_ARTIFACT_ID"].toString(),
+        version = project.version.toString()
+    )
+    signAllPublications()
+    pom {
+        name.set("Ktor Swagger Gradle Plugin")
+        description.set("Provides Gradle bridge for ktor-docs-plugin")
+        url.set("https://github.com/tabilzad/ktor-docs-plugin")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
             }
         }
-    }
-    publications {
-        create<MavenPublication>("sonartype") {
-            groupId = project.group.toString()
-            version = project.version.toString()
-            artifactId = project.properties["POM_ARTIFACT_ID"].toString()
-
-            from(components["java"])
-            pom {
-                name.set("Ktor Swagger Gradle Plugin")
-                description.set("Provides Gradle bridge for ktor-docs-plugin")
-                url.set("https://github.com/tabilzad/ktor-docs-plugin")
-                licenses {
-                    license {
-                        name.set("The Apache License, Version 2.0")
-                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-                    }
-                }
-                developers {
-                    developer {
-                        id.set("tabilzad")
-                        email.set("tim.abilzade@gmail.com")
-                    }
-                }
-                scm {
-                    url.set("https://github.com/tabilzad/ktor-docs-plugin")
-                }
+        developers {
+            developer {
+                id.set("tabilzad")
+                email.set("tim.abilzade@gmail.com")
+                url.set("https://github.com/tabilzad")
             }
+        }
+        scm {
+            url.set("https://github.com/tabilzad/ktor-docs-plugin")
         }
     }
 }
+
