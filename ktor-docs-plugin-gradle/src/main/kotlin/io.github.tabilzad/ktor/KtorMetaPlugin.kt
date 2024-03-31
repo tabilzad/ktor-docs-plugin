@@ -35,7 +35,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
         val project = kotlinCompilation.target.project
         val swaggerExtension = project.extensions.findByType(KtorDocsExtension::class.java) ?: KtorDocsExtension()
 
-        val buildDir = project.buildDir.absolutePath
+        val buildDir = project.layout.buildDirectory.asFile.get().absolutePath
         val modulePath = project.projectDir.absolutePath
 
         kotlinCompilation.dependencies {
