@@ -27,10 +27,10 @@ compilerTest = {module = "com.github.tschuchortdev:kotlin-compile-testing", vers
 jacksonKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonVersion" }
 jacksonYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jacksonVersion" }
 ktor = { module = "io.ktor:ktor", version.ref = "ktorVersion" }
-ktorNetty = { module = "io.ktor:ktor", version.ref = "ktorVersion" }
+ktorNetty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" }
 kotlinGradleApi = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion"}
 kotlinGradle = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion"}
-arrowTest = { module = "io.arrow-kt:arrow-meta", version.ref = "arrowVersion" }
+arrowTest = { module = "io.arrow-kt:arrow-meta-test", version.ref = "arrowVersion" }
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinVersion" }
 
 
