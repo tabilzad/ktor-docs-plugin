@@ -186,7 +186,6 @@ fun Route.ordersRouting() {
 
 ## Sample Specification
 
-![image](https://github.com/tabilzad/ktor-docs-plugin/assets/16094286/84f94b0c-8064-4314-ac27-afc422a7f5a0)
 ![sample](https://github.com/tabilzad/ktor-docs-plugin/assets/16094286/6d0b0a6a-5925-4f52-ad23-11b1c44b43a1)
 
 
