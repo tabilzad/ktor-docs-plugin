@@ -1,19 +1,29 @@
 plugins {
     kotlin("jvm")
-   // id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.3.0-alpha"
+    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.5.1-alpha"
 }
 
-//swagger {
-//    title = "Ktor Server Title"
-//    description = "Ktor Server Description"
-//    version = "1.0"
-//    requestFeature = true
-//}
+swagger {
+
+    documentation {
+        docsTitle = "Ktor Server Title"
+        docsDescription = "Ktor Server Description"
+        docsVersion = "1.0"
+        generateRequestSchemas = true
+        hideTransientFields = true
+        hidePrivateAndInternalFields = true
+    }
+
+    pluginOptions {
+        enabled = true // true by default
+        saveInBuild = true// false by default
+        format = "yaml" // or json
+    }
+}
 
 repositories {
     mavenLocal()
     mavenCentral()
-    maven(url= "https://oss.sonatype.org/content/repositories/snapshots/")
 }
 
 dependencies {

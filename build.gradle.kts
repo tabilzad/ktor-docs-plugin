@@ -14,7 +14,6 @@ buildscript {
         classpath(kotlin("gradle-plugin", version = libs.versions.kotlinVersion.get()))
         classpath ("com.vanniktech:gradle-maven-publish-plugin:0.28.0")
         classpath ("org.jetbrains.dokka:dokka-gradle-plugin:1.5.30")
-        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.3.0-alpha")
     }
 }
 
