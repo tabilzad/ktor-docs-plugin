@@ -1,9 +1,9 @@
-# Ktor Swagger Plugin
+# Open API (Swagger) Plugin for Ktor
 
 This plugin implements a plug and play solution to support OpenAPI (Swagger) for Ktor server with minimal effort.
 Annotate your route(s) definition with `@KtorDocs` and `openapi.yaml` will be generated at build time.
 
-Take a look at `use-plugin` module to reference the plugin gradle setup and `StabilityTests` to see all the supported
+Take a look at `use-plugin` module to reference the plugin setup and `StabilityTests` to see all supported
 features.
 
 ## How to apply the plugin
@@ -41,6 +41,21 @@ swagger {
 | Response Schemas             | ✅           | Explicit  |
 | Endpoint/Scheme Descriptions | ✅           | Explicit  |
 | Endpoint Tagging             | ✅           | Explicit  |
+
+## Plugin Configuration
+
+| Option                                       | Default Value                             | Explanation                                                                           |
+|----------------------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------|
+| `documentation.docsTitle`                    | `"Open API Specification"`                | Title for the API specification that is generated                                     |
+| `documentation.docsDescription`              | `"Generated using Ktor Docs Plugin"`      | A brief description for the generated API specification                               |
+| `documentation.docsVersion`                  | `"1.0.0"`                                 | Specifies the version for the generated API specification                             |
+| `documentation.generateRequestSchemas`       | `true`                                    | Determines if request body schemas should be automatically resolved and included      |
+| `documentation.hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` are omitted in schema outputs        |
+| `documentation.hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields labeled as `private` or `internal` from schema outputs         |
+| `pluginOptions.enabled`                      | `true`                                    | Enable/Disables the plugin                                                            |
+| `pluginOptions.saveInBuild`                  | `false`                                   | Decides if the generated specification file should be saved in the `build/` directory |
+| `pluginOptions.format`                       | `yaml`                                    | The chosen format for the OpenAPI specification (options: json/yaml)                  |
+| `pluginOptions.filePath`                     | `$modulePath/src/main/resources/openapi/` | The designated absolute path for saving the generated specification file              |
 
 ## How to use the plugin
 
@@ -111,7 +126,6 @@ fun Route.ordersRouting() {
         @KtorDescription(
             summary = "Orders Endpoint",
             description = "This endpoint will provide a list of all orders",
-            tags = ["v1"]
         )
         post("/create") {
             call.receive<RequestSample>()
@@ -130,7 +144,47 @@ fun Route.ordersRouting() {
 }
 ```
 
-Sample Specification
+### Tagging
+
+Tagging allows to separate individual endpoint into specified groups. 
+Specifying tags in the @KtorDocs annotation will assign the tags to every endpoint defined underneath.
+
+```
+@KtorDocs(["Orders"])
+fun Route.ordersRouting() {
+    route("/v1") {
+        post("/create") { /*...*/ }
+        get("/orders") { /*...*/ }
+    }
+    route("/v2") {
+        post("/create") { /*...*/ }
+        get("/orders") { /*...*/ }
+    }
+}
+```
+Alternatively specifying the tags in @KtorDescription annotation will assign the tags to the specific endpoint. 
+
+```
+@KtorDocs(["Orders"])
+fun Route.ordersRouting() {
+    route("/v1") {
+        @KtorDescription(tags = ["Order Operations"])
+        post("/order") { /*...*/ }
+        @KtorDescription(tags = ["Cart Operations"])
+        get("/cart") { /*...*/ }
+    }
+}
+```
+
+## Planned Features
+
+* Automatic Response resolution
+* Support for polymorphic types
+* Option for an automatic tag resolution from module/route function declaration
+* Introduce a separate `@KtorTag` annotation that is applicable to module/route/endpoint
+* Tag descriptions
+
+## Sample Specification
 
 ![image](https://github.com/tabilzad/ktor-docs-plugin/assets/16094286/84f94b0c-8064-4314-ac27-afc422a7f5a0)
 

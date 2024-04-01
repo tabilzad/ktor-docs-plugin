@@ -1,6 +1,6 @@
 plugins {
     kotlin("jvm")
-    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.5.1-alpha"
+    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.5.2-alpha"
 }
 
 swagger {
