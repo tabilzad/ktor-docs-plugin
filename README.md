@@ -44,18 +44,18 @@ swagger {
 
 ## Plugin Configuration
 
-| Option                                       | Explanation                                                                           | Default Value                             |
-|----------------------------------------------|---------------------------------------------------------------------------------------|-------------------------------------------|
-| `documentation.docsTitle`                    | Title for the API specification that is generated                                     | `"Open API Specification"`                |
-| `documentation.docsDescription`              | A brief description for the generated API specification                               | `"Generated using Ktor Docs Plugin"`      |
-| `documentation.docsVersion`                  | Specifies the version for the generated API specification                             | `"1.0.0"`                                 |
-| `documentation.generateRequestSchemas`       | Determines if request body schemas should be automatically resolved and included      | `true`                                    |
-| `documentation.hideTransientFields`          | Controls whether fields marked with `@Transient` are omitted in schema outputs        | `true`                                    |
-| `documentation.hidePrivateAndInternalFields` | Opts to exclude fields labeled as `private` or `internal` from schema outputs         | `true`                                    |
-| `pluginOptions.enabled`                      | Enable/Disables the plugin                                                            | `true`                                    |
-| `pluginOptions.saveInBuild`                  | Decides if the generated specification file should be saved in the `build/` directory | `false`                                   |
-| `pluginOptions.format`                       | The chosen format for the OpenAPI specification (options: json/yaml)                  | `yaml`                                    |
-| `pluginOptions.filePath`                     | The designated absolute path for saving the generated specification file              | `$modulePath/src/main/resources/openapi/` |
+| Option                                       | Default Value                             | Explanation                                                                                 |
+|----------------------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------|
+| `documentation.docsTitle`                    | `"Open API Specification"`                | Title for the API specification that is generated                                           |
+| `documentation.docsDescription`              | `"Generated using Ktor Docs Plugin"`      | A brief description for the generated API specification                                     |
+| `documentation.docsVersion`                  | `"1.0.0"`                                 | Specifies the version for the generated API specification                                   |
+| `documentation.generateRequestSchemas`       | `true`                                    | Determines if request body schemas should <br/>be automatically resolved and included       |
+| `documentation.hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` <br/> are omitted in schema outputs        |
+| `documentation.hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields labeled as `private` or `internal` from schema outputs               |
+| `pluginOptions.enabled`                      | `true`                                    | Enable/Disables the plugin                                                                  |
+| `pluginOptions.saveInBuild`                  | `false`                                   | Decides if the generated specification file should <br/> be saved in the `build/` directory |
+| `pluginOptions.format`                       | `yaml`                                    | The chosen format for the OpenAPI specification <br/>(options: json/yaml)                   |
+| `pluginOptions.filePath`                     | `$modulePath/src/main/resources/openapi/` | The designated absolute path for saving <br/> the generated specification file              |
 
 ## How to use the plugin
 
