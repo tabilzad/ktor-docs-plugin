@@ -21,15 +21,13 @@ fun locateOrCreateSwaggerFile(
             File(dir.path + "/openapi.$format")
         }
     } else {
-        val filePath = modulePath.split("/main").first() + "/main"
-        val resourcesDir = File(filePath).listFiles()?.firstNotNullOf {
-            if (listOf("res", "resources").contains(it.name)) {
-                it.name
-            } else {
-                null
-            }
-        } ?: throw IllegalAccessException("error")
-        File("$filePath/$resourcesDir/raw/").apply {
+        val mainModule = "$modulePath/src/main"
+        val resourcesDir = File(mainModule).listFiles()?.find {
+            (listOf("res", "resources").contains(it.name))
+        } ?: throw IllegalAccessException("Couldn't find resources directory to save openapi file to." +
+                " Searched in $modulePath")
+
+        File("${resourcesDir.absolutePath}/openapi/").apply {
             mkdir()
         }.let { dir ->
             File(dir.path + "/openapi.$format")

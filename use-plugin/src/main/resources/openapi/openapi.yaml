@@ -1,0 +1,170 @@
+---
+openapi: "3.1.0"
+info:
+  title: "Ktor Server Title"
+  description: "Ktor Server Description"
+  version: "1.0"
+paths:
+  /v1/orders/create:
+    post:
+      summary: "Create Order"
+      description: "This endpoint will create a new order"
+      tags:
+      - "Main Module"
+      - "Order"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/io.github.tabilzad.model.Sample"
+  /v1/orders/{order_id}:
+    get:
+      summary: "Get Order"
+      description: "This endpoint will fetch an order by id"
+      tags:
+      - "Main Module"
+      - "Order"
+      responses:
+        "200":
+          description: "Order by ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/io.github.tabilzad.model.Sample"
+        "404":
+          description: "OrderNotFound"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/io.github.tabilzad.model.ErrorResponseSample"
+      parameters:
+      - name: "order_id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+  /v1/orders/:
+    get:
+      summary: "Get Orders"
+      description: "This endpoint will fetch all orders"
+      tags:
+      - "Main Module"
+      - "Order"
+      responses:
+        "200":
+          description: "All order by price"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/io.github.tabilzad.model.Sample"
+      parameters:
+      - name: "price"
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+  /v1/carts/create:
+    post:
+      summary: "Create Cart"
+      description: "This endpoint will create a new cart"
+      tags:
+      - "Main Module"
+      - "Cart"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/io.github.tabilzad.model.Sample"
+  /v1/carts/{cart_id}:
+    get:
+      summary: "Get Order"
+      description: "This endpoint will fetch an cart by id"
+      tags:
+      - "Main Module"
+      - "Cart"
+      responses:
+        "200":
+          description: "Cart by ID"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/io.github.tabilzad.model.Sample"
+        "404":
+          description: "Cart Not Found"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/io.github.tabilzad.model.ErrorResponseSample"
+      parameters:
+      - name: "cart_id"
+        in: "path"
+        required: true
+        schema:
+          type: "string"
+  /v1/carts/:
+    get:
+      summary: "Get Carts"
+      description: "This endpoint will fetch all carts"
+      tags:
+      - "Main Module"
+      - "Cart"
+      responses:
+        "200":
+          description: "All carts by price"
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/io.github.tabilzad.model.Sample"
+      parameters:
+      - name: "price"
+        in: "query"
+        required: false
+        schema:
+          type: "string"
+components:
+  schemas:
+    io.github.tabilzad.model.ErrorResponseSample:
+      type: "object"
+      properties:
+        erroCode:
+          type: "integer"
+          description: "Description for error code"
+        message:
+          type: "string"
+          description: "Description for error message"
+    io.github.tabilzad.model.NestedSample:
+      type: "object"
+      properties:
+        d:
+          type: "array"
+          properties: {}
+          items:
+            type: "array"
+            properties: {}
+            items:
+              type: "string"
+          description: "Description for field 4"
+      description: "Description for field 3"
+    io.github.tabilzad.model.Sample:
+      type: "object"
+      properties:
+        a:
+          type: "object"
+          properties: {}
+          additionalProperties:
+            type: "string"
+        b:
+          description: "Description for field 2"
+          $ref: "#/components/schemas/io.github.tabilzad.model.NestedSample"
+        c:
+          type: "array"
+          properties: {}
+          items:
+            $ref: "#/components/schemas/io.github.tabilzad.model.NestedSample"
+          description: "Description for field 3"

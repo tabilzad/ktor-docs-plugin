@@ -1,37 +1,53 @@
 # Ktor Swagger Plugin
 
 This plugin implements a plug and play solution to support OpenAPI (Swagger) for Ktor server with minimal effort.
-Annotate your route(s) definition with `@KtorDocs` and `openapi.json` will be generated at build time.
+Annotate your route(s) definition with `@KtorDocs` and `openapi.yaml` will be generated at build time.
 
-Take a look at `use-plugin` module to reference the plugin gradle setup and `StabilityTests` to see all the supported features.
+Take a look at `use-plugin` module to reference the plugin gradle setup and `StabilityTests` to see all the supported
+features.
 
 ## How to apply the plugin
 
 ```groovy
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath ("io.github.tabilzad:ktor-docs-plugin-gradle:0.3.0-alpha")
-    }
+plugins {
+    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.5.2-alpha"
 }
-
-apply plugin: 'io.github.tabilzad.ktor-docs-plugin-gradle'
 
 swagger {
-    title = "Ktor Server"
-    description = "Ktor Server Description"
-    version = "1.0"
-    // generates request body schemas
-    requestFeature = true 
+
+    documentation {
+        docsTitle = "Ktor Server Title"
+        docsDescription = "Ktor Server Description"
+        docsVersion = "1.0"
+        generateRequestSchemas = true
+        hideTransientFields = true
+        hidePrivateAndInternalFields = true
+    }
+
+    pluginOptions {
+        enabled = true // true by default
+        saveInBuild = true// false by default
+        format = "yaml" // or json
+    }
 }
 ```
+
+## Supported Features
+
+| Feature                      | isSupported | type      |
+|------------------------------|-------------|-----------|
+| Path/Endpoint definitions    | ✅           | Automatic |
+| Request Schemas              | ✅           | Automatic |
+| Response Schemas             | ✅           | Explicit  |
+| Endpoint/Scheme Descriptions | ✅           | Explicit  |
+| Endpoint Tagging             | ✅           | Explicit  |
 
 ## How to use the plugin
 
 ### Generating endpoint specifications
-Annotate the specific route definitions you want the OpenAPI specification to be generated for. 
+
+Annotate the specific route definitions you want the OpenAPI specification to be generated for.
+
 ```kotlin
 
 @KtorDocs
@@ -45,7 +61,9 @@ fun Route.ordersRouting() {
 
 ```
 
-You could also annotate the entire `Application` module with multiple/nested route definitions. The plugin will recursively visit each `Route`. extension and generate its documentation. 
+You could also annotate the entire `Application` module with multiple/nested route definitions. The plugin will
+recursively visit each `Route`. extension and generate its documentation.
+
 ```kotlin
 
 @KtorDocs
@@ -66,9 +84,10 @@ fun Route.routeTwo() {
 }
 
 ```
+
 ### Endpoint and field descriptions
 
-Annotate the HTTP methods of the route with `@KtorDescription`
+Annotate the HTTP methods or class fields with `@KtorDescription`.
 
 ```kotlin
 import io.github.tabilzad.ktor.KtorDocs
@@ -90,17 +109,18 @@ data class More(
 fun Route.ordersRouting() {
     route("/v1") {
         @KtorDescription(
-            summary= "Orders Endpoint",
-            description= "This endpoint will provide a list of all orders"
+            summary = "Orders Endpoint",
+            description = "This endpoint will provide a list of all orders",
+            tags = ["v1"]
         )
         post("/create") {
             call.receive<RequestSample>()
         }
- 
+
         route("/orders") {
             @KtorDescription(
-                summary= "Orders Endpoint",
-                description= "This endpoint will provide a list of all orders"
+                summary = "Orders Endpoint",
+                description = "This endpoint will provide a list of all orders"
             )
             get {
                 /*...*/
