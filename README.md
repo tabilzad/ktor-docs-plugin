@@ -145,7 +145,7 @@ fun Route.ordersRouting() {
 ```
 
 ### Responses
-Defining response schemas and their corresponding HTTP status codes are done via `@KtorRespons` annotation on an endpoint. 
+Defining response schemas and their corresponding HTTP status codes are done via `@KtorResponds` annotation on an endpoint. 
 ```kotlin
 @KtorDocs(["Orders"])
 fun Route.ordersRouting() {
