@@ -124,8 +124,8 @@ data class More(
 fun Route.ordersRouting() {
     route("/v1") {
         @KtorDescription(
-            summary = "Orders Endpoint",
-            description = "This endpoint will provide a list of all orders",
+            summary = "Create Order",
+            description = "This endpoint will create an order",
         )
         post("/create") {
             call.receive<RequestSample>()
@@ -133,13 +133,32 @@ fun Route.ordersRouting() {
 
         route("/orders") {
             @KtorDescription(
-                summary = "Orders Endpoint",
-                description = "This endpoint will provide a list of all orders"
+                summary = "All Orders",
+                description = "This endpoint will return a list of all orders"
             )
             get {
                 /*...*/
             }
         }
+    }
+}
+```
+
+### Responses
+Defining response schemas and their corresponding HTTP status codes are done via `@KtorRespons` annotation on an endpoint. 
+```kotlin
+@KtorDocs(["Orders"])
+fun Route.ordersRouting() {
+    route("/v1") {
+        @KtorResponds(
+               [
+                   ResponseEntry("200", Order::class, description = "Created order"),
+                   ResponseEntry("400", ErrorResponseSample::class, description = "Invalid order payload")
+               ]
+        )
+        post("/create") { /*...*/ }
+        @KtorResponds([ResponseEntry("200", Order::class, isCollection=true, description = "All orders")])
+        get("/orders") { /*...*/ }
     }
 }
 ```
