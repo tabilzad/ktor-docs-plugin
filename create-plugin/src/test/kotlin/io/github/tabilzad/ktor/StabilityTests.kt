@@ -156,6 +156,15 @@ class StabilityTests {
     }
 
     @Test
+    fun `should break down endpoints by tag when tags are specified at application or route level`() {
+        val testFile = File(tempDir.toAbsolutePath().pathString)
+        val (source, expected) = loadSourceAndExpected("Tags")
+        generateArrowTest(testFile, source)
+        val result = testFile.findSwagger()?.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should ignore private fields or ones annotated with @Transient`() {
         val testFile = File(tempDir.toAbsolutePath().pathString)
         val (source, expected) = loadSourceAndExpected("PrivateFields")
@@ -186,6 +195,6 @@ class StabilityTests {
         assertThat(this).isNotNull.withFailMessage {
             "swagger file was not generated"
         }
-        assertThat(this).isEqualTo(expected)
+        assertThat(this).isEqualTo(expected.removeTrailingNewLine())
     }
 }

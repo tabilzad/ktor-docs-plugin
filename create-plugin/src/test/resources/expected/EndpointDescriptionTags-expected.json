@@ -55,7 +55,7 @@
       "get" : {
         "summary" : "My Summary",
         "description" : "My Description",
-        "tags" : [ "tag1" ]
+        "tags" : [ "subModule", "tag1" ]
       }
     }
   },
