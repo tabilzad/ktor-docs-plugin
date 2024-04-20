@@ -415,7 +415,6 @@ internal class ExpressionsVisitor(
     }
 
     private fun KtExpression.visitFunctionDeclaration(parent: KtorElement?): List<KtorElement>? {
-        println()
         return if (this is KtCallExpression) {
             resolveToDescriptor(this, this@ExpressionsVisitor.context)?.let {
                 inspectFunctionBody(it, parent)
@@ -505,7 +504,10 @@ internal class ExpressionsVisitor(
                 } else {
                     if (parent is DocRoute) {
                         // we are under some base route definition
-                        val newElement = DocRoute(routePathArg.toString())
+                        val newElement = DocRoute(
+                            routePathArg.toString(),
+                            tags = parent.tags)
+
                         resultElement = newElement
                         parent.children.add(newElement)
                     }

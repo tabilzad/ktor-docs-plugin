@@ -30,6 +30,8 @@ object TestSourceUtil {
             ?: throw FileNotFoundException("$fileName does not exist")
 }
 
+fun String.removeTrailingNewLine(): String = if (endsWith(System.lineSeparator())) dropLast(System.lineSeparator().length) else this
+
 @OptIn(ExperimentalCompilerApi::class)
 fun generateArrowTest(
     testFile: File,

@@ -4,8 +4,8 @@ import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import sources.annotations.KtorDocs
 
-@KtorDocs
-fun Application.annotationIsAppliedToApplication() {
+@KtorDocs(["AppLevel"])
+fun Application.tagsAreAppliedToApplicationModule() {
     routing {
         route("/v1") {
             get("/getRequest1") {
@@ -15,8 +15,8 @@ fun Application.annotationIsAppliedToApplication() {
     }
 }
 
-@KtorDocs
-fun Route.annotationIsAppliedToRoute() {
+@KtorDocs(["RouteLevel"])
+fun Route.tagsAreAppliedToRoute() {
     route("/v2") {
         get("/getRequest2") {
 

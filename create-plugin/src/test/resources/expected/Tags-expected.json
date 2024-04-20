@@ -7,19 +7,14 @@
   },
   "paths" : {
     "/v1/getRequest1" : {
-      "get" : { }
+      "get" : {
+        "tags" : [ "AppLevel" ]
+      }
     },
     "/v2/getRequest2" : {
-      "get" : { }
-    },
-    "/v3/v3a/getElse" : {
-      "get" : { }
-    },
-    "/v3/v3b/getRequest3a" : {
-      "get" : { }
-    },
-    "/v3/v3b/getRequestElse" : {
-      "get" : { }
+      "get" : {
+        "tags" : [ "RouteLevel" ]
+      }
     }
   },
   "components" : {
