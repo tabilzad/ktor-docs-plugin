@@ -35,9 +35,6 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
         val project = kotlinCompilation.target.project
         val swaggerExtension = project.extensions.findByType(KtorDocsExtension::class.java) ?: KtorDocsExtension()
 
-        val buildDir = project.layout.buildDirectory.asFile.get().absolutePath
-        val modulePath = project.projectDir.absolutePath
-
         kotlinCompilation.dependencies {
             compileOnly("io.github.tabilzad:ktor-docs-plugin:$ktorDocsVersion")
         }
@@ -92,11 +89,11 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
         val gradleProvidedOptions = listOf(
             SubpluginOption(
                 key = "buildPath",
-                value = buildDir
+                value = kotlinCompilation.output.resourcesDir.absolutePath
             ),
             SubpluginOption(
                 key = "modulePath",
-                value = modulePath
+                value = project.projectDir.absolutePath
             )
         )
         return project.provider { gradleProvidedOptions + userProvidedOptions }
