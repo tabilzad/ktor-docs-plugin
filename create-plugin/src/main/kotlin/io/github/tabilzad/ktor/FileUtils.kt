@@ -16,7 +16,7 @@ fun locateOrCreateSwaggerFile(
         File("$filePath/openapi.$format")
     } else if (saveInBuild) {
         File("$buildPath/openapi").apply {
-            mkdir()
+            mkdirs()
         }.let { dir ->
             File(dir.path + "/openapi.$format")
         }

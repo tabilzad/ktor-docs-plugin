@@ -2,10 +2,7 @@ package io.github.tabilzad.ktor
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
-import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
-import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.plugin.*
 
 const val PLUGIN_ID = "io.github.tabilzad.ktor-docs-plugin-gradle"
 
@@ -87,11 +84,11 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
         }
 
         val gradleProvidedOptions = listOf(
-            SubpluginOption(
+            InternalSubpluginOption(
                 key = "buildPath",
                 value = kotlinCompilation.output.resourcesDir.absolutePath
             ),
-            SubpluginOption(
+            InternalSubpluginOption(
                 key = "modulePath",
                 value = project.projectDir.absolutePath
             )
