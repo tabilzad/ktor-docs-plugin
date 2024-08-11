@@ -13,7 +13,7 @@ data class PluginConfiguration(
     val title: String,
     val description: String,
     val version: String,
-    val filePath: String,
+    val filePath: String?,
     val requestBody: Boolean,
     val hideTransients: Boolean,
     val hidePrivateFields: Boolean,

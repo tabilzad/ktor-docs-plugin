@@ -168,7 +168,7 @@ fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = Plu
     title = this?.get(SwaggerConfigurationKeys.ARG_TITLE) ?: "Open API Specification",
     description = this?.get(SwaggerConfigurationKeys.ARG_DESCR) ?: "",
     version = this?.get(SwaggerConfigurationKeys.ARG_VER) ?: "1.0.0",
-    filePath = this?.get(SwaggerConfigurationKeys.ARG_PATH) ?: "openapi.yaml",
+    filePath = this?.get(SwaggerConfigurationKeys.ARG_PATH),
     buildPath = this?.get(SwaggerConfigurationKeys.ARG_BUILD_PATH)
         ?: throw CompilationException("Failed resolve the build folder path for the module", null, null),
     modulePath = this?.get(SwaggerConfigurationKeys.ARG_MODULE_PATH)
