@@ -45,14 +45,14 @@ fun MemberScope.forEachVariable(configuration: PluginConfiguration, predicate: (
         .toList().forEach { predicate(it) }
 }
 
-val Iterable<OpenApiSpec.ObjectType>.names get() = mapNotNull { it.fqName }
+internal val Iterable<OpenApiSpec.ObjectType>.names get() = mapNotNull { it.fqName }
 
 fun String?.addLeadingSlash() = when {
     this == null -> null
     else -> if (this.startsWith("/")) this else "/$this"
 }
 
-fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { child ->
+internal fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { child ->
     when (child) {
         is DocRoute -> {
             reduce(
@@ -84,7 +84,7 @@ fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { child ->
     }
 }
 
-fun List<KtorRouteSpec>.cleanPaths() = map {
+internal fun List<KtorRouteSpec>.cleanPaths() = map {
     it.copy(
         path = it.path
             .replace("//", "/")
@@ -92,14 +92,14 @@ fun List<KtorRouteSpec>.cleanPaths() = map {
     )
 }
 
-fun List<KtorRouteSpec>.convertToSpec(): Map<String, Map<String, OpenApiSpec.Path>> = groupBy { it ->
+internal fun List<KtorRouteSpec>.convertToSpec(): Map<String, Map<String, OpenApiSpec.Path>> = groupBy { it ->
     it.path
 }.mapValues { (key, value) ->
     value.associate {
         it.method to OpenApiSpec.Path(
             summary = it.summary,
             description = it.description,
-            tags = it.tags?.toList(),
+            tags = it.tags?.toList()?.sorted(),
             parameters = addPathParams(it) merge addQueryParams(it),
             requestBody = addPostBody(it),
             responses = it.responses
@@ -168,7 +168,7 @@ fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = Plu
     title = this?.get(SwaggerConfigurationKeys.ARG_TITLE) ?: "Open API Specification",
     description = this?.get(SwaggerConfigurationKeys.ARG_DESCR) ?: "",
     version = this?.get(SwaggerConfigurationKeys.ARG_VER) ?: "1.0.0",
-    filePath = this?.get(SwaggerConfigurationKeys.ARG_PATH),
+    filePath = this?.get(SwaggerConfigurationKeys.ARG_PATH) ?: "openapi.yaml",
     buildPath = this?.get(SwaggerConfigurationKeys.ARG_BUILD_PATH)
         ?: throw CompilationException("Failed resolve the build folder path for the module", null, null),
     modulePath = this?.get(SwaggerConfigurationKeys.ARG_MODULE_PATH)
@@ -176,9 +176,10 @@ fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = Plu
     requestBody = this?.get(SwaggerConfigurationKeys.ARG_REQUEST_FEATURE) ?: true,
     hideTransients = this?.get(SwaggerConfigurationKeys.ARG_HIDE_TRANSIENTS) ?: true,
     hidePrivateFields = this?.get(SwaggerConfigurationKeys.ARG_HIDE_PRIVATE) ?: true,
+    deriveFieldRequirementFromTypeNullability = this?.get(SwaggerConfigurationKeys.ARG_DERIVE_PROP_REQ) ?: true
 )
 
-fun Class<*>.resolveDefinitionTo(obj: OpenApiSpec.ObjectType): OpenApiSpec.ObjectType {
+internal fun Class<*>.resolveDefinitionTo(obj: OpenApiSpec.ObjectType): OpenApiSpec.ObjectType {
     kotlin.memberProperties.forEach { field ->
         if (field.returnType.jvmErasure.java.isPrimitive) {
             obj.properties?.set(

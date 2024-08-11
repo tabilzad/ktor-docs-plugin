@@ -1,0 +1,63 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/requestWithDescribedFields" : {
+      "post" : {
+        "summary" : "My Summary",
+        "description" : "My Description",
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.MyDescribedPayload"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.MyDescribedPayload" : {
+        "type" : "object",
+        "properties" : {
+          "field1" : {
+            "type" : "string",
+            "description" : "this is field 1 (string)"
+          },
+          "field2" : {
+            "type" : "integer",
+            "description" : "this is field 2 (int)"
+          },
+          "field3" : {
+            "description" : "this is field 3 (int)",
+            "$ref" : "#/components/schemas/sources.NestedObject"
+          }
+        },
+        "required" : [ "field1", "field3" ]
+      },
+      "sources.NestedObject" : {
+        "type" : "object",
+        "properties" : {
+          "subField" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "subField2" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "subField" ]
+      }
+    }
+  }
+}

@@ -24,8 +24,10 @@ fun locateOrCreateSwaggerFile(
         val mainModule = "$modulePath/src/main"
         val resourcesDir = File(mainModule).listFiles()?.find {
             (listOf("res", "resources").contains(it.name))
-        } ?: throw IllegalAccessException("Couldn't find resources directory to save openapi file to." +
-                " Searched in $modulePath")
+        } ?: throw IllegalAccessException(
+            "Couldn't find resources directory to save openapi file to." +
+                    " Searched in $modulePath"
+        )
 
         File("${resourcesDir.absolutePath}/openapi/").apply {
             mkdir()
@@ -48,6 +50,9 @@ fun OpenApiSpec.serializeAndWriteTo(configuration: PluginConfiguration) {
         val sorted = new.copy(
             components = new.components.copy(
                 schemas = new.components.schemas.toSortedMap()
+                    .mapValues {
+                        it.value.copy(properties = it.value.properties?.toSortedMap())
+                    }
             )
         )
         file.writeText(mapper.writeValueAsString(sorted))
