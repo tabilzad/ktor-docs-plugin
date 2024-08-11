@@ -13,10 +13,11 @@ data class PluginConfiguration(
     val title: String,
     val description: String,
     val version: String,
-    val filePath: String?,
+    val filePath: String,
     val requestBody: Boolean,
     val hideTransients: Boolean,
     val hidePrivateFields: Boolean,
+    val deriveFieldRequirementFromTypeNullability: Boolean
 )
 interface OpenApiSpecParam {
     val name: String
@@ -24,7 +25,7 @@ interface OpenApiSpecParam {
     val required: Boolean
 }
 
-data class KtorRouteSpec(
+internal data class KtorRouteSpec(
     val path: String,
     val queryParameters: List<String>?,
     val method: String,
@@ -35,9 +36,11 @@ data class KtorRouteSpec(
     val responses: Map<String, OpenApiSpec.ResponseDetails>?
 )
 
-interface KtorElement {
-    var path: String?
-    var tags: Set<String>?
+sealed class KtorElement {
+    abstract var path: String?
+    abstract var tags: Set<String>?
+
+    abstract fun newInstance(tags: Set<String>?): KtorElement
 }
 
 enum class ExpType(val labels: List<String>) {
@@ -46,7 +49,7 @@ enum class ExpType(val labels: List<String>) {
     RECEIVE(listOf("receive"))
 }
 
-data class EndPoint(
+internal data class EndPoint(
     override var path: String?,
     val method: String = "",
     var body: OpenApiSpec.ObjectType = OpenApiSpec.ObjectType(type = "object"),
@@ -55,22 +58,31 @@ data class EndPoint(
     var summary: String? = null,
     override var tags: Set<String>? = null,
     var responses: Map<String, OpenApiSpec.ResponseDetails>? = null
-) : KtorElement
+) : KtorElement() {
+    override fun newInstance(tags: Set<String>?): EndPoint {
+        return copy(tags = tags)
+    }
+}
 
 data class DocRoute(
     override var path: String? = "/",
     val children: MutableList<KtorElement> = mutableListOf(),
-    override var tags: Set<String>?= null,
-) : KtorElement
+    override var tags: Set<String>? = null
+) : KtorElement() {
+    override fun newInstance(tags: Set<String>?): DocRoute {
+        return copy(tags = tags)
+    }
+}
 
-enum class ContentType{
+enum class ContentType {
     @JsonProperty("application/json")
     APPLICATION_JSON;
 }
 
-typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
+internal typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
 
-typealias BodyContent = Map<ContentType, ContentSchema>
+internal typealias BodyContent = Map<ContentType, ContentSchema>
+
 data class OpenApiComponents(
     val schemas: Map<String, OpenApiSpec.ObjectType>
 )
@@ -110,7 +122,7 @@ data class OpenApiSpec(
         val content: BodyContent
     )
 
-    interface AnyObject{
+    interface NamedObject{
         var fqName: String?
     }
     data class ObjectType(
@@ -123,11 +135,12 @@ data class OpenApiSpec(
         var description: String? = null,
         @JsonProperty("\$ref")
         var ref: String? = null,
-
         @JsonIgnore
         var contentBodyRef: String? = null,
-        var additionalProperties: ObjectType? = null
-    ): AnyObject
+        var additionalProperties: ObjectType? = null,
+        var oneOf: List<SchemaRef>? = null,
+        var required: MutableList<String>? = null
+    ) : NamedObject
 
     data class PathParam(
         override val name: String,
@@ -138,7 +151,8 @@ data class OpenApiSpec(
 
 
     data class SchemaRef(
-        val `$ref`: String,
+        val `$ref`: String? = null,
+        val type: String? = null
     )
 
     data class SchemaType(

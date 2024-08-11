@@ -85,64 +85,34 @@
           "something" : {
             "type" : "string"
           }
-        }
+        },
+        "required" : [ "something" ]
       },
       "sources.requests.ComplexRequest" : {
         "type" : "object",
         "properties" : {
-          "evenMore" : {
-            "type" : "integer"
-          },
-          "list" : {
-            "type" : "array",
+          "complexEnumValueMap" : {
+            "type" : "object",
             "properties" : { },
-            "items" : {
-              "type" : "string"
-            }
-          },
-          "nestedList" : {
-            "type" : "array",
-            "properties" : { },
-            "items" : {
+            "additionalProperties" : {
               "type" : "array",
-              "properties" : { },
               "items" : {
-                "type" : "string"
-              }
-            }
-          },
-          "nestedMutableList" : {
-            "type" : "array",
-            "properties" : { },
-            "items" : {
-              "type" : "array",
-              "properties" : { },
-              "items" : {
-                "type" : "array",
-                "properties" : { },
-                "items" : {
-                  "type" : "array",
-                  "properties" : { },
-                  "items" : {
-                    "type" : "string"
-                  }
-                }
+                "type" : "string",
+                "enum" : [ "ONE", "TWO", "THREE" ]
               }
             }
           },
           "complexList" : {
             "type" : "array",
-            "properties" : { },
             "items" : {
               "$ref" : "#/components/schemas/sources.requests.ComplexMapValue"
             }
           },
-          "complexNestedList" : {
-            "type" : "array",
+          "complexListMap" : {
+            "type" : "object",
             "properties" : { },
-            "items" : {
+            "additionalProperties" : {
               "type" : "array",
-              "properties" : { },
               "items" : {
                 "$ref" : "#/components/schemas/sources.requests.ComplexMapValue"
               }
@@ -153,18 +123,15 @@
             "properties" : { },
             "additionalProperties" : {
               "type" : "array",
-              "properties" : { },
               "items" : {
                 "type" : "string"
               }
             }
           },
-          "complexListMap" : {
-            "type" : "object",
-            "properties" : { },
-            "additionalProperties" : {
+          "complexNestedList" : {
+            "type" : "array",
+            "items" : {
               "type" : "array",
-              "properties" : { },
               "items" : {
                 "$ref" : "#/components/schemas/sources.requests.ComplexMapValue"
               }
@@ -175,28 +142,12 @@
             "properties" : { },
             "additionalProperties" : {
               "type" : "array",
-              "properties" : { },
               "items" : {
                 "type" : "array",
-                "properties" : { },
                 "items" : {
                   "$ref" : "#/components/schemas/sources.requests.ComplexMapValue"
                 }
               }
-            }
-          },
-          "stringMap" : {
-            "type" : "object",
-            "properties" : { },
-            "additionalProperties" : {
-              "type" : "string"
-            }
-          },
-          "intValueMap" : {
-            "type" : "object",
-            "properties" : { },
-            "additionalProperties" : {
-              "type" : "integer"
             }
           },
           "complexValueMap" : {
@@ -211,23 +162,58 @@
             "properties" : { },
             "additionalProperties" : {
               "type" : "string",
-              "enum" : [ "TWO", "THREE", "ONE" ]
+              "enum" : [ "ONE", "TWO", "THREE" ]
             }
           },
-          "complexEnumValueMap" : {
+          "evenMore" : {
+            "type" : "integer"
+          },
+          "intValueMap" : {
             "type" : "object",
             "properties" : { },
             "additionalProperties" : {
+              "type" : "integer"
+            }
+          },
+          "list" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "nestedList" : {
+            "type" : "array",
+            "items" : {
               "type" : "array",
-              "properties" : { },
               "items" : {
-                "type" : "string",
-                "properties" : { },
-                "enum" : [ "ONE", "TWO", "THREE" ]
+                "type" : "string"
               }
             }
+          },
+          "nestedMutableList" : {
+            "type" : "array",
+            "items" : {
+              "type" : "array",
+              "items" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "array",
+                  "items" : {
+                    "type" : "string"
+                  }
+                }
+              }
+            }
+          },
+          "stringMap" : {
+            "type" : "object",
+            "properties" : { },
+            "additionalProperties" : {
+              "type" : "string"
+            }
           }
-        }
+        },
+        "required" : [ "list", "nestedList", "nestedMutableList", "complexList", "complexNestedList", "complexListStringMap", "complexListMap", "complexNestedListMap", "stringMap", "intValueMap", "complexValueMap", "enumValueMap", "complexEnumValueMap" ]
       },
       "sources.requests.NestedRequest" : {
         "type" : "object",
@@ -235,21 +221,23 @@
           "nestedObject" : {
             "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
           }
-        }
+        },
+        "required" : [ "nestedObject" ]
       },
       "sources.requests.SimpleRequest" : {
         "type" : "object",
         "properties" : {
-          "string" : {
-            "type" : "string"
+          "float" : {
+            "type" : "number"
           },
           "integer" : {
             "type" : "integer"
           },
-          "float" : {
-            "type" : "number"
+          "string" : {
+            "type" : "string"
           }
-        }
+        },
+        "required" : [ "string", "integer", "float" ]
       }
     }
   }

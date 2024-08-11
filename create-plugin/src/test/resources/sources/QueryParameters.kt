@@ -54,11 +54,14 @@ fun Application.queryParametersTest() {
             }
             get("/order6") {
                 call.request.queryParameters[queryParam].let{
+                    val k = "notParam"+ "notParam"
+
                     println(it)
                 }
             }
             get("/order7") {
                 call.request.queryParameters["param_part1" + "param_part2"].let{
+                    "notParam"+ "notParam"
                     println(it)
                 }
             }

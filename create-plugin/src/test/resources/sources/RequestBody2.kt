@@ -1,5 +1,6 @@
 package sources
 
+import io.github.tabilzad.ktor.Tag
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
@@ -8,14 +9,16 @@ import sources.annotations.KtorDocs
 import sources.requests.ComplexRequest
 import sources.requests.SimpleRequest
 
-@KtorDocs(["module1"])
+@KtorDocs
+@Tag(["module1"])
 fun Application.module1() {
     routing {
         requestBodyTest2()
     }
 }
 
-@KtorDocs(["submodule"])
+@KtorDocs
+@Tag(["submodule"])
 fun Route.requestBodyTest2() {
 
     val service = MyService2()

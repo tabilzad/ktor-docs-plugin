@@ -1,7 +1,8 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.0.0"
 }
 
 buildscript {
@@ -26,8 +27,8 @@ subprojects {
         maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
     }
     tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions {
-            jvmTarget = libs.versions.jvmTarget.get()
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
         }
     }
 
