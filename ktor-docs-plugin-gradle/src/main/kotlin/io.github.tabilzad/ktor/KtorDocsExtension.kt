@@ -6,7 +6,8 @@ open class DocumentationOptions(
     var docsVersion: String = "1.0.0",
     var generateRequestSchemas: Boolean = true,
     var hideTransientFields: Boolean = true,
-    var hidePrivateAndInternalFields: Boolean = true
+    var hidePrivateAndInternalFields: Boolean = true,
+    var deriveFieldRequirementFromTypeNullability: Boolean = true
 )
 
 open class PluginOptions(
