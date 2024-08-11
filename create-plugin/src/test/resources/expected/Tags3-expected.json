@@ -1,0 +1,23 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/l1/sub_l1/sub_l1_get" : {
+      "get" : {
+        "tags" : [ "MainModule", "SubModule" ]
+      }
+    },
+    "/l1/l2/l2get" : {
+      "get" : {
+        "tags" : [ "MainModule" ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : { }
+  }
+}

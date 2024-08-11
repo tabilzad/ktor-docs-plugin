@@ -36,7 +36,7 @@
       "get" : {
         "summary" : "My Summary",
         "description" : "My Description",
-        "tags" : [ "module2", "tag1", "subModule" ]
+        "tags" : [ "module2", "subModule", "tag1" ]
       }
     },
     "/v2/subRoute1/tagged1AndModule2" : {

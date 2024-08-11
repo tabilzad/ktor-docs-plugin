@@ -1,11 +1,13 @@
 package sources
 
+import io.github.tabilzad.ktor.KtorDocs
+import io.github.tabilzad.ktor.Tag
 import io.ktor.server.application.Application
 import io.ktor.server.routing.*
 import sources.annotations.KtorDescription
-import sources.annotations.KtorDocs
 
-@KtorDocs(["module1"])
+@KtorDocs
+@Tag(["module1"])
 fun Application.testDescriptionTags() {
     routing {
         route("/v1") {
@@ -45,7 +47,8 @@ fun Application.testDescriptionTags() {
     }
 }
 
-@KtorDocs(["module2"])
+@KtorDocs
+@Tag(["module2"])
 fun Application.testDescriptionTags2() {
     routing {
         route("/v2") {
@@ -68,7 +71,8 @@ fun Application.testDescriptionTags2() {
     }
 }
 
-@KtorDocs(["subModule"])
+@KtorDocs
+@Tag(["subModule"])
 fun Route.subRouteWithSpecialTag(){
 
     route("/subRoute2") {

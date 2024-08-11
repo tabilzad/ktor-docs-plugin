@@ -6,14 +6,14 @@
     "version" : "1.0.0"
   },
   "paths" : {
-    "/v1/bodyWithPrivateFields" : {
+    "/v3/postBodyRequestSimple" : {
       "post" : {
         "requestBody" : {
           "required" : true,
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/sources.requests.PrivateBodyRequest"
+                "$ref" : "#/components/schemas/sources.SomeRequest"
               }
             }
           }
@@ -23,20 +23,23 @@
   },
   "components" : {
     "schemas" : {
-      "sources.requests.PrivateBodyRequest" : {
+      "sources.SomeRequest" : {
         "type" : "object",
         "properties" : {
-          "invisible" : {
+          "abstractField1" : {
             "type" : "string"
           },
-          "transientFieldInvisible" : {
+          "abstractField2" : {
             "type" : "integer"
           },
-          "visible" : {
-            "type" : "boolean"
+          "concreteField" : {
+            "type" : "string"
+          },
+          "fieldWithGetter" : {
+            "type" : "string"
           }
         },
-        "required" : [ "visible", "invisible", "transientFieldInvisible" ]
+        "required" : [ "concreteField", "abstractField1", "abstractField2", "fieldWithGetter" ]
       }
     }
   }

@@ -1,9 +1,8 @@
 package io.github.tabilzad.ktor.visitors
 
-import arrow.meta.phases.resolve.unwrappedNotNullableType
-import io.github.tabilzad.ktor.KtorDescription
 import io.github.tabilzad.ktor.OpenApiSpec.ObjectType
 import io.github.tabilzad.ktor.PluginConfiguration
+import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.forEachVariable
 import io.github.tabilzad.ktor.names
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
@@ -12,7 +11,6 @@ import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
-import org.jetbrains.kotlin.js.descriptorUtils.getJetTypeFqName
 import org.jetbrains.kotlin.js.descriptorUtils.getKotlinTypeFqName
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -30,7 +28,7 @@ import org.jetbrains.kotlin.types.typeUtil.isEnum
 import org.jetbrains.kotlin.types.typeUtil.supertypes
 import org.jetbrains.kotlin.util.removeSuffixIfPresent
 
-class ClassDescriptorVisitor(val config: PluginConfiguration, val context: BindingContext) :
+internal class ClassDescriptorVisitor(val config: PluginConfiguration, val context: BindingContext) :
     DeclarationDescriptorVisitorEmptyBodies<ObjectType, ObjectType>() {
 
     val classNames = mutableListOf<ObjectType>()
@@ -46,7 +44,7 @@ class ClassDescriptorVisitor(val config: PluginConfiguration, val context: Bindi
         val docsDescription = descriptor.findDocsDescription()
 
         val result = when {
-            KotlinBuiltIns.isPrimitiveType(type.unwrappedNotNullableType) || KotlinBuiltIns.isString(type.unwrappedNotNullableType) -> {
+            KotlinBuiltIns.isPrimitiveType(type.asTypeProjection().type) || KotlinBuiltIns.isString(type.asTypeProjection().type) -> {
                 if (parent.type == "object") {
                     parent.properties?.put(
                         propertyName,
@@ -303,8 +301,8 @@ private fun PropertyDescriptor.findDocsDescription(): String? {
 }
 
 fun KotlinType.isIterable(): Boolean {
-    return supertypes().map { it.getJetTypeFqName(false) }
-        .contains(DefaultBuiltIns.Instance.iterableType.getJetTypeFqName(false))
+    return supertypes().map { it.getKotlinTypeFqName(false) }
+        .contains(DefaultBuiltIns.Instance.iterableType.getKotlinTypeFqName(false))
 }
 
 fun KotlinType.isMap(): Boolean {
@@ -342,10 +340,11 @@ fun MemberScope.resolveEnumValues(): List<String> {
 
 fun String.toSwaggerType(): String {
     return when (val type = this.lowercase().removeSuffixIfPresent("?")) {
-        "int" -> "integer"
-        "double" -> "number"
-        "float" -> "number"
-        "long" -> "integer"
+        "int", "kotlin/int" -> "integer"
+        "double", "kotlin/double" -> "number"
+        "float", "kotlin/float" -> "number"
+        "long", "kotlin/long" -> "integer"
+        "string", "kotlin/string"-> "string"
         else -> type
     }
 }

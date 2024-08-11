@@ -103,16 +103,17 @@
       "sources.requests.SimpleRequest" : {
         "type" : "object",
         "properties" : {
-          "string" : {
-            "type" : "string"
+          "float" : {
+            "type" : "number"
           },
           "integer" : {
             "type" : "integer"
           },
-          "float" : {
-            "type" : "number"
+          "string" : {
+            "type" : "string"
           }
-        }
+        },
+        "required" : [ "string", "integer", "float" ]
       }
     }
   }

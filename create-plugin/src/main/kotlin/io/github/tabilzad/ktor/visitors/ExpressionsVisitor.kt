@@ -1,6 +1,9 @@
 package io.github.tabilzad.ktor.visitors
 
 import io.github.tabilzad.ktor.*
+import io.github.tabilzad.ktor.annotations.KtorDescription
+import io.github.tabilzad.ktor.annotations.KtorDocs
+import io.github.tabilzad.ktor.annotations.KtorResponds
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -12,7 +15,6 @@ import org.jetbrains.kotlin.psi.*
 import org.jetbrains.kotlin.psi.psiUtil.argumentIndex
 import org.jetbrains.kotlin.psi.psiUtil.getAnnotationEntries
 import org.jetbrains.kotlin.psi.psiUtil.getCallNameExpression
-import org.jetbrains.kotlin.psi.psiUtil.isInImportDirective
 import org.jetbrains.kotlin.resolve.BindingContext
 import org.jetbrains.kotlin.resolve.DescriptorToSourceUtils
 import org.jetbrains.kotlin.resolve.DescriptorUtils
@@ -369,7 +371,6 @@ internal class ExpressionsVisitor(
         val jetTypeFqName = getKotlinTypeFqName(false)
         val r = OpenApiSpec.ObjectType(
             type = "object",
-            properties = mutableMapOf(),
             fqName = jetTypeFqName,
             contentBodyRef = "#/components/schemas/${jetTypeFqName}",
         )
@@ -513,7 +514,7 @@ internal class ExpressionsVisitor(
                     }
                 }
             } else if (ExpType.METHOD.labels.contains(expName)) {
-                val (summary, descr, tags) = expression.findDocsDescription(context)
+                val (summary, descr, tags) = expression.findDocsDescription()
                 val responds = expression.findRespondsAnnotation(context)
 
                 val responses = responds?.associate { response ->
@@ -628,27 +629,6 @@ internal class ExpressionsVisitor(
         return super.visitNamedFunction(function, newParent)
     }
 
-    private fun KtCallExpression.visitExpressionDefinition(
-        expressionsVisitor: ExpressionsVisitor,
-        kontext: KtorElement?
-    ): List<KtorElement>? {
-
-        val expName = getCallNameExpression()?.text.toString()
-
-        return calleeExpression?.let { exp ->
-
-            if (exp.isInImportDirective()) {
-
-                null
-
-            } else {
-                // look for anonymous/private function with this name in this file
-                exp.containingKtFile.children
-                    .filterIsInstance<KtNamedFunction>()
-                    .firstOrNull { it.name == expName }?.bodyExpression?.accept(expressionsVisitor, kontext)
-            }
-        }
-    }
 
     override fun visitLambdaExpression(lambdaExpression: KtLambdaExpression, parent: KtorElement?): List<KtorElement> {
         println("visitLambdaExpression $parent")
@@ -660,7 +640,8 @@ internal class ExpressionsVisitor(
 internal data class KtorDescriptionBag(
     val summary: String? = null,
     val descr: String? = null,
-    val tags: Set<String>? = null
+    val tags: Set<String>? = null,
+    val isRequired: Boolean = false
 )
 
 internal data class KtorResponseBag(
@@ -671,7 +652,7 @@ internal data class KtorResponseBag(
 )
 
 @OptIn(UnsafeCastFunction::class)
-private fun KtExpression.findDocsDescription(context: BindingContext): KtorDescriptionBag {
+private fun KtExpression.findDocsDescription(): KtorDescriptionBag {
 
     return getAnnotationEntries().find { it ->
         it.typeReference?.typeElement.safeAs<KtUserType>()?.referencedName == KtorDescription::class.simpleName!!

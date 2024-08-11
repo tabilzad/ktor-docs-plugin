@@ -1,6 +1,7 @@
 package io.github.tabilzad.ktor
 
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_BUILD_PATH
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_DERIVE_PROP_REQ
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_DESCR
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_ENABLED
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_FORMAT
@@ -13,6 +14,7 @@ import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_SAVE_IN_BUILD
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_TITLE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_VER
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_BUILD_PATH
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_DERIVE_PROP_REQ
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_DESCR
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_FORMAT
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_HIDE_PRIVATE
@@ -44,6 +46,7 @@ object SwaggerConfigurationKeys {
     const val OPTION_REQUEST_BODY = "generateRequestSchemas"
     const val OPTION_HIDE_TRANSIENT = "hideTransientFields"
     const val OPTION_HIDE_PRIVATE = "hidePrivateAndInternalFields"
+    const val OPTION_DERIVE_PROP_REQ = "deriveFieldRequirementFromTypeNullability"
     const val OPTION_FORMAT = "format"
 
     val ARG_ENABLED = CompilerConfigurationKey.create<Boolean>(OPTION_IS_ENABLED)
@@ -57,6 +60,7 @@ object SwaggerConfigurationKeys {
     val ARG_REQUEST_FEATURE = CompilerConfigurationKey.create<Boolean>(OPTION_REQUEST_BODY)
     val ARG_HIDE_TRANSIENTS = CompilerConfigurationKey.create<Boolean>(OPTION_HIDE_TRANSIENT)
     val ARG_HIDE_PRIVATE = CompilerConfigurationKey.create<Boolean>(OPTION_HIDE_PRIVATE)
+    val ARG_DERIVE_PROP_REQ = CompilerConfigurationKey.create<Boolean>(OPTION_DERIVE_PROP_REQ)
     val ARG_FORMAT = CompilerConfigurationKey.create<String>(OPTION_FORMAT)
 }
 
@@ -132,6 +136,12 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             "Hide private or internal fields in body definitions",
             false
         )
+        val derivePropRequirement = CliOption(
+            OPTION_DERIVE_PROP_REQ,
+            "true sets automation resolution, false sets to explicit",
+            "Automatically derive object properties' requirement from the type nullability",
+            false
+        )
         val formatOption = CliOption(
             OPTION_FORMAT,
             "Specification format",
@@ -156,6 +166,7 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             requestSchema,
             hideTransientFields,
             hidePrivateAndInternalFields,
+            derivePropRequirement,
             formatOption
         )
 
@@ -183,6 +194,8 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             pathOption -> configuration.put(ARG_PATH, value)
 
             formatOption -> configuration.put(ARG_FORMAT, value)
+
+            derivePropRequirement -> configuration.put(ARG_DERIVE_PROP_REQ, value.toBooleanStrictOrNull() ?: true)
 
             requestSchema -> configuration.put(ARG_REQUEST_FEATURE, value.toBooleanStrictOrNull() ?: true)
 

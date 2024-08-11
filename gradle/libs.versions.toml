@@ -1,10 +1,9 @@
 [versions]
-jvmTarget = "11"
-kotlinVersion = "1.9.22"
-arrowVersion = "1.6.2"
+kotlinVersion = "2.0.0"
+classgraph = "4.8.157"
 jacksonVersion = "2.15.2"
 ktorVersion = "2.2.4"
-compilerTestingVersion = "1.5.0"
+compilerTestingVersion = "0.5.0-alpha08"
 assertJVerison = "3.24.2"
 
 [plugins]
@@ -18,19 +17,18 @@ ktor = ["ktor", "ktorNetty"]
 kotlinGradle = ["kotlinGradleApi","kotlinGradle"]
 
 [libraries]
-arrowMeta = { module = "io.arrow-kt:arrow-meta", version.ref = "arrowVersion" }
 kotlinCompiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlinVersion" }
 assertJ = {module = "org.assertj:assertj-core", version.ref = "assertJVerison"}
+classGraph = {module="io.github.classgraph:classgraph", version.ref="classgraph"}
 junit = {module = "org.junit:junit-bom", version = "5.10.0"}
 junitJupiter = {module = "org.junit.jupiter:junit-jupiter"}
-compilerTest = {module = "com.github.tschuchortdev:kotlin-compile-testing", version.ref = "compilerTestingVersion"}
+compilerTest = {module = "dev.zacsweers.kctfork:core", version.ref = "compilerTestingVersion"}
 jacksonKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonVersion" }
 jacksonYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jacksonVersion" }
 ktor = { module = "io.ktor:ktor", version.ref = "ktorVersion" }
 ktorNetty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" }
 kotlinGradleApi = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion"}
 kotlinGradle = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion"}
-arrowTest = { module = "io.arrow-kt:arrow-meta-test", version.ref = "arrowVersion" }
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinVersion" }
 
 

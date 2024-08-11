@@ -1,0 +1,55 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v3/postGenericRequest" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.SomeGenericRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.GenericType" : {
+        "type" : "object",
+        "properties" : {
+          "other" : {
+            "type" : "string"
+          },
+          "status" : {
+            "type" : "integer"
+          }
+        },
+        "required" : [ "status", "other" ]
+      },
+      "sources.SomeGenericRequest" : {
+        "type" : "object",
+        "properties" : {
+          "generic" : {
+            "type" : "array",
+            "items" : {
+              "type" : "array",
+              "items" : {
+                "$ref" : "#/components/schemas/sources.GenericType"
+              }
+            }
+          }
+        },
+        "required" : [ "generic" ]
+      }
+    }
+  }
+}

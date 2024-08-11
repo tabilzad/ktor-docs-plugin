@@ -1,6 +1,6 @@
 package io.github.tabilzad.ktor
 
-import arrow.meta.dsl.config.ConfigSyntax
+import io.github.tabilzad.ktor.annotations.KtorDocs
 import io.github.tabilzad.ktor.visitors.ExpressionsVisitor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.KtAnnotated
@@ -11,30 +11,26 @@ import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 import org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-
-/**
- * This is the main phase of the plugin that starts going through
- * all declarations in the code and search for functions annotated with @KtorDocs.
- * For such functions it invokes the ExpressionVisitor which recursively walks through
- * all expressions in the function body to extract Ktor dsl related data
- * and convert in to Open API specification
- */
-fun ConfigSyntax.swaggerExtensionPhase(config: PluginConfiguration) = declarationChecker { ktDeclaration: KtDeclaration,
-                                                                                               declarationDescriptor: DeclarationDescriptor,
-                                                                                               declarationCheckerContext: DeclarationCheckerContext ->
-
+@Deprecated("used for k1 backend only, we wont be supporting k1, see SwaggerDeclarationChecker")
+fun swaggerExtensionPhase(
+    config: PluginConfiguration,
+    ktDeclaration: KtDeclaration,
+    declarationDescriptor: DeclarationDescriptor,
+    declarationCheckerContext: DeclarationCheckerContext
+) {
     if (config.isEnabled) {
         ktDeclaration.startVisiting(declarationCheckerContext, config)
     }
 }
 
+@Deprecated("used for k1 backend only, we wont be supporting k1")
 private fun KtDeclaration.startVisiting(
     declarationCheckerContext: DeclarationCheckerContext,
     configuration: PluginConfiguration,
 ) {
     if (hasAnnotation(KtorDocs::class.simpleName)) {
-        val context = declarationCheckerContext.trace.bindingContext
 
+        val context = declarationCheckerContext.trace.bindingContext
         val expressionsVisitor = ExpressionsVisitor(configuration, context)
         val rawRoutes = accept(expressionsVisitor, null)
 
@@ -65,7 +61,7 @@ private fun KtDeclaration.startVisiting(
     }
 }
 
-private fun convertInternalToOpenSpec(
+internal fun convertInternalToOpenSpec(
     routes: List<DocRoute>,
     configuration: PluginConfiguration,
     schemas: Map<String, OpenApiSpec.ObjectType>
@@ -78,7 +74,7 @@ private fun convertInternalToOpenSpec(
         }
         .reduce { acc, route ->
             acc.plus(route)
-        }
+        }.mapKeys { it.key.replace("//", "/") }
 
     return OpenApiSpec(
         info = OpenApiSpec.Info(

@@ -6,11 +6,11 @@
     "version" : "1.0.0"
   },
   "paths" : {
-    "/v1/postBodyRequestSimple" : {
+    "/v5/postBodyRequestSimple" : {
       "post" : {
         "responses" : {
           "200" : {
-            "description" : "Success",
+            "description" : "line0line1line3",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -20,7 +20,7 @@
             }
           },
           "500" : {
-            "description" : "Failure",
+            "description" : "external",
             "content" : {
               "application/json" : {
                 "schema" : {
@@ -42,15 +42,18 @@
         }
       }
     },
-    "/v1/implicitArgNames" : {
+    "/v5/implicitField" : {
       "post" : {
         "responses" : {
           "200" : {
-            "description" : "",
+            "description" : "line0line1line3",
             "content" : {
               "application/json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
+                  }
                 }
               }
             }
@@ -68,8 +71,8 @@
         }
       }
     },
-    "/v1/listOfs" : {
-      "post" : {
+    "/v5/implicitArgs" : {
+      "get" : {
         "responses" : {
           "200" : {
             "description" : "",

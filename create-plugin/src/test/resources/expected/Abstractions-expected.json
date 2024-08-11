@@ -1,0 +1,68 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/action" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.RequestBody"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.Action" : {
+        "type" : "object",
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/sources.ActionOne"
+        }, {
+          "$ref" : "#/components/schemas/sources.ActionThree"
+        }, {
+          "$ref" : "#/components/schemas/sources.ActionTwo"
+        } ]
+      },
+      "sources.ActionOne" : {
+        "type" : "object",
+        "properties" : {
+          "field" : {
+            "type" : "integer"
+          }
+        },
+        "required" : [ "field" ]
+      },
+      "sources.ActionThree" : {
+        "type" : "object"
+      },
+      "sources.ActionTwo" : {
+        "type" : "object",
+        "properties" : {
+          "value" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "value" ]
+      },
+      "sources.RequestBody" : {
+        "type" : "object",
+        "properties" : {
+          "action" : {
+            "$ref" : "#/components/schemas/sources.Action"
+          }
+        },
+        "required" : [ "action" ]
+      }
+    }
+  }
+}

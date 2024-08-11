@@ -11,11 +11,10 @@ plugins {
 dependencies {
     compileOnly(libs.kotlinCompiler)
 
-    implementation(libs.arrowMeta)
     implementation(libs.bundles.jackson)
     implementation(libs.kotlinReflect)
 
-    testImplementation(libs.arrowTest)
+    testImplementation(libs.classGraph)
     testImplementation(libs.compilerTest)
     testImplementation(libs.bundles.ktor)
     testImplementation(libs.assertJ)
