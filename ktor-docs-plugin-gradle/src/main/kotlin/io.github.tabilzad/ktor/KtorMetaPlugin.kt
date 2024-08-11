@@ -36,7 +36,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             compileOnly("io.github.tabilzad:ktor-docs-plugin:$ktorDocsVersion")
         }
 
-        val userProvidedOptions = listOf(
+        val userProvidedOptions = mutableListOf(
             SubpluginOption(
                 key = "enabled",
                 value = swaggerExtension.pluginOptions.enabled.toString()
@@ -69,12 +69,16 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
                 value = swaggerExtension.documentation.hidePrivateAndInternalFields.toString()
             ),
             SubpluginOption(
+                key = "deriveFieldRequirementFromTypeNullability",
+                value = swaggerExtension.documentation.deriveFieldRequirementFromTypeNullability.toString()
+            ),
+            SubpluginOption(
                 key = "format",
                 value = swaggerExtension.pluginOptions.format
             )
         ).apply {
             swaggerExtension.pluginOptions.filePath?.let {
-                plus(
+                add(
                     SubpluginOption(
                         key = "filePath",
                         value = it
