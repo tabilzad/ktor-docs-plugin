@@ -54,7 +54,7 @@ swagger {
 | `docsVersion`                  | `"1.0.0"`                                 | Specifies the version for the generated API specification                                   |
 | `generateRequestSchemas`       | `true`                                    | Determines if request body schemas should <br/>be automatically resolved and included       |
 | `hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` <br/> are omitted in schema outputs        |
-| `hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields labeled as `private` or `internal` from schema outputs               |
+| `hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields with `private` or `internal` modifiers from schema outputs           |
 | `deriveFieldRequirementFromTypeNullability` | `true`                       | Automatically derive object fields' requirement from its type nullability                   |
 
 ### Plugin options
