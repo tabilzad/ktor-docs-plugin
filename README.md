@@ -45,19 +45,25 @@ swagger {
 
 ## Plugin Configuration
 
-| Option                                       | Default Value                             | Explanation                                                                                 |
-|----------------------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------|
-| `documentation.docsTitle`                    | `"Open API Specification"`                | Title for the API specification that is generated                                           |
-| `documentation.docsDescription`              | `"Generated using Ktor Docs Plugin"`      | A brief description for the generated API specification                                     |
-| `documentation.docsVersion`                  | `"1.0.0"`                                 | Specifies the version for the generated API specification                                   |
-| `documentation.generateRequestSchemas`       | `true`                                    | Determines if request body schemas should <br/>be automatically resolved and included       |
-| `documentation.hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` <br/> are omitted in schema outputs        |
-| `documentation.hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields labeled as `private` or `internal` from schema outputs               |
-| `documentation.deriveFieldRequirementFromTypeNullability` | `true`                       | Automatically derive object fields' requirement from its type nullability                   |
-| `pluginOptions.enabled`                      | `true`                                    | Enable/Disables the plugin                                                                  |
-| `pluginOptions.saveInBuild`                  | `false`                                   | Decides if the generated specification file should <br/> be saved in the `build/` directory |
-| `pluginOptions.format`                       | `yaml`                                    | The chosen format for the OpenAPI specification <br/>(options: json/yaml)                   |
-| `pluginOptions.filePath`                     | `$modulePath/src/main/resources/openapi/` | The designated absolute path for saving <br/> the generated specification file              |
+### Documentation options
+
+| Option                         | Default Value                             | Explanation                                                                                 |
+|--------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------|
+| `docsTitle`                    | `"Open API Specification"`                | Title for the API specification that is generated                                           |
+| `docsDescription`              | `"Generated using Ktor Docs Plugin"`      | A brief description for the generated API specification                                     |
+| `docsVersion`                  | `"1.0.0"`                                 | Specifies the version for the generated API specification                                   |
+| `generateRequestSchemas`       | `true`                                    | Determines if request body schemas should <br/>be automatically resolved and included       |
+| `hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` <br/> are omitted in schema outputs        |
+| `hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields labeled as `private` or `internal` from schema outputs               |
+| `deriveFieldRequirementFromTypeNullability` | `true`                       | Automatically derive object fields' requirement from its type nullability                   |
+
+### Plugin options
+| Option                         | Default Value                             | Explanation                                                                                 |
+|--------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------|
+| `enabled`                      | `true`                                    | Enable/Disables the plugin                                                                  |
+| `saveInBuild`                  | `false`                                   | Decides if the generated specification file should <br/> be saved in the `build/` directory |
+| `format`                       | `yaml`                                    | The chosen format for the OpenAPI specification <br/>(options: json/yaml)                   |
+| `filePath`                     | `$modulePath/src/main/resources/openapi/` | The designated absolute path for saving <br/> the generated specification file              |
 
 ## How to use the plugin
 
@@ -130,9 +136,7 @@ fun Route.ordersRouting() {
                 summary = "All Orders",
                 description = "This endpoint will return a list of all orders"
             )
-            get {
-                /*...*/
-            }
+            get { /*...*/ }
         }
     }
 }
@@ -142,7 +146,7 @@ fun Route.ordersRouting() {
 Defining response schemas and their corresponding HTTP status codes are done via `@KtorResponds` annotation on an endpoint. 
 
 ```kotlin
-@KtorDocs(["Orders"])
+@GenerateOpenApi
 fun Route.ordersRouting() {
     route("/v1") {
         @KtorResponds(
@@ -179,12 +183,12 @@ fun Route.ordersRouting() {
 On the other hand, if the tags are specified with `@KtorDescription` or `@Tag` annotation on an endpoint, they are associated exclusively with that particular endpoint.
 
 ```kotlin
-@KtorDocs(["Orders"])
+@GenerateOpenApi
 fun Route.ordersRouting() {
     route("/v1") {
         @KtorDescription(tags = ["Order Operations"])
         post("/order") { /*...*/ }
-        @KtorDescription(tags = ["Cart Operations"])
+        @Tag(["Cart Operations"])
         get("/cart") { /*...*/ }
     }
 }
