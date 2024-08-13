@@ -10,7 +10,7 @@ features.
 
 ```groovy
 plugins {
-    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.5.4-alpha"
+    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.6.0-alpha"
 }
 
 swagger {
@@ -22,6 +22,7 @@ swagger {
         generateRequestSchemas = true
         hideTransientFields = true
         hidePrivateAndInternalFields = true
+        deriveFieldRequirementFromTypeNullability = true
     }
 
     pluginOptions {
@@ -52,6 +53,7 @@ swagger {
 | `documentation.generateRequestSchemas`       | `true`                                    | Determines if request body schemas should <br/>be automatically resolved and included       |
 | `documentation.hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` <br/> are omitted in schema outputs        |
 | `documentation.hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields labeled as `private` or `internal` from schema outputs               |
+| `documentation.deriveFieldRequirementFromTypeNullability` | `true`                       | Automatically derive object fields' requirement from its type nullability                   |
 | `pluginOptions.enabled`                      | `true`                                    | Enable/Disables the plugin                                                                  |
 | `pluginOptions.saveInBuild`                  | `false`                                   | Decides if the generated specification file should <br/> be saved in the `build/` directory |
 | `pluginOptions.format`                       | `yaml`                                    | The chosen format for the OpenAPI specification <br/>(options: json/yaml)                   |
@@ -65,7 +67,7 @@ Annotate the specific route definitions you want the OpenAPI specification to be
 
 ```kotlin
 
-@KtorDocs
+@GenerateOpenApi
 fun Route.ordersRouting() {
     route("/v1") {
         post("/order1") {
@@ -81,7 +83,7 @@ recursively visit each `Route`. extension and generate its documentation.
 
 ```kotlin
 
-@KtorDocs
+@GenerateOpenApi
 fun Application.ordersModule() {
     routing {
         routeOne()
@@ -102,25 +104,17 @@ fun Route.routeTwo() {
 
 ### Endpoint and field descriptions
 
-Annotate the HTTP methods or class fields with `@KtorDescription`.
+Describe endpoints or schema fields.
 
 ```kotlin
-import io.github.tabilzad.ktor.KtorDocs
-
 data class RequestSample(
-    @KtorDescription("this is a string")
+    @KtorFieldDescription("this is a string")
     val string: String,
     val int: Int,
-    val double: Double,
-    val obj: More,
-    val collection: List<More>,
+    val double: Double
 )
 
-data class More(
-    val nested: List<List<String>>
-)
-
-@KtorDocs
+@GenerateOpenApi
 fun Route.ordersRouting() {
     route("/v1") {
         @KtorDescription(
@@ -146,6 +140,7 @@ fun Route.ordersRouting() {
 
 ### Responses
 Defining response schemas and their corresponding HTTP status codes are done via `@KtorResponds` annotation on an endpoint. 
+
 ```kotlin
 @KtorDocs(["Orders"])
 fun Route.ordersRouting() {
@@ -165,11 +160,11 @@ fun Route.ordersRouting() {
 
 ### Tagging
 
-Using tags enables the categorization of individual endpoints into designated groups.
-When tags are defined within the `@KtorDocs` annotation, these tags apply to every endpoint contained within it.
+Using tags enables the categorization of individual endpoints into designated groups. 
+Tags specified at the parent route will propogate down to all endpoints contained within it.
 
 ```kotlin
-@KtorDocs(["Orders"])
+@Tag(["Orders"])
 fun Route.ordersRouting() {
     route("/v1") {
         post("/create") { /*...*/ }
@@ -181,7 +176,7 @@ fun Route.ordersRouting() {
     }
 }
 ```
-On the other hand, if the tags are specified within the `@KtorDescription` annotation, they are associated exclusively with that particular endpoint.
+On the other hand, if the tags are specified with `@KtorDescription` or `@Tag` annotation on an endpoint, they are associated exclusively with that particular endpoint.
 
 ```kotlin
 @KtorDocs(["Orders"])
@@ -199,8 +194,8 @@ fun Route.ordersRouting() {
 
 * Automatic Response resolution
 * Support for polymorphic types
+* Support ktor resources
 * Option for an automatic tag resolution from module/route function declaration
-* Introduce a separate `@KtorTag` annotation that is applicable to module/route/endpoint
 * Tag descriptions
 
 ## Sample Specification
