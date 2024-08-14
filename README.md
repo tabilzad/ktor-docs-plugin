@@ -1,10 +1,7 @@
 # Open API (Swagger) Plugin for Ktor
 
-This plugin implements a plug and play solution to support OpenAPI (Swagger) for Ktor server with minimal effort.
-Annotate your route(s) definition with `@GenerateOpenApi` and `openapi.yaml` will be generated at build time.
-
-Take a look at `use-plugin` module to reference the plugin setup and `StabilityTests` to see all supported
-features.
+This plugin implements a plug and play solution for generating OpenAPI (Swagger) specification for your Ktor server with minimal effort - no need to modify your existing code, no special DSL wrappers etc.
+Just annotate your route(s) definitions with `@GenerateOpenApi` and `openapi.yaml` will be generated at build time.
 
 ## How to apply the plugin
 
