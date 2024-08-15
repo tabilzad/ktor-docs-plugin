@@ -6,14 +6,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 // Internal
 data class PluginConfiguration(
     val isEnabled: Boolean,
-    val buildPath: String,
-    val saveInBuild: Boolean,
-    val modulePath: String,
     val format: String,
     val title: String,
     val description: String,
     val version: String,
-    val filePath: String?,
+    val filePath: String,
     val requestBody: Boolean,
     val hideTransients: Boolean,
     val hidePrivateFields: Boolean,

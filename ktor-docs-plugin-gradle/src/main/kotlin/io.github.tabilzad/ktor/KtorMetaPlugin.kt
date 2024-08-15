@@ -3,19 +3,20 @@ package io.github.tabilzad.ktor
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.kotlin.gradle.plugin.*
+import java.io.File
+import java.lang.IllegalArgumentException
 
 const val PLUGIN_ID = "io.github.tabilzad.ktor-docs-plugin-gradle"
 
 open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun getCompilerPluginId() = PLUGIN_ID
-    override fun getPluginArtifact(): SubpluginArtifact {
-        return SubpluginArtifact(
+    override fun getPluginArtifact(): SubpluginArtifact =
+        SubpluginArtifact(
             groupId = "io.github.tabilzad",
             artifactId = "ktor-docs-plugin",
             version = ktorDocsVersion
         )
-    }
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
         return kotlinCompilation.target.project.plugins.hasPlugin(KtorMetaPlugin::class.java)
@@ -36,14 +37,29 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             compileOnly("io.github.tabilzad:ktor-docs-plugin:$ktorDocsVersion")
         }
 
-        val userProvidedOptions = mutableListOf(
+        val openApiOutputFile = with(swaggerExtension.pluginOptions) {
+            getOpenApiOutputFile(
+                filePath = filePath,
+                saveInBuild = saveInBuild,
+                buildPath = kotlinCompilation.output.resourcesDir.absolutePath, // TODO: This is build/processedResources/release, do we want /build instead? kotlinCompilation.target.project.buildDir.absolutePath
+                modulePath = project.projectDir.absolutePath,
+                format = format
+            )
+        }
+
+        kotlinCompilation.compileTaskProvider.configure { task ->
+            if (!openApiOutputFile.exists()) {
+                task.outputs.upToDateWhen { false }
+            }
+            // This should be a more correct way to do this:
+            // task.outputs.file(openApiOutputFile)
+            // However, setting a KotlinCompile output task.outputs.file("foo") always creates a *directory* named foo
+        }
+
+        val subpluginOptions = listOf(
             SubpluginOption(
                 key = "enabled",
                 value = swaggerExtension.pluginOptions.enabled.toString()
-            ),
-            SubpluginOption(
-                key = "saveInBuild",
-                value = swaggerExtension.pluginOptions.saveInBuild.toString()
             ),
             SubpluginOption(
                 key = "title",
@@ -75,29 +91,47 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             SubpluginOption(
                 key = "format",
                 value = swaggerExtension.pluginOptions.format
-            )
-        ).apply {
-            swaggerExtension.pluginOptions.filePath?.let {
-                add(
-                    SubpluginOption(
-                        key = "filePath",
-                        value = it
-                    )
-                )
-            }
-        }
-
-        val gradleProvidedOptions = listOf(
-            InternalSubpluginOption(
-                key = "buildPath",
-                value = kotlinCompilation.output.resourcesDir.absolutePath
             ),
-            InternalSubpluginOption(
-                key = "modulePath",
-                value = project.projectDir.absolutePath
+            SubpluginOption(
+                key = "filePath",
+                value = openApiOutputFile.path
             )
         )
-        return project.provider { gradleProvidedOptions + userProvidedOptions }
+
+        return project.provider { subpluginOptions }
+    }
+
+    private fun getOpenApiOutputFile(
+        filePath: String?,
+        saveInBuild: Boolean,
+        buildPath: String,
+        modulePath: String,
+        format: String,
+    ): File {
+        val directoryPath =  when {
+            filePath != null -> filePath
+            saveInBuild -> "$buildPath/openapi"
+            else -> "${getProjectResourcesDirectory(modulePath)}/openapi"
+        }
+        val directory = createOutputDirectory(directoryPath)
+        return File(directory, "openapi.$format")
+    }
+
+    private fun createOutputDirectory(path: String): File {
+        return File(path).apply {
+            if (!exists() && !mkdirs()) {
+                throw IllegalArgumentException("Invalid output directory $path")
+            }
+        }
+    }
+
+    private fun getProjectResourcesDirectory(modulePath: String): File {
+        val mainModule = File("$modulePath/src/main")
+        val resourcesDir = mainModule.listFiles()?.find {
+            it.name in listOf("res", "resources")
+        } ?: throw IllegalArgumentException(
+            "Couldn't find resources directory to save openapi file to. Searched in $modulePath"
+        )
+        return resourcesDir
     }
 }
-

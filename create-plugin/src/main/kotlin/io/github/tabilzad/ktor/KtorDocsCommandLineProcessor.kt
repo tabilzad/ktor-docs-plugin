@@ -73,27 +73,6 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             "Is plugin enabled",
             false
         )
-
-        val saveInBuild = CliOption(
-            OPTION_SAVE_IN_BUILD,
-            "Should save spec to build directory",
-            "Should save generated file to the module's build directory",
-            false
-        )
-
-        val buildPath = CliOption(
-            OPTION_BUILD_PATH,
-            "Build directory path of module the plugin is applied to",
-            "Provided by gradle",
-            false
-        )
-
-        val modulePath = CliOption(
-            OPTION_MODULE_PATH,
-            "The path of module the plugin is applied to",
-            "Provided by gradle",
-            false
-        )
         private val titleOption = CliOption(
             OPTION_TITLE,
             "Server title/name",
@@ -156,9 +135,6 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
     override val pluginOptions: Collection<AbstractCliOption>
         get() = listOf(
             isEnabled,
-            buildPath,
-            saveInBuild,
-            modulePath,
             titleOption,
             descOption,
             versionOption,
@@ -178,12 +154,6 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
     ) {
         when (option) {
             isEnabled -> configuration.put(ARG_ENABLED, value.toBooleanStrictOrNull() ?: true)
-
-            buildPath -> configuration.put(ARG_BUILD_PATH, value)
-
-            saveInBuild -> configuration.put(ARG_SAVE_IN_BUILD, value.toBooleanStrictOrNull() ?: false)
-
-            modulePath -> configuration.put(ARG_MODULE_PATH, value)
 
             titleOption -> configuration.put(ARG_TITLE, value)
 
