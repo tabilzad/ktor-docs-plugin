@@ -163,16 +163,11 @@ private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
 
 fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = PluginConfiguration(
     isEnabled = this?.get(SwaggerConfigurationKeys.ARG_ENABLED) ?: true,
-    saveInBuild = this?.get(SwaggerConfigurationKeys.ARG_SAVE_IN_BUILD) ?: false,
     format = this?.get(SwaggerConfigurationKeys.ARG_FORMAT) ?: "yaml",
     title = this?.get(SwaggerConfigurationKeys.ARG_TITLE) ?: "Open API Specification",
     description = this?.get(SwaggerConfigurationKeys.ARG_DESCR) ?: "",
     version = this?.get(SwaggerConfigurationKeys.ARG_VER) ?: "1.0.0",
-    filePath = this?.get(SwaggerConfigurationKeys.ARG_PATH),
-    buildPath = this?.get(SwaggerConfigurationKeys.ARG_BUILD_PATH)
-        ?: throw CompilationException("Failed resolve the build folder path for the module", null, null),
-    modulePath = this?.get(SwaggerConfigurationKeys.ARG_MODULE_PATH)
-        ?: throw CompilationException("Failed resolve the build folder path for the module", null, null),
+    filePath = this?.get(SwaggerConfigurationKeys.ARG_PATH) ?: "openapi.yaml",
     requestBody = this?.get(SwaggerConfigurationKeys.ARG_REQUEST_FEATURE) ?: true,
     hideTransients = this?.get(SwaggerConfigurationKeys.ARG_HIDE_TRANSIENTS) ?: true,
     hidePrivateFields = this?.get(SwaggerConfigurationKeys.ARG_HIDE_PRIVATE) ?: true,

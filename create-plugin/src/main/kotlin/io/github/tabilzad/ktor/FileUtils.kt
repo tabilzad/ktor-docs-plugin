@@ -9,36 +9,10 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import java.io.File
 
-fun locateOrCreateSwaggerFile(
-    configuration: PluginConfiguration,
-): File = configuration.run {
-    if (filePath != null) {
-        File("$filePath/openapi.$format")
-    } else if (saveInBuild) {
-        File("$buildPath/openapi").apply {
-            mkdirs()
-        }.let { dir ->
-            File(dir.path + "/openapi.$format")
-        }
-    } else {
-        val mainModule = "$modulePath/src/main"
-        val resourcesDir = File(mainModule).listFiles()?.find {
-            (listOf("res", "resources").contains(it.name))
-        } ?: throw IllegalAccessException(
-            "Couldn't find resources directory to save openapi file to." +
-                    " Searched in $modulePath"
-        )
 
-        File("${resourcesDir.absolutePath}/openapi/").apply {
-            mkdir()
-        }.let { dir ->
-            File(dir.path + "/openapi.$format")
-        }
-    }
-}
 
 fun OpenApiSpec.serializeAndWriteTo(configuration: PluginConfiguration) {
-    val file = locateOrCreateSwaggerFile(configuration)
+    val file = File(configuration.filePath)
 
     getJacksonBy(configuration.format).let { mapper ->
         val new = try {
