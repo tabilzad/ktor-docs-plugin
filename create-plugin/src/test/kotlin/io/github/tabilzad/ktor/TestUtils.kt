@@ -137,16 +137,6 @@ fun generateCompilerTest(
             ),
             com.tschuchort.compiletesting.PluginOption(
                 clp.pluginId,
-                KtorDocsCommandLineProcessor.buildPath.optionName,
-                testFilePath
-            ),
-            com.tschuchort.compiletesting.PluginOption(
-                clp.pluginId,
-                KtorDocsCommandLineProcessor.modulePath.optionName,
-                testFilePath
-            ),
-            com.tschuchort.compiletesting.PluginOption(
-                clp.pluginId,
                 KtorDocsCommandLineProcessor.hideTransientFields.optionName,
                 hideTransient.toString()
             ),
@@ -159,8 +149,6 @@ fun generateCompilerTest(
     }
     compilationData.compile()
 }
-
-fun File.findSwagger() = listFiles()?.find { it.name.contains("openapi.json") }
 
 fun loadBaseSources2(source: String): List<SourceFile> {
     val annotationsFile = TestSourceUtil.loadAnnotations
