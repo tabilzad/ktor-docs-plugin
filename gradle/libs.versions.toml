@@ -30,5 +30,6 @@ ktorNetty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" 
 kotlinGradleApi = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion"}
 kotlinGradle = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion"}
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinVersion" }
+moshi = { module = "com.squareup.moshi:moshi", version = "1.14.0"}
 
 

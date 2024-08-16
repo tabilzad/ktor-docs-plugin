@@ -2,6 +2,7 @@ package io.github.tabilzad.ktor.k2
 
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 
 object ClassIds {
 
@@ -19,4 +20,6 @@ object ClassIds {
     val KTOR_DSL_ANNOTATION = ClassId(FqName("io.ktor.util"), FqName("KtorDsl"), false)
     val TRANSIENT_ANNOTATION = ClassId(FqName("kotlin.jvm"), FqName("Transient"), false)
 
+    val MOSHI_JSON_ANNOTATION_FQ_NAME = FqName("com.squareup.moshi.Json")
+    val MOSHI_JSON_ANNOTATION_NAME_ARGUMENT_IDENTIFIER: Name = Name.identifier("name")
 }

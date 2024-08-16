@@ -10,6 +10,7 @@ import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.descriptors.annotations.Annotations
 import org.jetbrains.kotlin.descriptors.impl.DeclarationDescriptorVisitorEmptyBodies
 import org.jetbrains.kotlin.js.descriptorUtils.getKotlinTypeFqName
 import org.jetbrains.kotlin.name.FqName
@@ -271,19 +272,39 @@ internal class ClassDescriptorVisitor(val config: PluginConfiguration, val conte
 
 
     private fun PropertyDescriptor.resolvePropertyName(): String {
-
-        val moshiJson = FqName("com.squareup.moshi.Json")
-        return if (backingField?.annotations?.hasAnnotation(moshiJson) == true) {
-
-            val an = backingField?.annotations?.findAnnotation(moshiJson)
-
-            val value = an?.allValueArguments?.get(Name.identifier("name"))
-
-            value?.value?.toString() ?: name.toString()
-        } else {
-            name.toString()
-        }
+        val moshiJsonName = getMoshiNameFromBackingField() ?: getMoshiNameFromDataClassConstructorParameter()
+        return moshiJsonName ?: name.toString()
     }
+
+    private fun PropertyDescriptor.getMoshiNameFromBackingField(): String? {
+        return backingField?.annotations?.getMoshiJsonName()
+    }
+
+    private fun Annotations.getMoshiJsonName(): String? {
+        return findAnnotation(MOSHI_JSON_ANNOTATION_FQ_NAME)
+            ?.allValueArguments
+            ?.get(MOSHI_JSON_ANNOTATION_NAME_ARGUMENT_IDENTIFIER)
+            ?.value?.toString()
+    }
+
+    private fun PropertyDescriptor.getMoshiNameFromDataClassConstructorParameter(): String? {
+        val containingClass = this.containingDeclaration as? ClassDescriptor ?: return null
+
+        if (!containingClass.isData) return null
+
+        return containingClass.unsubstitutedPrimaryConstructor
+            ?.valueParameters
+            ?.find { it.name == this.name }
+            ?.annotations
+            ?.getMoshiJsonName()
+    }
+
+    companion object {
+        private val MOSHI_JSON_ANNOTATION_FQ_NAME = FqName("com.squareup.moshi.Json")
+        private val MOSHI_JSON_ANNOTATION_NAME_ARGUMENT_IDENTIFIER: Name = Name.identifier("name")
+
+    }
+
 }
 
 private fun PropertyDescriptor.findDocsDescription(): String? {

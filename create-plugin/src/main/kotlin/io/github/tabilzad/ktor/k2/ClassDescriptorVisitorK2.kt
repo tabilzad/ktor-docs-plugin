@@ -5,6 +5,7 @@ import io.github.tabilzad.ktor.OpenApiSpec.ObjectType
 import io.github.tabilzad.ktor.PluginConfiguration
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorFieldDescription
+import io.github.tabilzad.ktor.k2.MoshiJsonNameResolver.getMoshiJsonName
 import io.github.tabilzad.ktor.names
 import io.github.tabilzad.ktor.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.visitors.toSwaggerType
@@ -356,6 +357,9 @@ internal class ClassDescriptorVisitorK2(
         }
     }
 
-    private fun FirProperty.findName(): String = name.asString()
+    private fun FirProperty.findName(): String {
+        return getMoshiJsonName(this, session) ?: name.asString()
+    }
+
 }
 

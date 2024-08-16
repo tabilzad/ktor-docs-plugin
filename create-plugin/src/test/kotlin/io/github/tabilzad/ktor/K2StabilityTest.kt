@@ -264,6 +264,14 @@ class K2StabilityTest {
         result.assertWith(expected)
     }
 
+    @Test
+    fun `should handle Moshi annotated properties and data class constructor parameters`() {
+        val (source, expected) = loadSourceAndExpected("MoshiAnnotated")
+        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
     private fun String?.assertWith(expected: String){
         assertThat(this).isNotNull.withFailMessage {
             "swagger file was not generated"
