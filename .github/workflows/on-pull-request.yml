@@ -1,0 +1,11 @@
+name: On Pull Request Opened
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    name: Stability Tests
+    uses: ./.github/workflows/run-tests.yml
