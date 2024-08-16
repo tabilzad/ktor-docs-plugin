@@ -1,0 +1,49 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/action" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.MoshiAnnotated"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.MoshiAnnotated" : {
+        "type" : "object",
+        "properties" : {
+          "moshi_annotated_constructor_derived_property" : {
+            "type" : "string"
+          },
+          "moshi_annotated_constructor_parameter" : {
+            "type" : "string"
+          },
+          "moshi_annotated_lateinit_var" : {
+            "type" : "string"
+          },
+          "moshi_annotated_mutable_property" : {
+            "type" : "string"
+          },
+          "notMoshiAnnotated" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "moshi_annotated_constructor_parameter", "notMoshiAnnotated", "moshi_annotated_constructor_derived_property", "moshi_annotated_lateinit_var" ]
+      }
+    }
+  }
+}

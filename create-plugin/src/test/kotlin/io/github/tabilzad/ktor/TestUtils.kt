@@ -168,4 +168,6 @@ val deps = arrayOf(
     "ktor-utils:2.2.4",
     "ktor-server-netty:2.2.4",
     "ktor-http:2.2.4",
-    "kotlinx-coroutines-core:1.6.4")
+    "kotlinx-coroutines-core:1.6.4",
+    "moshi:1.14.0",
+)
