@@ -272,6 +272,38 @@ class K2StabilityTest {
         result.assertWith(expected)
     }
 
+    @Test
+    fun `should resolve request body schema directly from http method parameter if it's not a resource`() {
+        val (source, expected) = loadSourceAndExpected("RequestBodyParam")
+        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should resolve endpoint spec from type-safe ktor resources`() {
+        val (source, expected) = loadSourceAndExpected("Resources")
+        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should resolve endpoint spec from type-safe ktor resources with query params`() {
+        val (source, expected) = loadSourceAndExpected("ResourcesWithParams")
+        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should resolve described resources`() {
+        val (source, expected) = loadSourceAndExpected("DescribedResources")
+        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
     private fun String?.assertWith(expected: String){
         assertThat(this).isNotNull.withFailMessage {
             "swagger file was not generated"

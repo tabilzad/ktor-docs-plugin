@@ -35,6 +35,7 @@ open class KtorMetaPluginRegistrar : CompilerPluginRegistrar() {
 
 class FirCheckers(session: FirSession, configuration: CompilerConfiguration) : FirAdditionalCheckersExtension(session) {
     override val declarationCheckers: DeclarationCheckers = object : DeclarationCheckers() {
+        // these could probably be ExpressionCheckers instead of Declaration
         override val simpleFunctionCheckers: Set<FirSimpleFunctionChecker> =
             setOf(SwaggerDeclarationChecker(session, configuration))
     }

@@ -13,7 +13,7 @@ mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.28.0" }
 
 [bundles]
 jackson = ["jacksonKotlin", "jacksonYaml"]
-ktor = ["ktor", "ktorNetty"]
+ktor = ["ktor", "ktorNetty", "ktorResources"]
 kotlinGradle = ["kotlinGradleApi","kotlinGradle"]
 
 [libraries]
@@ -27,6 +27,7 @@ jacksonKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin",
 jacksonYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jacksonVersion" }
 ktor = { module = "io.ktor:ktor", version.ref = "ktorVersion" }
 ktorNetty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" }
+ktorResources = { module = "io.ktor:ktor-server-resources", version.ref = "ktorVersion" }
 kotlinGradleApi = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion"}
 kotlinGradle = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion"}
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinVersion" }

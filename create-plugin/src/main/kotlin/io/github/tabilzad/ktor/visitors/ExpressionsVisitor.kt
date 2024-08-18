@@ -51,7 +51,7 @@ internal class ExpressionsVisitor(
             val queryParamValue = resolveQueryParamFromArrayAccessIndex(expression, this@ExpressionsVisitor.context)
 
             if (queryParamValue != null) {
-                parent.queryParameters = parent.queryParameters merge queryParamValue
+                parent.parameters = parent.parameters merge queryParamValue
             }
         }
 
@@ -193,7 +193,7 @@ internal class ExpressionsVisitor(
     private fun resolveQueryParamFromArrayAccessIndex(
         arrayAccessExpression: KtArrayAccessExpression?,
         bindingContext: BindingContext
-    ): Set<String>? {
+    ): Set<QueryParamSpec>? {
         if (arrayAccessExpression == null) return null
         val indices = arrayAccessExpression.indexExpressions
 
@@ -207,7 +207,7 @@ internal class ExpressionsVisitor(
 
                         if (resultingDescriptor is PropertyDescriptor) {
                             resultingDescriptor.compileTimeInitializer?.value?.toString()?.let {
-                                add(it)
+                                add(QueryParamSpec(it))
                             }
                         }
                     }
@@ -240,13 +240,13 @@ internal class ExpressionsVisitor(
                             }
                             r
                         }.let {
-                            add(it)
+                            add(QueryParamSpec(it))
                         }
                     }
 
                     is KtBinaryExpression -> {
                         evaluateBinaryExpression(indexExpression).let {
-                            add(it)
+                            add(QueryParamSpec(it))
                         }
                     }
 
@@ -274,7 +274,7 @@ internal class ExpressionsVisitor(
                                             ?.replace("[()\"]".toRegex(), "")
 
                                         if (enumEntryName != null) {
-                                            add(enumEntryName)
+                                            add(QueryParamSpec(enumEntryName))
                                         }
                                     }
                                 }
@@ -288,7 +288,7 @@ internal class ExpressionsVisitor(
 
                                 if (resultingDescriptor is PropertyDescriptor) {
                                     resultingDescriptor.compileTimeInitializer?.value?.toString()?.let {
-                                        add(it)
+                                        add(QueryParamSpec(it))
                                     }
                                 }
                             }
@@ -358,7 +358,7 @@ internal class ExpressionsVisitor(
                         resolveQueryParamFromArrayAccessIndex(it, this@ExpressionsVisitor.context).orEmpty()
                     }.toSet()
 
-                    parent.queryParameters = parent.queryParameters merge queryParamValue
+                    parent.parameters = parent.parameters merge queryParamValue
                 }
             }
         } else {

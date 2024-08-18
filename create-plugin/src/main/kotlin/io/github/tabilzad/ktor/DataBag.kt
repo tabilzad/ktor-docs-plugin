@@ -16,15 +16,33 @@ data class PluginConfiguration(
     val hidePrivateFields: Boolean,
     val deriveFieldRequirementFromTypeNullability: Boolean
 )
+
 interface OpenApiSpecParam {
     val name: String
     val `in`: String
     val required: Boolean
+    val description: String?
 }
+
+internal interface ParamSpec {
+    val name: String
+    val description: String?
+}
+
+internal data class PathParamSpec(
+    override val name: String,
+    override val description: String? = null,
+) : ParamSpec
+
+internal data class QueryParamSpec(
+    override val name: String,
+    override val description: String? = null,
+    val isRequired: Boolean = false
+) : ParamSpec
 
 internal data class KtorRouteSpec(
     val path: String,
-    val queryParameters: List<String>?,
+    val parameters: List<ParamSpec>?,
     val method: String,
     val body: OpenApiSpec.ObjectType,
     val summary: String?,
@@ -49,8 +67,8 @@ enum class ExpType(val labels: List<String>) {
 internal data class EndPoint(
     override var path: String?,
     val method: String = "",
-    var body: OpenApiSpec.ObjectType = OpenApiSpec.ObjectType(type = "object"),
-    var queryParameters: Set<String>? = null,
+    var body: OpenApiSpec.ObjectType? = OpenApiSpec.ObjectType(type = "object"),
+    var parameters: Set<ParamSpec>? = null,
     var description: String? = null,
     var summary: String? = null,
     override var tags: Set<String>? = null,
@@ -73,7 +91,10 @@ data class DocRoute(
 
 enum class ContentType {
     @JsonProperty("application/json")
-    APPLICATION_JSON;
+    APPLICATION_JSON,
+
+    @JsonProperty("text/plain")
+    TEXT_PLAIN;
 }
 
 internal typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
@@ -88,6 +109,7 @@ data class OpenApiComponents(
 data class OpenSpecPath(
     val path: String,
 )
+
 data class OpenApiSpec(
     val openapi: String = "3.1.0",
     val info: Info,
@@ -119,9 +141,10 @@ data class OpenApiSpec(
         val content: BodyContent
     )
 
-    interface NamedObject{
+    interface NamedObject {
         var fqName: String?
     }
+
     data class ObjectType(
         var type: String?,
         var properties: MutableMap<String, ObjectType>? = null,
@@ -143,6 +166,7 @@ data class OpenApiSpec(
         override val name: String,
         override val `in`: String,
         override val required: Boolean = true,
+        override val description: String? = null,
         val schema: SchemaType,
     ) : OpenApiSpecParam
 

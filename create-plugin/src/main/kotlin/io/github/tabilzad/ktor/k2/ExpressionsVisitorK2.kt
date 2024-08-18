@@ -14,10 +14,14 @@ import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.resolved
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 import org.jetbrains.kotlin.fir.resolve.firClassLike
+import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
+import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.util.PrivateForInline
 
 internal class ExpressionsVisitorK2(
@@ -70,13 +74,13 @@ internal class ExpressionsVisitorK2(
     // Evaluation Order 3
     override fun visitBlock(block: FirBlock, parent: KtorElement?): List<KtorElement> {
 
-        if (parent is EndPoint) {
+        if (parent is EndPoint && parent.body == null) {
 
             val receiveCall = block.statements.findReceiveCallExpression()
             val queryParam = block.statements.findQueryParameterExpression()
 
             if (queryParam.isNotEmpty()) {
-                parent.queryParameters = parent.queryParameters merge queryParam.toSet()
+                parent.parameters = parent.parameters merge queryParam.toSet()
             }
 
             if (receiveCall != null) {
@@ -119,11 +123,11 @@ internal class ExpressionsVisitorK2(
         return objectType
     }
 
-    private fun List<FirStatement>.findQueryParameterExpression(): List<String> {
+    private fun List<FirStatement>.findQueryParameterExpression(): List<ParamSpec> {
         val queryParams = mutableListOf<String>()
         flatMap { it.allChildren }.filterIsInstance<FirFunctionCall>()
             .forEach { it.accept(QueryParamsVisitor(session), queryParams) }
-        return queryParams
+        return queryParams.map { QueryParamSpec(it) }
     }
 
     private fun List<FirStatement>.findReceiveCallExpression(): FirFunctionCall? {
@@ -179,7 +183,7 @@ internal class ExpressionsVisitorK2(
 
 
     @OptIn(SymbolInternals::class)
-    override fun visitFunctionCall(functionCall: FirFunctionCall, data: KtorElement?): List<KtorElement> {
+    override fun visitFunctionCall(functionCall: FirFunctionCall, parent: KtorElement?): List<KtorElement> {
         var resultElement: KtorElement? = null
         val resolvedExp = functionCall.toResolvedCallableReference(session)
         val expName = resolvedExp?.name?.asString() ?: ""
@@ -192,41 +196,42 @@ internal class ExpressionsVisitorK2(
             val routePathArg = args.entries.find { it.key == "path" }?.value
 
             if (ExpType.ROUTE.labels.contains(expName)) {
-                if (data == null) {
+                if (parent == null) {
                     resultElement = routePathArg?.let {
                         DocRoute(routePathArg)
                     } ?: run {
                         DocRoute(expName)
                     }
                 } else {
-                    if (data is DocRoute) {
+                    if (parent is DocRoute) {
                         val newElement = DocRoute(
                             routePathArg.toString(),
-                            tags = data.tags merge tagsFromAnnotation
+                            tags = parent.tags merge tagsFromAnnotation
                         )
 
                         resultElement = newElement
-                        data.children.add(newElement)
+                        parent.children.add(newElement)
                     }
                 }
             } else if (ExpType.METHOD.labels.contains(expName)) {
-                val (summary, descr, tags) = functionCall.findDocsDescription(session)
+                val descr = functionCall.findDocsDescription(session)
                 val responds = functionCall.findRespondsAnnotation(session)
                 val responses = responds?.associate { response ->
 
                     val kotlinType = response.type
 
-                    val schema = if (kotlinType?.isPrimitiveOrNullablePrimitive == true || kotlinType?.isString == true || kotlinType?.isNullableString == true) {
-                        OpenApiSpec.SchemaType(
-                            type = kotlinType.toString().toSwaggerType()
-                        )
-                    } else {
+                    val schema =
+                        if (kotlinType?.isPrimitiveOrNullablePrimitive == true || kotlinType?.isString == true || kotlinType?.isNullableString == true) {
+                            OpenApiSpec.SchemaType(
+                                type = kotlinType.toString().toSwaggerType()
+                            )
+                        } else {
 
-                        val typeRef = response.type?.generateTypeAndVisitMemberDescriptors()
-                        OpenApiSpec.SchemaType(
-                            `$ref` = "${typeRef?.contentBodyRef}"
-                        )
-                    }
+                            val typeRef = response.type?.generateTypeAndVisitMemberDescriptors()
+                            OpenApiSpec.SchemaType(
+                                `$ref` = "${typeRef?.contentBodyRef}"
+                            )
+                        }
                     if (!response.isCollection) {
                         response.status to
                                 OpenApiSpec.ResponseDetails(
@@ -256,63 +261,78 @@ internal class ExpressionsVisitorK2(
                     }
                 }
 
-                if (data == null) {
-                    resultElement = routePathArg?.let {
-                        EndPoint(
-                            routePathArg,
-                            expName,
-                            description = descr,
-                            summary = summary,
-                            tags = tags merge tagsFromAnnotation,
-                            responses = responses
+                val params = functionCall.typeArguments
+
+                var body: OpenApiSpec.ObjectType? = null
+                var resource: KtorElement? = null
+
+                val endpoint = EndPoint(
+                    path = null,
+                    method = expName,
+                    description = descr.descr,
+                    summary = descr.summary,
+                    tags = descr.tags merge tagsFromAnnotation,
+                    responses = responses
+                )
+
+                val type = params.firstOrNull()?.toConeTypeProjection()?.type
+
+                if (functionCall.isInPackage(ClassIds.KTOR_RESOURCES) && type.isKtorResourceAnnotated()) {
+
+                    resource = type?.toRegularClassSymbol(session)
+                        ?.fir
+                        ?.accept(
+                            ResourceClassVisitor(
+                                session, config, endpoint
+                            ), null
                         )
-                    } ?: EndPoint(
-                        expName,
-                        description = descr,
-                        summary = summary,
-                        tags = tags merge tagsFromAnnotation,
-                        responses = responses
-                    )
-                } else {
-                    if (data is DocRoute) {
-                        val endPoint = EndPoint(
-                            routePathArg,
-                            expName,
-                            description = descr,
-                            summary = summary,
-                            tags = tags merge tagsFromAnnotation,
-                            responses = responses
-                        )
-                        resultElement = endPoint
-                        data.children.add(endPoint)
-                    } else {
-                        log.report(IrMessageLogger.Severity.WARNING, "Endpoints cant have Endpoint as routes", null)
+
+                } else if (functionCall.isInPackage(ClassIds.KTOR_ROUTING_PACKAGE)) {
+                    body = type?.toEndpointBody()
+                }
+
+                resultElement = when (parent) {
+                    null -> resource ?: routePathArg?.let {
+                        endpoint.copy(path = routePathArg, body = body)
+                    }
+
+                    is DocRoute -> {
+                        val element = resource ?: endpoint.copy(path = routePathArg, body = body)
+                        parent.children.add(element)
+                        element
+                    }
+
+                    else -> {
+                        log.report(IrMessageLogger.Severity.WARNING, "Endpoints can't have Endpoint as routes", null)
+                        null
                     }
                 }
+
             }
         }
+
         val lambda = functionCall.findLambda()
         if (lambda != null) {
-            lambda.accept(this, resultElement ?: data)
+            lambda.accept(this, resultElement ?: parent)
         } else {
 
             val declaration = functionCall.calleeReference.toResolvedFunctionSymbol()?.fir
 
             // val tagsFromAnnotation = declaration?.findTags(session)
 
-            if (data is DocRoute) {
+            if (parent is DocRoute) {
                 val accept = declaration?.accept(this, null)
 
                 accept?.onEach {
                     it.tags = it.tags merge tagsFromAnnotation
                 }
-                data.children.addAll(accept ?: emptyList())
+                parent.children.addAll(accept ?: emptyList())
             } else {
-                declaration?.accept(this, data)
+                declaration?.accept(this, parent)
             }
         }
 
-        return (resultElement ?: data).wrapAsList()
+        return (resultElement ?: parent).wrapAsList()
     }
 
 
@@ -325,6 +345,29 @@ internal class ExpressionsVisitorK2(
         anonymousFunction: FirAnonymousFunction,
         parent: KtorElement?
     ): List<KtorElement> = anonymousFunction.body?.accept(this, parent) ?: parent.wrapAsList()
+
+
+    private fun ConeKotlinType.toEndpointBody(): OpenApiSpec.ObjectType? {
+        return if (isPrimitiveOrNullablePrimitive || isString || isNullableString) {
+            OpenApiSpec.ObjectType(type = toString().toSwaggerType())
+        } else {
+            if (config.requestBody) {
+                generateTypeAndVisitMemberDescriptors()
+            } else {
+                null
+            }
+        }
+    }
+
+    private fun ConeKotlinType?.isKtorResourceAnnotated(): Boolean =
+        this?.toRegularClassSymbol(session)?.hasAnnotation(ClassIds.KTOR_RESOURCE_ANNOTATION, session) == true
+
+    private fun FirRegularClassSymbol.findAnnotation(classId: ClassId): FirAnnotation? {
+        return annotations.find { it.fqName(session) == classId.asSingleFqName() }
+    }
+
+    private fun FirFunctionCall.isInPackage(fqName: FqName): Boolean =
+        toResolvedCallableSymbol()?.callableId?.packageName == fqName
 
 }
 

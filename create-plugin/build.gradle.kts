@@ -5,6 +5,7 @@ import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     kotlin("jvm")
+    kotlin("plugin.serialization") version "2.0.0"
     id("com.vanniktech.maven.publish.base")
 }
 

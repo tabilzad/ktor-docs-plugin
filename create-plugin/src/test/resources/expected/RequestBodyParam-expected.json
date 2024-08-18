@@ -1,0 +1,85 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/post" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/otherPost" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/v2a/patch" : {
+      "patch" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/v2a/primitive" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "text/plain" : {
+              "schema" : {
+                "type" : "string"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.requests.SimpleRequest" : {
+        "type" : "object",
+        "properties" : {
+          "float" : {
+            "type" : "number"
+          },
+          "integer" : {
+            "type" : "integer"
+          },
+          "string" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "string", "integer", "float" ]
+      }
+    }
+  }
+}
