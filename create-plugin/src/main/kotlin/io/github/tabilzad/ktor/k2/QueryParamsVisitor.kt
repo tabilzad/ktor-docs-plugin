@@ -29,21 +29,20 @@ class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Un
         stringConcatenationCall: FirStringConcatenationCall,
         data: MutableList<String>
     ) {
-        val args = stringConcatenationCall.argumentList.arguments
-        val l = mutableListOf<String>()
-        args.forEach {
-            it.accept(this, l)
-        }
-        data.add(l.joinToString(""))
+        data.add(stringConcatenationCall.argumentList.arguments.flatMap { acc ->
+            buildList {
+                acc.accept(this@QueryParamsVisitor, this)
+            }
+        }.joinToString(""))
     }
 
 
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: MutableList<String>) {
-        val d = functionCall.dispatchReceiver?.toResolvedCallableSymbol(session)?.callableId?.asSingleFqName()
-        if (d == ClassIds.KTOR_QUERY_PARAM || d == ClassIds.KTOR_RAW_QUERY_PARAM) {
+        val functionFqName = functionCall.dispatchReceiver?.toResolvedCallableSymbol(session)?.callableId?.asSingleFqName()
+        if (functionFqName == ClassIds.KTOR_QUERY_PARAM || functionFqName == ClassIds.KTOR_RAW_QUERY_PARAM) {
             functionCall.acceptChildren(this, data)
         } else {
-            println()
+            // skip
         }
     }
 

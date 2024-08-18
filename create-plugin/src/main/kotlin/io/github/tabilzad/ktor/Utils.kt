@@ -1,6 +1,5 @@
 package io.github.tabilzad.ktor
 
-import org.jetbrains.kotlin.codegen.CompilationException
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.name.FqName
@@ -9,8 +8,6 @@ import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 import java.io.OutputStream
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.jvmErasure
 
 val transientAnnotation = FqName("kotlin.jvm.Transient")
 
@@ -68,10 +65,10 @@ internal fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { chi
                 KtorRouteSpec(
                     path = e.path + (child.path.addLeadingSlash() ?: ""),
                     method = child.method,
-                    body = child.body,
+                    body = child.body ?: OpenApiSpec.ObjectType("object"),
                     summary = child.summary,
                     description = child.description,
-                    queryParameters = child.queryParameters?.toList(),
+                    parameters = child.parameters?.toList(),
                     responses = child.responses,
                     tags = e.tags merge child.tags
                 )
@@ -111,13 +108,24 @@ infix fun <T> List<T>?.merge(params: List<T>?): List<T>? = this?.plus(params ?: 
 
 infix fun <T> Set<T>?.merge(params: Set<T>?): Set<T>? = this?.plus(params ?: emptyList()) ?: params
 
-private fun addPathParams(it: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
-    val params = "\\{([^}]*)}".toRegex().findAll(it.path).toList()
+private fun addPathParams(spec: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
+    val params = "\\{([^}]*)}".toRegex().findAll(spec.path).toList()
     return if (params.isNotEmpty()) {
         params.mapNotNull {
             val pathParamName = it.groups[1]?.value
-            if (pathParamName.isNullOrBlank()) {
-                null
+            if (pathParamName.isNullOrBlank() || spec.parameters
+                    ?.filterIsInstance<PathParamSpec>()
+                    ?.any { it.name == pathParamName } == true
+            ) {
+                spec.parameters?.find { it.name == pathParamName }?.let {
+                    OpenApiSpec.PathParam(
+                        name = it.name,
+                        `in` = "path",
+                        required = pathParamName?.contains("?") != true,
+                        schema = OpenApiSpec.SchemaType("string"),
+                        description = it.description
+                    )
+                }
             } else {
                 OpenApiSpec.PathParam(
                     name = pathParamName.replace("?", ""),
@@ -133,14 +141,14 @@ private fun addPathParams(it: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
 }
 
 private fun addQueryParams(it: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
-    return it.queryParameters?.map {
+    return it.parameters?.filterIsInstance<QueryParamSpec>()?.map {
         OpenApiSpec.PathParam(
-            name = it,
+            name = it.name,
             `in` = "query",
-            required = false,
-            schema = OpenApiSpec.SchemaType("string")
+            required = it.isRequired,
+            schema = OpenApiSpec.SchemaType("string"),
+            description = it.description
         )
-
     }
 }
 
@@ -156,10 +164,23 @@ private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
                 )
             )
         )
+    } else if (it.method != "get" && it.body.isPrimitive()) {
+        OpenApiSpec.RequestBody(
+            required = true,
+            content = mapOf(
+                ContentType.TEXT_PLAIN to mapOf(
+                    "schema" to OpenApiSpec.SchemaType(
+                        type = "${it.body.type}"
+                    )
+                )
+            )
+        )
     } else {
         null
     }
 }
+
+private fun OpenApiSpec.ObjectType.isPrimitive() = listOf("string", "number", "integer").contains(type)
 
 fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = PluginConfiguration(
     isEnabled = this?.get(SwaggerConfigurationKeys.ARG_ENABLED) ?: true,
@@ -173,34 +194,6 @@ fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = Plu
     hidePrivateFields = this?.get(SwaggerConfigurationKeys.ARG_HIDE_PRIVATE) ?: true,
     deriveFieldRequirementFromTypeNullability = this?.get(SwaggerConfigurationKeys.ARG_DERIVE_PROP_REQ) ?: true
 )
-
-internal fun Class<*>.resolveDefinitionTo(obj: OpenApiSpec.ObjectType): OpenApiSpec.ObjectType {
-    kotlin.memberProperties.forEach { field ->
-        if (field.returnType.jvmErasure.java.isPrimitive) {
-            obj.properties?.set(
-                field.name, OpenApiSpec.ObjectType(
-                    type = field.returnType.jvmErasure.java.simpleName.lowercase(),
-                    properties = null
-                )
-            )
-        } else {
-            obj.properties?.set(
-                field.name, OpenApiSpec.ObjectType(
-                    type = "object",
-                    properties = mutableMapOf(
-                        field.name to field.javaClass.resolveDefinitionTo(
-                            OpenApiSpec.ObjectType(
-                                "object",
-                                mutableMapOf()
-                            )
-                        )
-                    )
-                )
-            )
-        }
-    }
-    return obj
-}
 
 operator fun OutputStream.plusAssign(str: String) {
     this.write(str.toByteArray())

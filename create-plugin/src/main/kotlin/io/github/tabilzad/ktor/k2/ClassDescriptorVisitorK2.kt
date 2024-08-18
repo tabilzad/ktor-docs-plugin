@@ -312,24 +312,6 @@ internal class ClassDescriptorVisitorK2(
         }
     }
 
-    @OptIn(PrivateForInline::class)
-    private fun FirProperty.findDocsDescription(session: FirSession): KtorDescriptionBag? {
-        val docsAnnotation =
-            findAnnotation(KtorDescription::class.simpleName) ?: findAnnotation(KtorFieldDescription::class.simpleName)
-            ?: return null
-
-        val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(docsAnnotation, session)
-        val summary = resolved?.entries?.find { it.key.asString() == "summary" }?.value?.result
-        val descr = resolved?.entries?.find { it.key.asString() == "description" }?.value?.result
-        val required = resolved?.entries?.find { it.key.asString() == "required" }?.value?.result
-        return KtorDescriptionBag(
-            summary = summary?.accept(StringResolutionVisitor(), ""),
-            descr = descr?.accept(StringResolutionVisitor(), ""),
-            isRequired = required?.accept(StringResolutionVisitor(), "")?.toBooleanStrictOrNull()
-                ?: (returnTypeRef.isMarkedNullable == false)
-        )
-    }
-
     private fun ObjectType.addProperty(fir: FirProperty, objectType: ObjectType?, session: FirSession) {
         val resolvedDescription = fir.findDocsDescription(session)
         val docsDescription = resolvedDescription.let { it?.summary ?: it?.descr }
@@ -363,3 +345,20 @@ internal class ClassDescriptorVisitorK2(
 
 }
 
+@OptIn(PrivateForInline::class)
+internal fun FirProperty.findDocsDescription(session: FirSession): KtorDescriptionBag? {
+    val docsAnnotation =
+        findAnnotation(KtorDescription::class.simpleName) ?: findAnnotation(KtorFieldDescription::class.simpleName)
+        ?: return null
+
+    val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(docsAnnotation, session)
+    val summary = resolved?.entries?.find { it.key.asString() == "summary" }?.value?.result
+    val descr = resolved?.entries?.find { it.key.asString() == "description" }?.value?.result
+    val required = resolved?.entries?.find { it.key.asString() == "required" }?.value?.result
+    return KtorDescriptionBag(
+        summary = summary?.accept(StringResolutionVisitor(), ""),
+        descr = descr?.accept(StringResolutionVisitor(), ""),
+        isRequired = required?.accept(StringResolutionVisitor(), "")?.toBooleanStrictOrNull()
+            ?: (returnTypeRef.isMarkedNullable == false)
+    )
+}

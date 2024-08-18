@@ -1,0 +1,72 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/articles" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "sort",
+          "in" : "query",
+          "required" : false,
+          "description" : "this will sort the articles",
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      },
+      "post" : {
+        "summary" : "Saves an article",
+        "parameters" : [ {
+          "name" : "sort",
+          "in" : "query",
+          "required" : false,
+          "description" : "this will sort the articles",
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/articles/new" : {
+      "get" : {
+        "summary" : "Creates new article",
+        "description" : "Creates new articles (description)"
+      }
+    },
+    "/articles/{id}" : {
+      "get" : {
+        "summary" : "Get article by id",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "description" : "Id of the article",
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/articles/{id}/edit" : {
+      "get" : {
+        "summary" : "Get Edit article by id",
+        "parameters" : [ {
+          "name" : "id",
+          "in" : "path",
+          "required" : true,
+          "description" : "Id of the article",
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : { }
+  }
+}

@@ -88,13 +88,10 @@ fun generateCompilerTest(
     val testFilePath = testFile.path
     val clp = KtorDocsCommandLineProcessor()
     val compilationData = KotlinCompilation().apply {
-        val testSources = workingDir.resolve("sources")
-        System.setProperty("arrow.meta.generate.source.dir", testSources.absolutePath)
         compilerPluginRegistrars = listOf(KtorMetaPluginRegistrar())
         commandLineProcessors = listOf(clp)
         classpaths = deps.map { classpathOf(it) }
-        val loadBaseSources2 = loadBaseSources2(testSubjectSource)
-        sources = loadBaseSources2
+        sources = loadBaseSources(testSubjectSource)
         kotlincArguments = emptyList()
         jvmTarget = "1.8"
         messageOutputStream =
@@ -150,7 +147,7 @@ fun generateCompilerTest(
     compilationData.compile()
 }
 
-fun loadBaseSources2(source: String): List<SourceFile> {
+private fun loadBaseSources(source: String): List<SourceFile> {
     val annotationsFile = TestSourceUtil.loadAnnotations
     val nativeAnnotationsFile = TestSourceUtil.loadNativeAnnotations
     val requestsDefinitions = TestSourceUtil.loadRequests
@@ -162,9 +159,11 @@ fun loadBaseSources2(source: String): List<SourceFile> {
     )
 }
 
-val deps = arrayOf(
+private val deps = arrayOf(
     "ktor:2.2.4",
     "ktor-server-core:2.2.4",
+    "ktor-resources:2.3.4",
+    "ktor-server-resources:2.3.4",
     "ktor-utils:2.2.4",
     "ktor-server-netty:2.2.4",
     "ktor-http:2.2.4",
