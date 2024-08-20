@@ -224,6 +224,14 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should break down endpoints by tag when tags are appplies to common routes or endpoints`() {
+        val (source, expected) = loadSourceAndExpected("Tags4")
+        generateCompilerTest(testFile, source)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should ignore private fields or ones annotated with @Transient`() {
         val (source, expected) = loadSourceAndExpected("PrivateFields")
         generateCompilerTest(testFile, source)

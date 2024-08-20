@@ -42,7 +42,7 @@ internal class ExpressionsVisitorK2(
     }
 
     @OptIn(PrivateForInline::class)
-    private fun FirFunction.findTags(session: FirSession): Set<String>? {
+    private fun FirStatement.findTags(session: FirSession): Set<String>? {
         val annotation = findAnnotation(ClassIds.KTOR_TAGS_ANNOTATION, session) ?: return null
         val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(annotation, session)
         return resolved?.entries?.find { it.key.asString() == "tags" }?.value?.result?.accept(
@@ -188,7 +188,7 @@ internal class ExpressionsVisitorK2(
         val resolvedExp = functionCall.toResolvedCallableReference(session)
         val expName = resolvedExp?.name?.asString() ?: ""
 
-        val tagsFromAnnotation = functionCall.calleeReference.toResolvedFunctionSymbol()?.fir?.findTags(session)
+        val tagsFromAnnotation = functionCall.findTags(session)
         if (functionCall.isARouteDefinition() || ExpType.METHOD.labels.contains(expName)) {
 
             val args = functionCall.extractArguments()
@@ -198,9 +198,9 @@ internal class ExpressionsVisitorK2(
             if (ExpType.ROUTE.labels.contains(expName)) {
                 if (parent == null) {
                     resultElement = routePathArg?.let {
-                        DocRoute(routePathArg)
+                        DocRoute(routePathArg, tags = tagsFromAnnotation)
                     } ?: run {
-                        DocRoute(expName)
+                        DocRoute(expName, tags = tagsFromAnnotation)
                     }
                 } else {
                     if (parent is DocRoute) {

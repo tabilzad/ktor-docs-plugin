@@ -11,7 +11,7 @@ import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
-import org.jetbrains.kotlin.fir.expressions.FirExpression
+import org.jetbrains.kotlin.fir.expressions.FirStatement
 import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
@@ -110,7 +110,7 @@ fun FirFunction.hasAnnotation(session: FirSession, name: String): Boolean {
     return annotations.any { it.fqName(session)?.shortName()?.asString() == name }
 }
 
-fun FirExpression.findAnnotation(name: String): FirAnnotation? {
+fun FirStatement.findAnnotation(name: String): FirAnnotation? {
     return annotations.firstOrNull {
         it.annotationTypeRef.coneType.renderReadableWithFqNames().contains(name)
     }
@@ -129,7 +129,7 @@ fun FirFunction.findAnnotation(name: String): FirAnnotation? {
     }
 }
 
-fun FirDeclaration.findAnnotation(classId: ClassId, session: FirSession): FirAnnotation? {
+fun FirStatement.findAnnotation(classId: ClassId, session: FirSession): FirAnnotation? {
     return annotations.firstOrNull {
         it.annotationTypeRef.coneType.fullyExpandedClassId(session) == classId
     }
