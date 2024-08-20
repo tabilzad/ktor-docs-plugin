@@ -4,6 +4,7 @@
 This plugin implements a plug and play solution for generating OpenAPI (Swagger) specification for your Ktor server with minimal effort - no need to modify your existing code, no special DSL wrappers etc.
 Just annotate your route(s) definitions with `@GenerateOpenApi` and `openapi.yaml` will be generated at build time.
 
+Take a look at the [Sample Project](https://github.com/tabilzad/ktor-inspektor-example) to get started. 
 ## How to apply the plugin
 
 ```groovy
