@@ -280,6 +280,14 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should handle kotlinx serialization annotated properties and data class constructor parameters`() {
+        val (source, expected) = loadSourceAndExpected("SerializationAnnotated")
+        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should resolve request body schema directly from http method parameter if it's not a resource`() {
         val (source, expected) = loadSourceAndExpected("RequestBodyParam")
         generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)

@@ -14,23 +14,24 @@ mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.28.0" }
 [bundles]
 jackson = ["jacksonKotlin", "jacksonYaml"]
 ktor = ["ktor", "ktorNetty", "ktorResources"]
-kotlinGradle = ["kotlinGradleApi","kotlinGradle"]
+kotlinGradle = ["kotlinGradleApi", "kotlinGradle"]
 
 [libraries]
 kotlinCompiler = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlinVersion" }
-assertJ = {module = "org.assertj:assertj-core", version.ref = "assertJVerison"}
-classGraph = {module="io.github.classgraph:classgraph", version.ref="classgraph"}
-junit = {module = "org.junit:junit-bom", version = "5.10.0"}
-junitJupiter = {module = "org.junit.jupiter:junit-jupiter"}
-compilerTest = {module = "dev.zacsweers.kctfork:core", version.ref = "compilerTestingVersion"}
+assertJ = { module = "org.assertj:assertj-core", version.ref = "assertJVerison" }
+classGraph = { module = "io.github.classgraph:classgraph", version.ref = "classgraph" }
+junit = { module = "org.junit:junit-bom", version = "5.10.0" }
+junitJupiter = { module = "org.junit.jupiter:junit-jupiter" }
+compilerTest = { module = "dev.zacsweers.kctfork:core", version.ref = "compilerTestingVersion" }
 jacksonKotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jacksonVersion" }
 jacksonYaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version.ref = "jacksonVersion" }
 ktor = { module = "io.ktor:ktor", version.ref = "ktorVersion" }
 ktorNetty = { module = "io.ktor:ktor-server-netty", version.ref = "ktorVersion" }
 ktorResources = { module = "io.ktor:ktor-server-resources", version.ref = "ktorVersion" }
-kotlinGradleApi = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion"}
-kotlinGradle = {module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion"}
+kotlinGradleApi = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlinVersion" }
+kotlinGradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlinVersion" }
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlinVersion" }
-moshi = { module = "com.squareup.moshi:moshi", version = "1.14.0"}
+moshi = { module = "com.squareup.moshi:moshi", version = "1.14.0" }
+serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version = "1.7.1" }
 
 

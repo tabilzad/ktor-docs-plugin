@@ -28,6 +28,9 @@ object ClassIds {
     val KTOR_DSL_ANNOTATION = ClassId(FqName("io.ktor.util"), FqName("KtorDsl"), false)
     val TRANSIENT_ANNOTATION = ClassId(FqName("kotlin.jvm"), FqName("Transient"), false)
 
-    val MOSHI_JSON_ANNOTATION_FQ_NAME = FqName("com.squareup.moshi.Json")
-    val MOSHI_JSON_ANNOTATION_NAME_ARGUMENT_IDENTIFIER: Name = Name.identifier("name")
+}
+
+enum class SerializationFramework(val fqName: FqName, val identifier: Name) {
+    MOSHI(FqName("com.squareup.moshi.Json"), Name.identifier("name")),
+    KOTLINX(FqName("kotlinx.serialization.SerialName"), Name.identifier("value"))
 }

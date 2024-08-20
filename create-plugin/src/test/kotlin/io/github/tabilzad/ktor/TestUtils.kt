@@ -163,4 +163,5 @@ private val deps = arrayOf(
     "ktor-http:2.2.4",
     "kotlinx-coroutines-core:1.6.4",
     "moshi:1.14.0",
+    "kotlinx-serialization-core:1.7.1"
 )

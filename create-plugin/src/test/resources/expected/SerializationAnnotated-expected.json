@@ -1,0 +1,49 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/action" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.SerialNameAnnotated"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.SerialNameAnnotated" : {
+        "type" : "object",
+        "properties" : {
+          "notAnnotated" : {
+            "type" : "string"
+          },
+          "serial_annotated_constructor_derived_property" : {
+            "type" : "string"
+          },
+          "serial_annotated_constructor_parameter" : {
+            "type" : "string"
+          },
+          "serial_annotated_lateinit_var" : {
+            "type" : "string"
+          },
+          "serial_annotated_mutable_property" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "serial_annotated_constructor_parameter", "notAnnotated", "serial_annotated_constructor_derived_property", "serial_annotated_lateinit_var" ]
+      }
+    }
+  }
+}

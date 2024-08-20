@@ -15,6 +15,7 @@ dependencies {
     implementation(libs.bundles.jackson)
     implementation(libs.kotlinReflect)
     implementation(libs.moshi)
+    implementation(libs.serialization)
 
     testImplementation(libs.classGraph)
     testImplementation(libs.compilerTest)
