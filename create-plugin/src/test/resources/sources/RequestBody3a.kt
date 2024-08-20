@@ -1,30 +1,27 @@
 package sources
 
-import sources.annotations.KtorDescription
-import io.ktor.http.*
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDocs
 
 interface MyInterface {
-    val abstractField1: String,
-    val abstractField2: Int,
+    val abstractField1: String
+    val abstractField2: Int
     val fieldWithGetter: String
         get() = abstractField1 + abstractField2.toString()
 }
 
-data class SomeRequest(
-    val concreteField: String
+data class LocalSampleRequest(
+    val concreteField: String, override val abstractField1: String, override val abstractField2: Int
 ) : MyInterface
 
-@KtorDocs
-fun Application.responseBody() {
+@GenerateOpenApi
+fun Application.responseBody3a() {
     routing {
         route("/v3") {
             post("/postBodyRequestSimple") {
-                call.receive<SomeRequest>()
+                call.receive<LocalSampleRequest>()
             }
         }
     }

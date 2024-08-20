@@ -1,11 +1,11 @@
 package sources
 
-import io.github.tabilzad.ktor.KtorFieldDescription
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.KtorDescription
+import io.github.tabilzad.ktor.annotations.KtorFieldDescription
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDescription
-import sources.annotations.KtorDocs
 
 
 data class MyDescribedPayload(
@@ -24,7 +24,7 @@ data class NestedObject(
     val subField2: String
 )
 
-@KtorDocs
+@GenerateOpenApi
 fun Application.testDescriptionBody() {
     routing {
         route("/v1") {

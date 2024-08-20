@@ -1,11 +1,11 @@
 package sources
 
-import io.ktor.server.application.Application
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.KtorDescription
+import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDescription
-import sources.annotations.KtorDocs
 
-@KtorDocs
+@GenerateOpenApi
 fun Application.testDescription() {
     routing {
         route("/base") {

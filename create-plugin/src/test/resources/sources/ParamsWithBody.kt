@@ -1,12 +1,12 @@
 package sources
 
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDocs
 import sources.requests.SimpleRequest
 
-@KtorDocs
+@GenerateOpenApi
 fun Application.pathParamsWithBody() {
     routing {
         route("/v1") {

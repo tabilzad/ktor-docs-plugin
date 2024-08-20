@@ -318,13 +318,13 @@ internal class ExpressionsVisitorK2(
 
             val declaration = functionCall.calleeReference.toResolvedFunctionSymbol()?.fir
 
-            // val tagsFromAnnotation = declaration?.findTags(session)
+            val tagsFromDeclaration = declaration?.findTags(session)
 
             if (parent is DocRoute) {
                 val accept = declaration?.accept(this, null)
 
                 accept?.onEach {
-                    it.tags = it.tags merge tagsFromAnnotation
+                    it.tags = it.tags merge tagsFromAnnotation merge tagsFromDeclaration
                 }
                 parent.children.addAll(accept ?: emptyList())
             } else {

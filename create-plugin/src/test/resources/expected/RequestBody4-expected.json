@@ -13,7 +13,7 @@
           "content" : {
             "application/json" : {
               "schema" : {
-                "$ref" : "#/components/schemas/sources.SomeGenericRequest"
+                "$ref" : "#/components/schemas/sources.MyGenericRequest"
               }
             }
           }
@@ -23,7 +23,16 @@
   },
   "components" : {
     "schemas" : {
-      "sources.GenericType" : {
+      "sources.MyGenericRequest" : {
+        "type" : "object",
+        "properties" : {
+          "generic" : {
+            "$ref" : "#/components/schemas/sources.MyGenericType"
+          }
+        },
+        "required" : [ "generic" ]
+      },
+      "sources.MyGenericType" : {
         "type" : "object",
         "properties" : {
           "other" : {
@@ -34,15 +43,6 @@
           }
         },
         "required" : [ "status", "other" ]
-      },
-      "sources.SomeGenericRequest" : {
-        "type" : "object",
-        "properties" : {
-          "generic" : {
-            "$ref" : "#/components/schemas/sources.GenericType"
-          }
-        },
-        "required" : [ "generic" ]
       }
     }
   }

@@ -1,23 +1,21 @@
 package sources
 
-import io.github.tabilzad.ktor.Tag
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDescription
-import sources.annotations.KtorDocs
-import sources.requests.ComplexRequest
 import sources.requests.SimpleRequest
 
-@KtorDocs
+@GenerateOpenApi
 @Tag(["module1"])
-fun Application.module1() {
+fun Application.moduleWithBody() {
     routing {
         requestBodyTest2()
     }
 }
 
-@KtorDocs
+@GenerateOpenApi
 @Tag(["submodule"])
 fun Route.requestBodyTest2() {
 

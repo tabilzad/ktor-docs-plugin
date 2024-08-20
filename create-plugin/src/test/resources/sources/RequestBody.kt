@@ -1,14 +1,14 @@
 package sources
 
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDocs
 import sources.requests.ComplexRequest
 import sources.requests.NestedRequest
 import sources.requests.SimpleRequest
 
-@KtorDocs
+@GenerateOpenApi
 fun Application.requestBodyTest() {
     routing {
         route("/v1"){

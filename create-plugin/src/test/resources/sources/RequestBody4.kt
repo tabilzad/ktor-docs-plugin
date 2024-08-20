@@ -1,29 +1,25 @@
 package sources
 
-import io.github.tabilzad.ktor.GenerateOpenApi
-import sources.annotations.KtorDescription
-import io.ktor.http.*
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDocs
 
-data class GenericType<T>(
+data class MyGenericType<T>(
     val status: T,
     val other: String
 )
 
-data class SomeGenericRequest(
-    val generic: GenericType<Int>
+data class MyGenericRequest(
+    val generic: MyGenericType<Int>
 )
 
 @GenerateOpenApi
-fun Application.responseBody() {
+fun Application.responseBody4() {
     routing {
         route("/v3") {
             post("/postGenericRequest") {
-                call.receive<SomeGenericRequest>()
+                call.receive<MyGenericRequest>()
             }
         }
     }

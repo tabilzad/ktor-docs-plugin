@@ -1,7 +1,7 @@
 package sources
 
-import io.github.tabilzad.ktor.Tag
-import io.github.tabilzad.ktor.KtorDocs
+import io.github.tabilzad.ktor.annotations.Tag
+import io.github.tabilzad.ktor.annotations.KtorDocs
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 

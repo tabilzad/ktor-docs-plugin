@@ -1,8 +1,8 @@
 package sources
 
-import io.github.tabilzad.ktor.GenerateOpenApi
-import io.github.tabilzad.ktor.KtorFieldDescription
-import sources.annotations.KtorDescription
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.KtorDescription
+import io.github.tabilzad.ktor.annotations.KtorFieldDescription
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*

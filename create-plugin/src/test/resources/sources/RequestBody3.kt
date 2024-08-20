@@ -1,28 +1,26 @@
 package sources
 
-import sources.annotations.KtorDescription
-import io.ktor.http.*
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.KtorFieldDescription
 import io.ktor.server.application.*
 import io.ktor.server.request.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDocs
 
 enum class MyEnumClass{
     ENTRY1,
     ENTRY2
 }
 
-data class SomeRequest(
-    @KtorDescription("this is an enum field")
+data class LocalSomeRequest(
+    @KtorFieldDescription("this is an enum field")
     val myEnum: MyEnumClass
 )
-@KtorDocs
-fun Application.responseBody() {
+@GenerateOpenApi
+fun Application.responseBody3() {
     routing {
         route("/v3") {
             post("/postBodyRequestSimple") {
-                call.receive<SomeRequest>()
+                call.receive<LocalSomeRequest>()
             }
         }
     }

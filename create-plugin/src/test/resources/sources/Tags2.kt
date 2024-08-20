@@ -1,21 +1,20 @@
 package sources
 
-import io.github.tabilzad.ktor.Tag
-import io.github.tabilzad.ktor.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-
 
 @GenerateOpenApi
 @Tag(["Module"])
 fun Application.module1() {
     routing {
-        subModule1()
-        subModule2()
+        subModule1_tag2()
+        subModule2_tag2()
     }
 }
 
-fun Route.subModule1() {
+fun Route.subModule1_tag2() {
     route("/submodule1") {
         get("/sub1") {
 
@@ -24,7 +23,7 @@ fun Route.subModule1() {
 }
 
 @Tag(["SubModule"])
-fun Route.subModule2() {
+fun Route.subModule2_tag2() {
     route("/submodule2") {
         get("/sub2") {
 

@@ -1,12 +1,12 @@
 package sources
 
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import sources.Constants.EMPLOYEE_ID
 import sources.Constants.EMPLOYEE_ID2
 import sources.Constants.EMPLOYEE_ID3
-import sources.annotations.KtorDocs
 import sources.requests.SimpleRequest
 
 object Constants {
@@ -16,7 +16,7 @@ object Constants {
     const val EMPLOYEE_ID3 = "employeeId3"
 }
 
-@KtorDocs
+@GenerateOpenApi
 fun Application.queryParametersTest2() {
     routing {
         route("/v1") {

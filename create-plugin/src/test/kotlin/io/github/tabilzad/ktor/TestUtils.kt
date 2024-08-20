@@ -8,6 +8,7 @@ import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintStream
+import java.nio.file.Paths
 
 object TestSourceUtil {
     fun loadSourceCodeFrom(fileName: String): String =
@@ -19,13 +20,8 @@ object TestSourceUtil {
         loadSourceCodeFrom(fileName) to loadExpectation("${fileName}-expected")
 
 
-    val loadAnnotations by lazy {
-        this.javaClass.getResource("/sources/annotations/TestAnnotations.kt")
-            ?: throw FileNotFoundException("annotations don't exist")
-    }
-
     val loadNativeAnnotations by lazy {
-        this.javaClass.getResource("/io/github/tabilzad/ktor/Annotations.kt")
+        Paths.get("src/main/kotlin/io/github/tabilzad/ktor/annotations/Annotations.kt").toFile()
             ?: throw FileNotFoundException("annotations don't exist")
     }
 
@@ -148,12 +144,10 @@ fun generateCompilerTest(
 }
 
 private fun loadBaseSources(source: String): List<SourceFile> {
-    val annotationsFile = TestSourceUtil.loadAnnotations
     val nativeAnnotationsFile = TestSourceUtil.loadNativeAnnotations
     val requestsDefinitions = TestSourceUtil.loadRequests
     return listOf(
-        SourceFile.kotlin(annotationsFile.file, annotationsFile.readText().trimMargin()),
-        SourceFile.kotlin(nativeAnnotationsFile.file, nativeAnnotationsFile.readText().trimMargin()),
+        SourceFile.kotlin(nativeAnnotationsFile.name, nativeAnnotationsFile.readText().trimMargin()),
         SourceFile.kotlin(requestsDefinitions.file, requestsDefinitions.readText().trimMargin()),
         SourceFile.kotlin("TestSubject.kt", source)
     )

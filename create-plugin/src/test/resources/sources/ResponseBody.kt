@@ -1,18 +1,18 @@
 package sources
 
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.KtorResponds
+import io.github.tabilzad.ktor.annotations.ResponseEntry
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDocs
-import sources.annotations.KtorResponds
-import sources.annotations.ResponseEntry
 import sources.requests.PrivateBodyRequest
 import sources.requests.SimpleRequest
 
-@KtorDocs
-fun Application.responseBody() {
+@GenerateOpenApi
+fun Application.responseBodySample() {
     routing {
         route("/v1") {
             @KtorResponds(

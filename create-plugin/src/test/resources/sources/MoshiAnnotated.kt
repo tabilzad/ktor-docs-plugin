@@ -1,14 +1,10 @@
 package sources
 
 import com.squareup.moshi.Json
-import io.github.tabilzad.ktor.GenerateOpenApi
-import io.ktor.server.application.Application
-import io.ktor.server.application.call
-import io.ktor.server.request.receive
-import io.ktor.server.routing.post
-import io.ktor.server.routing.route
-import io.ktor.server.routing.routing
-
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.ktor.server.application.*
+import io.ktor.server.request.*
+import io.ktor.server.routing.*
 
 data class MoshiAnnotated(
     @Json(name = "moshi_annotated_constructor_parameter")
@@ -26,7 +22,7 @@ data class MoshiAnnotated(
 }
 
 @GenerateOpenApi
-fun Application.module1() {
+fun Application.moduleMoshi() {
     routing {
         route("/v1") {
             post("/action") {

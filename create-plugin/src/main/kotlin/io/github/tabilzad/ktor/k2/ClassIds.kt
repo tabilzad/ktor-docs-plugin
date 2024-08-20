@@ -20,9 +20,9 @@ object ClassIds {
     val KTOR_QUERY_PARAM = FqName("io.ktor.server.request.ApplicationRequest.queryParameters")
     val KTOR_RAW_QUERY_PARAM = FqName("io.ktor.server.request.ApplicationRequest.rawQueryParameters")
 
-    val KTOR_TAGS_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor"), FqName("Tag"), false)
-    val KTOR_GENERATE_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor"), FqName("GenerateOpenApi"), false)
-    val KTOR_DOCS_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor"), FqName("KtorDocs"), false)
+    val KTOR_TAGS_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor.annotations"), FqName("Tag"), false)
+    val KTOR_GENERATE_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor.annotations"), FqName("GenerateOpenApi"), false)
+    val KTOR_DOCS_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor.annotations"), FqName("KtorDocs"), false)
     val KTOR_RESOURCE_ANNOTATION = ClassId(FqName("io.ktor.resources"), FqName("Resource"), false)
 
     val KTOR_DSL_ANNOTATION = ClassId(FqName("io.ktor.util"), FqName("KtorDsl"), false)

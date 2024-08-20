@@ -1,11 +1,11 @@
 package sources
 
-import io.github.tabilzad.ktor.Tag
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDocs
 
-@KtorDocs
+@GenerateOpenApi
 @Tag(["AppLevel"])
 fun Application.tagsAreAppliedToApplicationModule() {
     routing {
@@ -17,7 +17,7 @@ fun Application.tagsAreAppliedToApplicationModule() {
     }
 }
 
-@KtorDocs
+@GenerateOpenApi
 @Tag(["RouteLevel"])
 fun Route.tagsAreAppliedToRoute() {
     route("/v2") {

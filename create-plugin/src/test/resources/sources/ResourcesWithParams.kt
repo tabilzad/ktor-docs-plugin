@@ -1,6 +1,6 @@
 package sources
 
-import io.github.tabilzad.ktor.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.application.*
@@ -9,7 +9,6 @@ import io.ktor.server.resources.post
 import io.ktor.server.resources.put
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-
 
 @Resource("/articles")
 class Articles2(val sort: String? = "new") {

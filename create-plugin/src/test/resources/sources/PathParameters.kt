@@ -1,10 +1,10 @@
 package sources
 
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
-import sources.annotations.KtorDocs
 
-@KtorDocs
+@GenerateOpenApi
 fun Application.pathParametersTest() {
     routing {
         route("/v1") {

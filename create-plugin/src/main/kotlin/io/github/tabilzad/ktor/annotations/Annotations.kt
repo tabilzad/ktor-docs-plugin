@@ -33,17 +33,17 @@ annotation class ResponseEntry(
 )
 
 @Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.FUNCTION,
-    AnnotationTarget.EXPRESSION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.EXPRESSION)
 annotation class KtorDescription(
     val summary: String = "",
     val description: String = "",
-    val required: Boolean = false,
-    val tags: Array<String> = [])
+    val tags: Array<String> = []
+)
 
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FIELD, AnnotationTarget.CLASS)
 annotation class KtorFieldDescription(
     val summary: String = "",
     val description: String = "",
-    val required: Boolean = false)
+    val required: Boolean = false
+)

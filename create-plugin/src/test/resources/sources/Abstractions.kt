@@ -1,10 +1,9 @@
 package sources
 
-import io.github.tabilzad.ktor.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
-
 
 sealed class Action()
 
@@ -17,7 +16,7 @@ data class RequestBody(
 )
 
 @GenerateOpenApi
-fun Application.module1() {
+fun Application.moduleAbstractions() {
     routing {
         route("/v1") {
 

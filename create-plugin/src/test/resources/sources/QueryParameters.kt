@@ -1,9 +1,9 @@
 package sources
 
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
 import sources.MyStringQueries.queryParam
-import sources.annotations.KtorDocs
 
 enum class MyQueries(val param: String) {
     ORDER_ID("orderId")
@@ -13,7 +13,7 @@ object MyStringQueries {
     val queryParam = "my_string_query_param"
 }
 
-@KtorDocs
+@GenerateOpenApi
 fun Application.queryParametersTest() {
     routing {
         route("/v1") {

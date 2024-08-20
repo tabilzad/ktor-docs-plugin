@@ -1,6 +1,6 @@
 package sources
 
-import io.github.tabilzad.ktor.GenerateOpenApi
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.ktor.resources.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
