@@ -12,7 +12,7 @@ open class DocumentationOptions(
 
 open class PluginOptions(
     var enabled: Boolean = true,
-    var saveInBuild: Boolean = false,
+    var saveInBuild: Boolean = true,
     var filePath: String? = null,
     var format: String = "json"
 )
