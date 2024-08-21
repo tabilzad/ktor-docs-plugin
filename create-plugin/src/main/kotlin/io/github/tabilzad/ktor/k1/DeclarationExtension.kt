@@ -1,5 +1,6 @@
-package io.github.tabilzad.ktor
+package io.github.tabilzad.ktor.k1
 
+import io.github.tabilzad.ktor.PluginConfiguration
 import org.jetbrains.kotlin.container.StorageComponentContainer
 import org.jetbrains.kotlin.container.useInstance
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
@@ -11,7 +12,7 @@ import org.jetbrains.kotlin.resolve.checkers.DeclarationChecker
 import org.jetbrains.kotlin.resolve.checkers.DeclarationCheckerContext
 
 // Registers K1 component
-class DeclarationExtension(
+internal class DeclarationExtension(
     private val configuration: PluginConfiguration
 ) : StorageComponentContainerContributor {
 

@@ -1,5 +1,6 @@
-package io.github.tabilzad.ktor.k2
+package io.github.tabilzad.ktor.k2.visitors
 
+import io.github.tabilzad.ktor.k2.ClassIds
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirEvaluatorResult
 import org.jetbrains.kotlin.fir.FirSession

@@ -1,9 +1,11 @@
-package io.github.tabilzad.ktor.visitors
+package io.github.tabilzad.ktor.k1.visitors
 
 import io.github.tabilzad.ktor.*
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorDocs
 import io.github.tabilzad.ktor.annotations.KtorResponds
+import io.github.tabilzad.ktor.k1.findAnnotation
+import io.github.tabilzad.ktor.k1.hasAnnotation
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

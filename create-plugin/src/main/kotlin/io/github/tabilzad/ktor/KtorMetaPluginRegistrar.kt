@@ -2,6 +2,7 @@
 
 package io.github.tabilzad.ktor
 
+import io.github.tabilzad.ktor.k1.DeclarationExtension
 import io.github.tabilzad.ktor.k2.SwaggerDeclarationChecker
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi

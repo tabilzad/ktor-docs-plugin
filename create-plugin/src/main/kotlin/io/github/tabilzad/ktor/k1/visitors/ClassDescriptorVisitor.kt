@@ -1,4 +1,4 @@
-package io.github.tabilzad.ktor.visitors
+package io.github.tabilzad.ktor.k1.visitors
 
 import io.github.tabilzad.ktor.OpenApiSpec.ObjectType
 import io.github.tabilzad.ktor.PluginConfiguration

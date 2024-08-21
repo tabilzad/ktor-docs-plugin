@@ -11,7 +11,7 @@ import java.io.File
 
 
 
-fun OpenApiSpec.serializeAndWriteTo(configuration: PluginConfiguration) {
+internal fun OpenApiSpec.serializeAndWriteTo(configuration: PluginConfiguration) {
     val file = File(configuration.filePath)
 
     getJacksonBy(configuration.format).let { mapper ->
@@ -52,7 +52,7 @@ fun OpenApiSpec.mergeAndResolveConflicts(newSpec: OpenApiSpec): OpenApiSpec {
     }
     return copy(
         paths = paths + newDistinctPaths + resolvedConflicts,
-        components = OpenApiComponents(components.schemas.plus(newSpec.components.schemas))
+        components = OpenApiSpec.OpenApiComponents(components.schemas.plus(newSpec.components.schemas))
     )
 }
 

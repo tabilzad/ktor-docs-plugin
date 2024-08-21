@@ -1,7 +1,8 @@
-package io.github.tabilzad.ktor
+package io.github.tabilzad.ktor.k1
 
+import io.github.tabilzad.ktor.*
 import io.github.tabilzad.ktor.annotations.KtorDocs
-import io.github.tabilzad.ktor.visitors.ExpressionsVisitor
+import io.github.tabilzad.ktor.k1.visitors.ExpressionsVisitor
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
@@ -12,7 +13,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 @Deprecated("used for k1 backend only, we wont be supporting k1, see SwaggerDeclarationChecker")
-fun swaggerExtensionPhase(
+internal fun swaggerExtensionPhase(
     config: PluginConfiguration,
     ktDeclaration: KtDeclaration,
     declarationDescriptor: DeclarationDescriptor,
@@ -82,7 +83,7 @@ internal fun convertInternalToOpenSpec(
             description = configuration.description,
             version = configuration.version
         ), paths = reducedRoutes,
-        components = OpenApiComponents(schemas)
+        components = OpenApiSpec.OpenApiComponents(schemas)
     )
 }
 

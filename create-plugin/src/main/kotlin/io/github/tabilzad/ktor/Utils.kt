@@ -1,15 +1,13 @@
 package io.github.tabilzad.ktor
 
+import io.github.tabilzad.ktor.k2.ClassIds.TRANSIENT_ANNOTATION_FQ
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyPublicApi
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
 import java.io.OutputStream
-
-val transientAnnotation = FqName("kotlin.jvm.Transient")
 
 fun Boolean.byFeatureFlag(flag: Boolean): Boolean = if (flag) {
     this
@@ -17,7 +15,8 @@ fun Boolean.byFeatureFlag(flag: Boolean): Boolean = if (flag) {
     true
 }
 
-fun MemberScope.forEachVariable(configuration: PluginConfiguration, predicate: (PropertyDescriptor) -> Unit) {
+@Deprecated("K1 only", replaceWith = ReplaceWith("ConeKotlinType.getMembers"))
+internal fun MemberScope.forEachVariable(configuration: PluginConfiguration, predicate: (PropertyDescriptor) -> Unit) {
     getDescriptorsFiltered(DescriptorKindFilter.VARIABLES)
         .asSequence()
         .map { it.original }
@@ -26,13 +25,13 @@ fun MemberScope.forEachVariable(configuration: PluginConfiguration, predicate: (
             it.isEffectivelyPublicApi.byFeatureFlag(configuration.hidePrivateFields)
         }
         .filter {
-            (!it.annotations.hasAnnotation(transientAnnotation)).byFeatureFlag(configuration.hideTransients)
+            (!it.annotations.hasAnnotation(TRANSIENT_ANNOTATION_FQ)).byFeatureFlag(configuration.hideTransients)
         }
         .filter {
-            (!(it.backingField?.annotations?.hasAnnotation(transientAnnotation) == true
-                    || it.delegateField?.annotations?.hasAnnotation(transientAnnotation) == true
-                    || it.setter?.annotations?.hasAnnotation(transientAnnotation) == true
-                    || it.getter?.annotations?.hasAnnotation(transientAnnotation) == true
+            (!(it.backingField?.annotations?.hasAnnotation(TRANSIENT_ANNOTATION_FQ) == true
+                    || it.delegateField?.annotations?.hasAnnotation(TRANSIENT_ANNOTATION_FQ) == true
+                    || it.setter?.annotations?.hasAnnotation(TRANSIENT_ANNOTATION_FQ) == true
+                    || it.getter?.annotations?.hasAnnotation(TRANSIENT_ANNOTATION_FQ) == true
                     )
 
                     ).byFeatureFlag(
@@ -73,10 +72,6 @@ internal fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { chi
                     tags = e.tags merge child.tags
                 )
             )
-        }
-
-        else -> {
-            emptyList()
         }
     }
 }
@@ -182,7 +177,7 @@ private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
 
 private fun OpenApiSpec.ObjectType.isPrimitive() = listOf("string", "number", "integer").contains(type)
 
-fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = PluginConfiguration(
+internal fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = PluginConfiguration(
     isEnabled = this?.get(SwaggerConfigurationKeys.ARG_ENABLED) ?: true,
     format = this?.get(SwaggerConfigurationKeys.ARG_FORMAT) ?: "yaml",
     title = this?.get(SwaggerConfigurationKeys.ARG_TITLE) ?: "Open API Specification",
@@ -199,61 +194,3 @@ operator fun OutputStream.plusAssign(str: String) {
     this.write(str.toByteArray())
 }
 
-object HttpCodeResolver {
-    fun resolve(code: String?): String = codes[code] ?: "200"
-    private val codes = mapOf(
-        "Continue" to "100",
-        "SwitchingProtocols" to "101",
-        "Processing" to "102",
-        "OK" to "200",
-        "Created" to "201",
-        "Accepted" to "202",
-        "NonAuthoritativeInformation" to "203",
-        "NoContent" to "204",
-        "ResetContent" to "205",
-        "PartialContent" to "206",
-        "MultiStatus" to "207",
-        "MultipleChoices" to "300",
-        "MovedPermanently" to "301",
-        "Found" to "302",
-        "SeeOther" to "303",
-        "NotModified" to "304",
-        "UseProxy" to "305",
-        "SwitchProxy" to "306",
-        "TemporaryRedirect" to "307",
-        "PermanentRedirect" to "308",
-        "BadRequest" to "400",
-        "Unauthorized" to "401",
-        "PaymentRequired" to "402",
-        "Forbidden" to "403",
-        "NotFound" to "404",
-        "MethodNotAllowed" to "405",
-        "NotAcceptable" to "406",
-        "ProxyAuthenticationRequired" to "407",
-        "RequestTimeout" to "408",
-        "Conflict" to "409",
-        "Gone" to "410",
-        "LengthRequired" to "411",
-        "PreconditionFailed" to "412",
-        "PayloadTooLarge" to "413",
-        "RequestURITooLong" to "414",
-        "UnsupportedMediaType" to "415",
-        "RequestedRangeNotSatisfiable" to "416",
-        "ExpectationFailed" to "417",
-        "UnprocessableEntity" to "422",
-        "Locked" to "423",
-        "FailedDependency" to "424",
-        "UpgradeRequired" to "426",
-        "TooManyRequests" to "429",
-        "RequestHeaderFieldTooLarge" to "431",
-        "InternalServerError" to "500",
-        "NotImplemented" to "501",
-        "BadGateway" to "502",
-        "ServiceUnavailable" to "503",
-        "GatewayTimeout" to "504",
-        "VersionNotSupported" to "505",
-        "VariantAlsoNegotiates" to "506",
-        "InsufficientStorage" to "507"
-    )
-
-}

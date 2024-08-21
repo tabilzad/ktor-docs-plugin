@@ -28,6 +28,8 @@ object ClassIds {
     val KTOR_DSL_ANNOTATION = ClassId(FqName("io.ktor.util"), FqName("KtorDsl"), false)
     val TRANSIENT_ANNOTATION = ClassId(FqName("kotlin.jvm"), FqName("Transient"), false)
 
+    val TRANSIENT_ANNOTATION_FQ = FqName("kotlin.jvm.Transient")
+
 }
 
 enum class SerializationFramework(val fqName: FqName, val identifier: Name) {

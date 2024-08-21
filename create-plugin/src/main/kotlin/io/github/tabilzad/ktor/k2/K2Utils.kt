@@ -137,7 +137,7 @@ fun FirStatement.findAnnotation(classId: ClassId, session: FirSession): FirAnnot
 
 
 @OptIn(SymbolInternals::class)
-fun ConeKotlinType.getMembers(session: FirSession, config: PluginConfiguration): List<FirDeclaration> {
+internal fun ConeKotlinType.getMembers(session: FirSession, config: PluginConfiguration): List<FirDeclaration> {
 
     val concreteDeclarations =
         (this as? ConeClassLikeType)?.lookupTag?.toClassSymbol(session)?.fir?.declarations?.filterIsInstance<FirProperty>()

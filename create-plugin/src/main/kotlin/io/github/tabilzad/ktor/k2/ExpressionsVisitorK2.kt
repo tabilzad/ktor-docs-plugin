@@ -3,8 +3,12 @@ package io.github.tabilzad.ktor.k2
 import io.github.tabilzad.ktor.*
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorResponds
-import io.github.tabilzad.ktor.visitors.KtorDescriptionBag
-import io.github.tabilzad.ktor.visitors.toSwaggerType
+import io.github.tabilzad.ktor.k2.visitors.*
+import io.github.tabilzad.ktor.k2.visitors.ClassDescriptorVisitorK2
+import io.github.tabilzad.ktor.k2.visitors.ResourceClassVisitor
+import io.github.tabilzad.ktor.k2.visitors.RespondsAnnotationVisitor
+import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
+import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext

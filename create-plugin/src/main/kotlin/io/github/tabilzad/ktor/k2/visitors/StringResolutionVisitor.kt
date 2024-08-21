@@ -1,4 +1,4 @@
-package io.github.tabilzad.ktor.k2
+package io.github.tabilzad.ktor.k2.visitors
 
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
