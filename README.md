@@ -37,10 +37,12 @@ swagger {
 | Feature                      | isSupported | type      |
 |------------------------------|-------------|-----------|
 | Path/Endpoint definitions    | ✅           | Automatic |
+| Ktor Resources               | ✅           | Automatic |
 | Request Schemas              | ✅           | Automatic |
 | Response Schemas             | ✅           | Explicit  |
 | Endpoint/Scheme Descriptions | ✅           | Explicit  |
 | Endpoint Tagging             | ✅           | Explicit  |
+
 
 ## Plugin Configuration
 
