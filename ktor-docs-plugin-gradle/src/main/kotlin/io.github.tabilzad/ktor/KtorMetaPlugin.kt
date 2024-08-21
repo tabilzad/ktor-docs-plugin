@@ -2,9 +2,11 @@ package io.github.tabilzad.ktor
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
+import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import java.io.File
-import java.lang.IllegalArgumentException
 
 const val PLUGIN_ID = "io.github.tabilzad.ktor-docs-plugin-gradle"
 
@@ -23,7 +25,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
     }
 
     override fun apply(target: Project) {
-        target.extensions.create("swagger", KtorDocsExtension::class.java).apply {
+        target.extensions.create("swagger", KtorInspectorGradleConfig::class.java).apply {
             documentation = target.extensions.create("documentation", DocumentationOptions::class.java)
             pluginOptions = target.extensions.create("pluginOptions", PluginOptions::class.java)
         }
@@ -31,7 +33,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
-        val swaggerExtension = project.extensions.findByType(KtorDocsExtension::class.java) ?: KtorDocsExtension()
+        val swaggerExtension = project.extensions.findByType(KtorInspectorGradleConfig::class.java) ?: KtorInspectorGradleConfig()
 
         kotlinCompilation.dependencies {
             compileOnly("io.github.tabilzad:ktor-docs-plugin:$ktorDocsVersion")
@@ -87,6 +89,10 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             SubpluginOption(
                 key = "deriveFieldRequirementFromTypeNullability",
                 value = swaggerExtension.documentation.deriveFieldRequirementFromTypeNullability.toString()
+            ),
+            SubpluginOption(
+                key = "servers",
+                value = swaggerExtension.documentation.servers.joinToString(",")
             ),
             SubpluginOption(
                 key = "format",

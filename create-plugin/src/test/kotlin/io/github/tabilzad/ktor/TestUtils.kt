@@ -1,8 +1,11 @@
 package io.github.tabilzad.ktor
 
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import io.github.classgraph.ClassGraph
+import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.assertj.core.api.Assertions
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
@@ -73,12 +76,18 @@ private fun dependenciesMatch(classpath: File, dependency: String): Boolean {
     return testdep == dependencyName
 }
 
+private val objectMapper by lazy { jacksonObjectMapper() }
+fun File.parseSpec(): OpenApiSpec {
+    return kotlin.runCatching { objectMapper.readValue<OpenApiSpec>(readText()) }.getOrElse {
+        Assertions.fail("Could not parse the file ${it.message}")
+    }
+}
+
 @OptIn(ExperimentalCompilerApi::class)
-fun generateCompilerTest(
+internal fun generateCompilerTest(
     testFile: File,
     testSubjectSource: String,
-    hideTransient: Boolean = true,
-    hidePrivate: Boolean = true,
+    config: PluginConfiguration = PluginConfiguration.createDefault()
 ) {
 
     val testFilePath = testFile.path
@@ -131,12 +140,17 @@ fun generateCompilerTest(
             com.tschuchort.compiletesting.PluginOption(
                 clp.pluginId,
                 KtorDocsCommandLineProcessor.hideTransientFields.optionName,
-                hideTransient.toString()
+                config.hideTransients.toString()
             ),
             com.tschuchort.compiletesting.PluginOption(
                 clp.pluginId,
                 KtorDocsCommandLineProcessor.hidePrivateAndInternalFields.optionName,
-                hidePrivate.toString()
+                config.hidePrivateFields.toString()
+            ),
+            com.tschuchort.compiletesting.PluginOption(
+                clp.pluginId,
+                KtorDocsCommandLineProcessor.serverUrls.optionName,
+                config.servers.joinToString(",")
             )
         )
     }

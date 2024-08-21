@@ -11,6 +11,7 @@ internal typealias BodyContent = Map<ContentType, ContentSchema>
 data class OpenApiSpec(
     val openapi: String = "3.1.0",
     val info: Info,
+    val servers: List<String>? = null,
     val paths: Map<String, Map<String, Path>>,
     val components: OpenApiComponents
 ) {
@@ -18,11 +19,6 @@ data class OpenApiSpec(
         val title: String,
         val description: String,
         val version: String
-    )
-
-    data class Server(
-        val url: String,
-        val description: String
     )
 
     data class Path(

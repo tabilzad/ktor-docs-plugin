@@ -7,7 +7,8 @@ open class DocumentationOptions(
     var generateRequestSchemas: Boolean = true,
     var hideTransientFields: Boolean = true,
     var hidePrivateAndInternalFields: Boolean = true,
-    var deriveFieldRequirementFromTypeNullability: Boolean = true
+    var deriveFieldRequirementFromTypeNullability: Boolean = true,
+    var servers: List<String> = emptyList()
 )
 
 open class PluginOptions(
@@ -17,7 +18,7 @@ open class PluginOptions(
     var format: String = "json"
 )
 
-open class KtorDocsExtension(
+open class KtorInspectorGradleConfig(
     var documentation: DocumentationOptions = DocumentationOptions(),
     var pluginOptions: PluginOptions = PluginOptions(),
 )

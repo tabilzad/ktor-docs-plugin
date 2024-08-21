@@ -178,17 +178,18 @@ private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
 
 private fun OpenApiSpec.ObjectType.isPrimitive() = listOf("string", "number", "integer").contains(type)
 
-internal fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = PluginConfiguration(
-    isEnabled = this?.get(SwaggerConfigurationKeys.ARG_ENABLED) ?: true,
-    format = this?.get(SwaggerConfigurationKeys.ARG_FORMAT) ?: "yaml",
-    title = this?.get(SwaggerConfigurationKeys.ARG_TITLE) ?: "Open API Specification",
-    description = this?.get(SwaggerConfigurationKeys.ARG_DESCR) ?: "",
-    version = this?.get(SwaggerConfigurationKeys.ARG_VER) ?: "1.0.0",
-    filePath = this?.get(SwaggerConfigurationKeys.ARG_PATH) ?: "openapi.yaml",
-    requestBody = this?.get(SwaggerConfigurationKeys.ARG_REQUEST_FEATURE) ?: true,
-    hideTransients = this?.get(SwaggerConfigurationKeys.ARG_HIDE_TRANSIENTS) ?: true,
-    hidePrivateFields = this?.get(SwaggerConfigurationKeys.ARG_HIDE_PRIVATE) ?: true,
-    deriveFieldRequirementFromTypeNullability = this?.get(SwaggerConfigurationKeys.ARG_DERIVE_PROP_REQ) ?: true
+internal fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfiguration = PluginConfiguration.createDefault(
+    isEnabled = this?.get(SwaggerConfigurationKeys.ARG_ENABLED),
+    format = this?.get(SwaggerConfigurationKeys.ARG_FORMAT),
+    title = this?.get(SwaggerConfigurationKeys.ARG_TITLE),
+    description = this?.get(SwaggerConfigurationKeys.ARG_DESCR),
+    version = this?.get(SwaggerConfigurationKeys.ARG_VER),
+    filePath = this?.get(SwaggerConfigurationKeys.ARG_PATH),
+    requestBody = this?.get(SwaggerConfigurationKeys.ARG_REQUEST_FEATURE),
+    hideTransients = this?.get(SwaggerConfigurationKeys.ARG_HIDE_TRANSIENTS),
+    hidePrivateFields = this?.get(SwaggerConfigurationKeys.ARG_HIDE_PRIVATE),
+    deriveFieldRequirementFromTypeNullability = this?.get(SwaggerConfigurationKeys.ARG_DERIVE_PROP_REQ),
+    servers = this?.get(SwaggerConfigurationKeys.ARG_SERVERS) ?: emptyList()
 )
 
 operator fun OutputStream.plusAssign(str: String) {

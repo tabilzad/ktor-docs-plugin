@@ -83,7 +83,9 @@ internal fun convertInternalToOpenSpec(
             title = configuration.title,
             description = configuration.description,
             version = configuration.version
-        ), paths = reducedRoutes,
+        ),
+        servers = configuration.servers.ifEmpty { null },
+        paths = reducedRoutes,
         components = OpenApiSpec.OpenApiComponents(schemas)
     )
 }

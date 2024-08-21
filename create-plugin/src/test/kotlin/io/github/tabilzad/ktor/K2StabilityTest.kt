@@ -1,6 +1,7 @@
 package io.github.tabilzad.ktor
 
 import io.github.tabilzad.ktor.TestSourceUtil.loadSourceAndExpected
+import io.github.tabilzad.ktor.TestSourceUtil.loadSourceCodeFrom
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -232,7 +233,7 @@ class K2StabilityTest {
     }
 
     @Test
-    fun `should ignore private fields or ones annotated with @Transient`() {
+    fun `should ignore private fields or ones annotated with @Transient by default`() {
         val (source, expected) = loadSourceAndExpected("PrivateFields")
         generateCompilerTest(testFile, source)
         val result = testFile.readText()
@@ -242,7 +243,7 @@ class K2StabilityTest {
     @Test
     fun `should include private fields or ones annotated with @Transient`() {
         val (source, expected) = loadSourceAndExpected("PrivateFieldsNegation")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false))
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -250,7 +251,7 @@ class K2StabilityTest {
     @Test
     fun `should generate response correct response bodies when explicitly specified`() {
         val (source, expected) = loadSourceAndExpected("ResponseBody")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false))
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -258,7 +259,7 @@ class K2StabilityTest {
     @Test
     fun `should correctly resolve complex descriptions specified on response annotations`() {
         val (source, expected) = loadSourceAndExpected("ResponseBody2")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false))
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -266,7 +267,7 @@ class K2StabilityTest {
     @Test
     fun `should handle abstract or sealed schema definitions`() {
         val (source, expected) = loadSourceAndExpected("Abstractions")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -274,7 +275,7 @@ class K2StabilityTest {
     @Test
     fun `should handle Moshi annotated properties and data class constructor parameters`() {
         val (source, expected) = loadSourceAndExpected("MoshiAnnotated")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -282,7 +283,7 @@ class K2StabilityTest {
     @Test
     fun `should handle kotlinx serialization annotated properties and data class constructor parameters`() {
         val (source, expected) = loadSourceAndExpected("SerializationAnnotated")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -290,7 +291,7 @@ class K2StabilityTest {
     @Test
     fun `should resolve request body schema directly from http method parameter if it's not a resource`() {
         val (source, expected) = loadSourceAndExpected("RequestBodyParam")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -298,7 +299,7 @@ class K2StabilityTest {
     @Test
     fun `should resolve endpoint spec from type-safe ktor resources`() {
         val (source, expected) = loadSourceAndExpected("Resources")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -306,7 +307,7 @@ class K2StabilityTest {
     @Test
     fun `should resolve endpoint spec from type-safe ktor resources with query params`() {
         val (source, expected) = loadSourceAndExpected("ResourcesWithParams")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -314,9 +315,26 @@ class K2StabilityTest {
     @Test
     fun `should resolve described resources`() {
         val (source, expected) = loadSourceAndExpected("DescribedResources")
-        generateCompilerTest(testFile, source, hideTransient = false, hidePrivate = false)
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.readText()
         result.assertWith(expected)
+    }
+
+    @Test
+    fun `should append servers from gradle config`() {
+        val source  = loadSourceCodeFrom("BlankSource")
+        val expectation = listOf("server1", "server2")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(servers = expectation))
+        val result = testFile.parseSpec()
+        assertThat(result.servers).containsExactlyElementsOf(expectation)
+    }
+
+    @Test
+    fun `should not append servers from gradle config if not specified`() {
+        val source  = loadSourceCodeFrom("BlankSource")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
+        val result = testFile.parseSpec()
+        assertThat(result.servers).isNull()
     }
 
     private fun String?.assertWith(expected: String){
