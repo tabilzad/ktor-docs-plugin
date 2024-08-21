@@ -57,7 +57,7 @@ swagger {
 | `hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` <br/> are omitted in schema outputs        |
 | `hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields with `private` or `internal` modifiers from schema outputs           |
 | `deriveFieldRequirementFromTypeNullability` | `true`                       | Automatically derive object fields' requirement from its type nullability                   |
-| `servers`                      | empty                                     | List of server URLs to be included in the spec  (ex: listOf("http://localhost:8080")        |
+| `servers`                      | empty                                     | List of server URLs to be included in the spec  (ex: `listOf("http://localhost:8080")`      |
 
 ### Plugin options
 | Option                         | Default Value                                | Explanation                                                                                 |
