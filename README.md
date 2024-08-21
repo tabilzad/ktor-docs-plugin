@@ -198,8 +198,7 @@ fun Route.ordersRouting() {
 ## Planned Features
 
 * Automatic Response resolution
-* Support for polymorphic types
-* Support ktor resources (coming in 0.6.2)
+* Support for polymorphic types with discriminators 
 * Option for an automatic tag resolution from module/route function declaration
 * Tag descriptions
 * Parsing kdocs do for schema property descriptions
