@@ -1,7 +1,7 @@
 # Open API (Swagger) Plugin for Ktor
 [![Test and Publish to SonarType](https://github.com/tabilzad/ktor-docs-plugin/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/tabilzad/ktor-docs-plugin/actions/workflows/gradle-publish.yml)
 
-This plugin implements a plug and play solution for generating OpenAPI (Swagger) specification for your Ktor server with minimal effort - no need to modify your existing code, no special DSL wrappers etc.
+This plugin implements a plug and play solution for generating OpenAPI (Swagger) specification for your Ktor server on any platform with minimal effort - no need to modify your existing code, no special DSL wrappers etc.
 Just annotate your route(s) definitions with `@GenerateOpenApi` and `openapi.yaml` will be generated at build time.
 
 Take a look at the [Sample Project](https://github.com/tabilzad/ktor-inspektor-example) to get started. 
