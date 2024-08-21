@@ -123,7 +123,9 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             OPTION_SERVERS,
             "Swagger server urls",
             "Comma separated list of server urls to include in openapi.yaml",
-            false
+            // should try collecting occurrences instead of parsing lists
+            allowMultipleOccurrences = true,
+            required = false
         )
     }
 
@@ -172,7 +174,7 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
 
             hidePrivateAndInternalFields -> configuration.put(ARG_HIDE_PRIVATE, value.toBooleanStrictOrNull() ?: true)
 
-            serverUrls -> configuration.put(ARG_SERVERS, value.split(",").filter { it.isNotBlank() })
+            serverUrls -> configuration.put(ARG_SERVERS, value.split("||").filter { it.isNotBlank() })
 
             else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")
         }

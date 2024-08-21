@@ -92,7 +92,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             ),
             SubpluginOption(
                 key = "servers",
-                value = swaggerExtension.documentation.servers.joinToString(",")
+                value = swaggerExtension.documentation.servers.joinToString("||")
             ),
             SubpluginOption(
                 key = "format",
