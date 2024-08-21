@@ -150,7 +150,7 @@ internal fun generateCompilerTest(
             com.tschuchort.compiletesting.PluginOption(
                 clp.pluginId,
                 KtorDocsCommandLineProcessor.serverUrls.optionName,
-                config.servers.joinToString(",")
+                config.servers.joinToString("||")
             )
         )
     }

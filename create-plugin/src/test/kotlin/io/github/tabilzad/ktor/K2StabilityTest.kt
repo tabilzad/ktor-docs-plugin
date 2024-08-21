@@ -2,6 +2,7 @@ package io.github.tabilzad.ktor
 
 import io.github.tabilzad.ktor.TestSourceUtil.loadSourceAndExpected
 import io.github.tabilzad.ktor.TestSourceUtil.loadSourceCodeFrom
+import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -323,8 +324,9 @@ class K2StabilityTest {
     @Test
     fun `should append servers from gradle config`() {
         val source  = loadSourceCodeFrom("BlankSource")
-        val expectation = listOf("server1", "server2")
-        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(servers = expectation))
+        val input = listOf("server1", "server2")
+        val expectation = input.map { OpenApiSpec.Server(it) }
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(servers = input))
         val result = testFile.parseSpec()
         assertThat(result.servers).containsExactlyElementsOf(expectation)
     }
