@@ -1,7 +1,9 @@
-package io.github.tabilzad.ktor
+package io.github.tabilzad.ktor.output
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.github.tabilzad.ktor.ContentType
+import io.github.tabilzad.ktor.OpenApiSpecParam
 
 internal typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
 

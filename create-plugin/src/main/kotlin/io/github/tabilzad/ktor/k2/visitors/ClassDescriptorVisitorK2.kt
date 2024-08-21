@@ -1,7 +1,7 @@
 package io.github.tabilzad.ktor.k2.visitors
 
-import io.github.tabilzad.ktor.OpenApiSpec
-import io.github.tabilzad.ktor.OpenApiSpec.ObjectType
+import io.github.tabilzad.ktor.output.OpenApiSpec
+import io.github.tabilzad.ktor.output.OpenApiSpec.ObjectType
 import io.github.tabilzad.ktor.PluginConfiguration
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorFieldDescription

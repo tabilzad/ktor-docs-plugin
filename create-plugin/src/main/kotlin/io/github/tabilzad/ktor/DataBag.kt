@@ -1,6 +1,7 @@
 package io.github.tabilzad.ktor
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import io.github.tabilzad.ktor.output.OpenApiSpec
 
 interface OpenApiSpecParam {
     val name: String

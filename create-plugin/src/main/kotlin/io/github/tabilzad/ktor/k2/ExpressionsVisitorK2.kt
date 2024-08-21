@@ -9,6 +9,7 @@ import io.github.tabilzad.ktor.k2.visitors.ResourceClassVisitor
 import io.github.tabilzad.ktor.k2.visitors.RespondsAnnotationVisitor
 import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
+import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext

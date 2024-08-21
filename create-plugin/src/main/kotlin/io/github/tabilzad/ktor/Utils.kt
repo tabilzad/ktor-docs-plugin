@@ -1,6 +1,7 @@
 package io.github.tabilzad.ktor
 
 import io.github.tabilzad.ktor.k2.ClassIds.TRANSIENT_ANNOTATION_FQ
+import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyPublicApi

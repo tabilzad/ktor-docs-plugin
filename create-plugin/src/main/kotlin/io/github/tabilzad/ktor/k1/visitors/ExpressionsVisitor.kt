@@ -6,6 +6,7 @@ import io.github.tabilzad.ktor.annotations.KtorDocs
 import io.github.tabilzad.ktor.annotations.KtorResponds
 import io.github.tabilzad.ktor.k1.findAnnotation
 import io.github.tabilzad.ktor.k1.hasAnnotation
+import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.CallableDescriptor
 import org.jetbrains.kotlin.descriptors.ClassDescriptor

@@ -3,6 +3,7 @@ package io.github.tabilzad.ktor.k1
 import io.github.tabilzad.ktor.*
 import io.github.tabilzad.ktor.annotations.KtorDocs
 import io.github.tabilzad.ktor.k1.visitors.ExpressionsVisitor
+import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
