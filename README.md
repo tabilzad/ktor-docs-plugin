@@ -9,7 +9,7 @@ Take a look at the [Sample Project](https://github.com/tabilzad/ktor-inspektor-e
 
 ```groovy
 plugins {
-    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.6.1-alpha"
+    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.6.2-alpha"
 }
 
 swagger {
@@ -57,14 +57,15 @@ swagger {
 | `hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` <br/> are omitted in schema outputs        |
 | `hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields with `private` or `internal` modifiers from schema outputs           |
 | `deriveFieldRequirementFromTypeNullability` | `true`                       | Automatically derive object fields' requirement from its type nullability                   |
+| `servers`                      | empty                                     | List of server URLs to be included in the spec  (ex: listOf("http://localhost:8080")        |
 
 ### Plugin options
-| Option                         | Default Value                             | Explanation                                                                                 |
-|--------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------|
-| `enabled`                      | `true`                                    | Enable/Disables the plugin                                                                  |
-| `saveInBuild`                  | `false`                                   | Decides if the generated specification file should <br/> be saved in the `build/` directory |
-| `format`                       | `yaml`                                    | The chosen format for the OpenAPI specification <br/>(options: json/yaml)                   |
-| `filePath`                     | `$modulePath/src/main/resources/openapi/` | The designated absolute path for saving <br/> the generated specification file              |
+| Option                         | Default Value                                | Explanation                                                                                 |
+|--------------------------------|----------------------------------------------|---------------------------------------------------------------------------------------------|
+| `enabled`                      | `true`                                       | Enable/Disables the plugin                                                                  |
+| `saveInBuild`                  | `true`                                       | Decides if the generated specification file should <br/> be saved in the `build/` directory |
+| `format`                       | `yaml`                                       | The chosen format for the OpenAPI specification <br/>(options: json/yaml)                   |
+| `filePath`                     | `$modulePath/build/resources/main/openapi/`  | The designated absolute path for saving <br/> the generated specification file              |
 
 ## How to use the plugin
 
