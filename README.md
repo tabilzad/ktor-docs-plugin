@@ -202,7 +202,7 @@ fun Route.ordersRouting() {
 * Support for polymorphic types with discriminators 
 * Option for an automatic tag resolution from module/route function declaration
 * Tag descriptions
-* Parsing kdocs do for schema property descriptions
+* Parsing kdocs for schema/property descriptions
 
 ## Sample Specification
 
