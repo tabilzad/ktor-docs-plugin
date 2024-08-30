@@ -25,8 +25,6 @@ swagger {
     }
 
     pluginOptions {
-        enabled = true // true by default
-        saveInBuild = true// false by default
         format = "yaml" // or json
     }
 }
