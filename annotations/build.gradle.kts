@@ -1,40 +1,21 @@
-
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     kotlin("jvm")
-    kotlin("plugin.serialization") version "2.0.0"
     id("com.vanniktech.maven.publish.base")
 }
 
-dependencies {
-    implementation(project(":annotations"))
-
-    compileOnly(libs.kotlinCompiler)
-    implementation(libs.bundles.jackson)
-    implementation(libs.kotlinReflect)
-    implementation(libs.moshi)
-    implementation(libs.serialization)
-
-    testImplementation(libs.classGraph)
-    testImplementation(libs.compilerTest)
-    testImplementation(libs.bundles.ktor)
-    testImplementation(libs.assertJ)
-    testImplementation(platform(libs.junit))
-    testImplementation(libs.junitJupiter)
-}
-
-tasks.test {
-    useJUnitPlatform()
-}
+group = "io.guthub.tabilzad.ktor"
 
 mavenPublishing {
-    configure(KotlinJvm(
-        javadocJar = JavadocJar.Javadoc(),
-        sourcesJar = true
-    ))
+    configure(
+        KotlinJvm(
+            javadocJar = JavadocJar.Javadoc(),
+            sourcesJar = true
+        )
+    )
     publishToMavenCentral(SonatypeHost.S01, automaticRelease = false)
     coordinates(
         project.group.toString(),
@@ -43,8 +24,8 @@ mavenPublishing {
     )
     signAllPublications()
     pom {
-        name.set("Ktor Open API specification generator")
-        description.set("Open API (Swagger) specification Generator for Ktor")
+        name.set("Annotations for Open API specification generator")
+        description.set("Annotations for Open API specification generator")
         url.set("https://github.com/tabilzad/ktor-docs-plugin")
         licenses {
             license {

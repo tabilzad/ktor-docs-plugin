@@ -158,10 +158,8 @@ internal fun generateCompilerTest(
 }
 
 private fun loadBaseSources(source: String): List<SourceFile> {
-    val nativeAnnotationsFile = TestSourceUtil.loadNativeAnnotations
     val requestsDefinitions = TestSourceUtil.loadRequests
     return listOf(
-        SourceFile.kotlin(nativeAnnotationsFile.name, nativeAnnotationsFile.readText().trimMargin()),
         SourceFile.kotlin(requestsDefinitions.file, requestsDefinitions.readText().trimMargin()),
         SourceFile.kotlin("TestSubject.kt", source)
     )
@@ -177,5 +175,6 @@ private val deps = arrayOf(
     "ktor-http:2.2.4",
     "kotlinx-coroutines-core:1.6.4",
     "moshi:1.14.0",
-    "kotlinx-serialization-core:1.7.1"
+    "kotlinx-serialization-core:1.7.1",
+    "annotations:0.6.2-alpha"
 )
