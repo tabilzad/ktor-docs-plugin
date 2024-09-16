@@ -7,8 +7,6 @@ plugins {
     id("com.vanniktech.maven.publish.base")
 }
 
-group = "io.guthub.tabilzad.ktor"
-
 mavenPublishing {
     configure(
         KotlinJvm(
