@@ -6,6 +6,7 @@ import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_ENABLED
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_FORMAT
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_HIDE_PRIVATE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_HIDE_TRANSIENTS
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_KDOCS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_REQUEST_FEATURE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_SERVERS
@@ -21,6 +22,7 @@ import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_REQUEST_BODY
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_SERVERS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_TITLE
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_USE_KDOCS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_VER
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
@@ -40,6 +42,7 @@ object SwaggerConfigurationKeys {
     const val OPTION_HIDE_TRANSIENT = "hideTransientFields"
     const val OPTION_HIDE_PRIVATE = "hidePrivateAndInternalFields"
     const val OPTION_DERIVE_PROP_REQ = "deriveFieldRequirementFromTypeNullability"
+    const val OPTION_USE_KDOCS = "useKDocs"
     const val OPTION_SERVERS = "servers"
     const val OPTION_FORMAT = "format"
 
@@ -54,6 +57,7 @@ object SwaggerConfigurationKeys {
     val ARG_DERIVE_PROP_REQ = CompilerConfigurationKey.create<Boolean>(OPTION_DERIVE_PROP_REQ)
     val ARG_FORMAT = CompilerConfigurationKey.create<String>(OPTION_FORMAT)
     val ARG_SERVERS = CompilerConfigurationKey.create<List<String>>(OPTION_SERVERS)
+    val ARG_KDOCS = CompilerConfigurationKey.create<Boolean>(OPTION_USE_KDOCS)
 }
 
 @OptIn(ExperimentalCompilerApi::class)
@@ -113,6 +117,12 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             "Automatically derive object properties' requirement from the type nullability",
             false
         )
+        val useKDocs = CliOption(
+            OPTION_USE_KDOCS,
+            "true opts for using kdocs for schema descriptions",
+            "Resolve schema descriptions from kdocs",
+            false
+        )
         val formatOption = CliOption(
             OPTION_FORMAT,
             "Specification format",
@@ -144,7 +154,8 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             hidePrivateAndInternalFields,
             derivePropRequirement,
             formatOption,
-            serverUrls
+            serverUrls,
+            useKDocs
         )
 
 
@@ -173,6 +184,8 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             hideTransientFields -> configuration.put(ARG_HIDE_TRANSIENTS, value.toBooleanStrictOrNull() ?: true)
 
             hidePrivateAndInternalFields -> configuration.put(ARG_HIDE_PRIVATE, value.toBooleanStrictOrNull() ?: true)
+
+            useKDocs -> configuration.put(ARG_KDOCS, value.toBooleanStrictOrNull() ?: true)
 
             serverUrls -> configuration.put(ARG_SERVERS, value.split("||").filter { it.isNotBlank() })
 

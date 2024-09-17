@@ -244,7 +244,11 @@ class K2StabilityTest {
     @Test
     fun `should include private fields or ones annotated with @Transient`() {
         val (source, expected) = loadSourceAndExpected("PrivateFieldsNegation")
-        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false))
+        generateCompilerTest(
+            testFile,
+            source,
+            PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false)
+        )
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -252,7 +256,11 @@ class K2StabilityTest {
     @Test
     fun `should generate response correct response bodies when explicitly specified`() {
         val (source, expected) = loadSourceAndExpected("ResponseBody")
-        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false))
+        generateCompilerTest(
+            testFile,
+            source,
+            PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false)
+        )
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -260,7 +268,11 @@ class K2StabilityTest {
     @Test
     fun `should correctly resolve complex descriptions specified on response annotations`() {
         val (source, expected) = loadSourceAndExpected("ResponseBody2")
-        generateCompilerTest(testFile, source, PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false))
+        generateCompilerTest(
+            testFile,
+            source,
+            PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false)
+        )
         val result = testFile.readText()
         result.assertWith(expected)
     }
@@ -284,6 +296,14 @@ class K2StabilityTest {
     @Test
     fun `should handle kotlinx serialization annotated properties and data class constructor parameters`() {
         val (source, expected) = loadSourceAndExpected("SerializationAnnotated")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should use kdocs as property or schema descriptions by default`() {
+        val (source, expected) = loadSourceAndExpected("KDocs")
         generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.readText()
         result.assertWith(expected)
@@ -323,7 +343,7 @@ class K2StabilityTest {
 
     @Test
     fun `should append servers from gradle config`() {
-        val source  = loadSourceCodeFrom("BlankSource")
+        val source = loadSourceCodeFrom("BlankSource")
         val input = listOf("server1", "server2")
         val expectation = input.map { OpenApiSpec.Server(it) }
         generateCompilerTest(testFile, source, PluginConfiguration.createDefault(servers = input))
@@ -333,13 +353,13 @@ class K2StabilityTest {
 
     @Test
     fun `should not append servers from gradle config if not specified`() {
-        val source  = loadSourceCodeFrom("BlankSource")
+        val source = loadSourceCodeFrom("BlankSource")
         generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
         val result = testFile.parseSpec()
         assertThat(result.servers).isNull()
     }
 
-    private fun String?.assertWith(expected: String){
+    private fun String?.assertWith(expected: String) {
         assertThat(this).isNotNull.withFailMessage {
             "swagger file was not generated"
         }

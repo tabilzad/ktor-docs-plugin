@@ -12,7 +12,8 @@ internal data class PluginConfiguration(
     val hideTransients: Boolean,
     val hidePrivateFields: Boolean,
     val servers: List<String>,
-    val deriveFieldRequirementFromTypeNullability: Boolean
+    val deriveFieldRequirementFromTypeNullability: Boolean,
+    val useKDocsForDescriptions: Boolean
 ) {
     companion object {
         fun createDefault(
@@ -27,6 +28,7 @@ internal data class PluginConfiguration(
             hidePrivateFields: Boolean? = null,
             servers: List<String>? = null,
             deriveFieldRequirementFromTypeNullability: Boolean? = null,
+            useKDocsForDescriptions: Boolean? = null
         ): PluginConfiguration = PluginConfiguration(
             isEnabled = isEnabled ?: true,
             format = format ?: "yaml",
@@ -39,6 +41,7 @@ internal data class PluginConfiguration(
             hidePrivateFields = hidePrivateFields ?: true,
             deriveFieldRequirementFromTypeNullability = deriveFieldRequirementFromTypeNullability ?: true,
             servers = servers ?: emptyList(),
+            useKDocsForDescriptions = useKDocsForDescriptions ?: true
         )
     }
 }

@@ -3,12 +3,9 @@ package io.github.tabilzad.ktor.k2
 import io.github.tabilzad.ktor.*
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorResponds
-import io.github.tabilzad.ktor.k2.visitors.*
-import io.github.tabilzad.ktor.k2.visitors.ClassDescriptorVisitorK2
-import io.github.tabilzad.ktor.k2.visitors.ResourceClassVisitor
-import io.github.tabilzad.ktor.k2.visitors.RespondsAnnotationVisitor
 import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
+import io.github.tabilzad.ktor.k2.visitors.*
 import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
@@ -20,6 +17,7 @@ import org.jetbrains.kotlin.fir.references.resolved
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 import org.jetbrains.kotlin.fir.resolve.firClassLike
 import org.jetbrains.kotlin.fir.resolve.fqName
+import org.jetbrains.kotlin.fir.resolve.toFirRegularClass
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
@@ -104,14 +102,21 @@ internal class ExpressionsVisitorK2(
     }
 
 
+    @OptIn(SymbolInternals::class)
     private fun ConeKotlinType.generateTypeAndVisitMemberDescriptors(): OpenApiSpec.ObjectType {
 
         val jetTypeFqName = fqNameStr()
+
+        val kdocs = this.toRegularClassSymbol(session)
+            ?.toLookupTag()
+            ?.toFirRegularClass(session)
+            ?.getKDocComments(config)
 
         val objectType = OpenApiSpec.ObjectType(
             type = "object",
             properties = mutableMapOf(),
             fqName = jetTypeFqName,
+            description = kdocs,
             contentBodyRef = "#/components/schemas/${jetTypeFqName}",
         )
         if (!classNames.names.contains(jetTypeFqName)) {

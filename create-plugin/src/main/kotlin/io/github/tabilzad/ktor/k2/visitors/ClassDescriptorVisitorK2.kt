@@ -1,15 +1,16 @@
 package io.github.tabilzad.ktor.k2.visitors
 
-import io.github.tabilzad.ktor.output.OpenApiSpec
-import io.github.tabilzad.ktor.output.OpenApiSpec.ObjectType
 import io.github.tabilzad.ktor.PluginConfiguration
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorFieldDescription
+import io.github.tabilzad.ktor.getKDocComments
+import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
+import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
 import io.github.tabilzad.ktor.k2.*
 import io.github.tabilzad.ktor.k2.JsonNameResolver.getCustomNameFromAnnotation
 import io.github.tabilzad.ktor.names
-import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
-import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
+import io.github.tabilzad.ktor.output.OpenApiSpec
+import io.github.tabilzad.ktor.output.OpenApiSpec.ObjectType
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
@@ -27,7 +28,8 @@ import org.jetbrains.kotlin.util.PrivateForInline
 import org.jetbrains.kotlin.util.getValueOrNull
 
 data class GenericParameter(
-    val genericName: String, val genericTypeRef: ConeKotlinType?
+    val genericName: String,
+    val genericTypeRef: ConeKotlinType?
 )
 
 internal class ClassDescriptorVisitorK2(
@@ -41,7 +43,6 @@ internal class ClassDescriptorVisitorK2(
 
     @OptIn(SealedClassInheritorsProviderInternals::class, SymbolInternals::class)
     override fun visitProperty(property: FirProperty, data: ObjectType): ObjectType {
-
         val coneTypeOrNull = property.returnTypeRef.coneTypeOrNull!!
         val type = if (coneTypeOrNull is ConeTypeParameterType && genericParameters.isNotEmpty()) {
             genericParameters.find { it.genericName == coneTypeOrNull.renderReadable() }?.genericTypeRef!!
@@ -314,6 +315,7 @@ internal class ClassDescriptorVisitorK2(
     }
 
     private fun ObjectType.addProperty(fir: FirProperty, objectType: ObjectType?, session: FirSession) {
+        val kdoc = fir.getKDocComments(config)
         val resolvedDescription = fir.findDocsDescription(session)
         val docsDescription = resolvedDescription.let { it?.summary ?: it?.descr }
         val name = fir.findName()
@@ -324,7 +326,7 @@ internal class ClassDescriptorVisitorK2(
             properties?.put(name, spec)
         }
 
-        objectType?.description = docsDescription
+        objectType?.description = docsDescription ?: kdoc
 
         val isRequiredFromExplicitDesc = resolvedDescription?.isRequired
         if (isRequiredFromExplicitDesc != null && isRequiredFromExplicitDesc) {

@@ -1,0 +1,54 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/action" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.KDocsClass"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.KDocsClass" : {
+        "type" : "object",
+        "properties" : {
+          "kdocsConstructorDerivedProperty" : {
+            "type" : "string",
+            "description" : "This field is called [kdocsConstructorDerivedProperty]."
+          },
+          "kdocsConstructorParameter" : {
+            "type" : "string",
+            "description" : "This field is called [kdocsConstructorParameter].\nTis is another line with\n* This is another line with extra *\n* This \\is another \\*line with extra *"
+          },
+          "kdocsLateinitVar" : {
+            "type" : "string",
+            "description" : "This field is called [kdocsLateinitVar]."
+          },
+          "kdocsProperty" : {
+            "type" : "string",
+            "description" : "This field is called [kdocsProperty]."
+          },
+          "noKdocs" : {
+            "type" : "string"
+          }
+        },
+        "description" : "This class contains fields with kdocs.",
+        "required" : [ "kdocsConstructorParameter", "noKdocs", "kdocsConstructorDerivedProperty", "kdocsLateinitVar" ]
+      }
+    }
+  }
+}
