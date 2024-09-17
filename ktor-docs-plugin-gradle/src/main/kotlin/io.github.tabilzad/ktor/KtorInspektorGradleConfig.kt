@@ -8,6 +8,7 @@ open class DocumentationOptions(
     var hideTransientFields: Boolean = true,
     var hidePrivateAndInternalFields: Boolean = true,
     var deriveFieldRequirementFromTypeNullability: Boolean = true,
+    var useKDocsForDescriptions: Boolean = true,
     var servers: List<String> = emptyList()
 )
 

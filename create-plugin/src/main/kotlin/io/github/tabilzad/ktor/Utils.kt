@@ -4,10 +4,13 @@ import io.github.tabilzad.ktor.k2.ClassIds.TRANSIENT_ANNOTATION_FQ
 import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.fir.declarations.FirDeclaration
+import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyPublicApi
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
+import org.jetbrains.kotlin.util.getChildren
 import java.io.OutputStream
 
 fun Boolean.byFeatureFlag(flag: Boolean): Boolean = if (flag) {
@@ -175,6 +178,32 @@ private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
         null
     }
 }
+
+internal fun FirDeclaration.getKDocComments(configuration: PluginConfiguration): String? {
+
+    if(!configuration.useKDocsForDescriptions) return null
+
+    fun String.sanitizeKDoc(): String {
+        val lines = trim().lines().map { it.trim() }
+        return lines.filter { it.isNotEmpty() && it != "*" }
+            .joinToString("\n") { line ->
+                when {
+                    line.startsWith("/**") -> line.removePrefix("/**").trim()
+                    line.startsWith("*/") -> ""
+                    else -> line.trimMargin("*").trim()
+                }
+            }
+            .trim()
+    }
+
+    return source?.treeStructure?.let {
+        source?.lighterASTNode?.getChildren(it)
+            ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT }
+            ?.toString()
+            ?.sanitizeKDoc()
+    }
+}
+
 
 private fun OpenApiSpec.ObjectType.isPrimitive() = listOf("string", "number", "integer").contains(type)
 
