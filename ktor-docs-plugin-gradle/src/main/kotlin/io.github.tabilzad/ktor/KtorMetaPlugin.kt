@@ -96,7 +96,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
                 value = swaggerExtension.documentation.servers.joinToString("||")
             ),
             SubpluginOption(
-                key = "useKdocs",
+                key = "useKDocs",
                 value = swaggerExtension.documentation.useKDocsForDescriptions.toString()
             ),
             SubpluginOption(
