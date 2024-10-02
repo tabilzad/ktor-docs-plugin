@@ -185,13 +185,11 @@ internal fun FirDeclaration.getKDocComments(configuration: PluginConfiguration):
     if (!configuration.useKDocsForDescriptions) return null
 
     fun String.sanitizeKDoc(): String {
-        val lines = trim().lines().map { it.trim() }
-        return lines.filter { it.isNotEmpty() && it != "*" }
+        return removePrefix("/**")
+            .removeSuffix("*/")
+            .lineSequence()
             .joinToString("\n") { line ->
-                line.removePrefix("/**")
-                    .removeSuffix("*/")
-                    .removePrefix("*/")
-                    .trimMargin("*")
+                line.trim().removePrefix("*")
             }
             .trim()
     }
