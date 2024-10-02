@@ -37,6 +37,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
 
         kotlinCompilation.dependencies {
             compileOnly("io.github.tabilzad:ktor-docs-plugin:$ktorDocsVersion")
+            implementation("io.github.tabilzad:annotations:$ktorDocsVersion")
         }
 
         val openApiOutputFile = with(swaggerExtension.pluginOptions) {

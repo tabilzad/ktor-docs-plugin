@@ -32,7 +32,7 @@
           },
           "kdocsConstructorParameter" : {
             "type" : "string",
-            "description" : "This field is called [kdocsConstructorParameter].\nTis is another line with\n* This is another line with extra *\n* This \\is another \\*line with extra *"
+            "description" : "This field is called [kdocsConstructorParameter].\n This is another line with\n * This is another line with extra *\n * This \\is another \\*line with extra *"
           },
           "kdocsLateinitVar" : {
             "type" : "string",

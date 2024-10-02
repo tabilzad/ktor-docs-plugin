@@ -5,6 +5,7 @@ import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
+import org.jetbrains.kotlin.kdoc.lexer.KDocTokens
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyPublicApi
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
@@ -181,24 +182,23 @@ private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
 
 internal fun FirDeclaration.getKDocComments(configuration: PluginConfiguration): String? {
 
-    if(!configuration.useKDocsForDescriptions) return null
+    if (!configuration.useKDocsForDescriptions) return null
 
     fun String.sanitizeKDoc(): String {
         val lines = trim().lines().map { it.trim() }
         return lines.filter { it.isNotEmpty() && it != "*" }
             .joinToString("\n") { line ->
-                when {
-                    line.startsWith("/**") -> line.removePrefix("/**").trim()
-                    line.startsWith("*/") -> ""
-                    else -> line.trimMargin("*").trim()
-                }
+                line.removePrefix("/**")
+                    .removeSuffix("*/")
+                    .removePrefix("*/")
+                    .trimMargin("*")
             }
             .trim()
     }
 
     return source?.treeStructure?.let {
         source?.lighterASTNode?.getChildren(it)
-            ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT }
+            ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT || it.tokenType == KDocTokens.KDOC }
             ?.toString()
             ?.sanitizeKDoc()
     }

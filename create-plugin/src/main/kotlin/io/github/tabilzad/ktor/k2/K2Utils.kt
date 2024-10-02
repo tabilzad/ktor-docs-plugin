@@ -112,20 +112,20 @@ fun FirFunction.hasAnnotation(session: FirSession, name: String): Boolean {
 
 fun FirStatement.findAnnotation(name: String): FirAnnotation? {
     return annotations.firstOrNull {
-        it.annotationTypeRef.coneType.renderReadableWithFqNames().contains(name)
+        it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
     }
 }
 
 fun FirProperty.findAnnotation(name: String?): FirAnnotation? {
     if(name == null) return null
     return backingField?.annotations?.firstOrNull {
-        it.annotationTypeRef.coneType.renderReadableWithFqNames().contains(name)
+        it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
     }
 }
 
 fun FirFunction.findAnnotation(name: String): FirAnnotation? {
     return annotations.firstOrNull {
-        it.annotationTypeRef.coneType.renderReadableWithFqNames().contains(name)
+        it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
     }
 }
 

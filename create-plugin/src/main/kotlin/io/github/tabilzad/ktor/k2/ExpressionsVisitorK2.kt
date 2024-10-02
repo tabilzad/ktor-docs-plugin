@@ -7,6 +7,8 @@ import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
 import io.github.tabilzad.ktor.k2.visitors.*
 import io.github.tabilzad.ktor.output.OpenApiSpec
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
@@ -22,7 +24,6 @@ import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
-import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.util.PrivateForInline
@@ -31,7 +32,7 @@ internal class ExpressionsVisitorK2(
     private val config: PluginConfiguration,
     private val context: CheckerContext,
     private val session: FirSession,
-    private val log: IrMessageLogger
+    private val log: MessageCollector?
 ) : FirDefaultVisitor<List<KtorElement>, KtorElement?>() {
 
     init {
@@ -179,8 +180,9 @@ internal class ExpressionsVisitorK2(
         }
 
         val values = expression.arguments
-            .filterIsInstance<FirLiteralExpression<String>>()
-            .map { it.value }
+            .filterIsInstance<FirLiteralExpression>()
+            .filter { it.value is String }
+            .map { it.value as String }
 
         return names.zip(values).toMap()
     }
@@ -313,7 +315,7 @@ internal class ExpressionsVisitorK2(
                     }
 
                     else -> {
-                        log.report(IrMessageLogger.Severity.WARNING, "Endpoints can't have Endpoint as routes", null)
+                        log?.report(CompilerMessageSeverity.WARNING, "Endpoints can't have Endpoint as routes", null)
                         null
                     }
                 }

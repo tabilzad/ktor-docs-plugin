@@ -11,7 +11,7 @@ import io.ktor.server.routing.*
 data class KDocsClass(
     /**
      * This field is called [kdocsConstructorParameter].
-     * Tis is another line with
+     * This is another line with
      * * This is another line with extra *
      * * This \is another \*line with extra *
      */
@@ -30,8 +30,7 @@ data class KDocsClass(
     var kdocsProperty: String? = null
 
     /**
-     * This field is called [kdocsLateinitVar].
-     */
+     * This field is called [kdocsLateinitVar]. */
     lateinit var kdocsLateinitVar: String
 }
 

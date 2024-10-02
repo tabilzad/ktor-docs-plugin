@@ -48,7 +48,7 @@ class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Un
     }
 
 
-    override fun <T> visitLiteralExpression(literalExpression: FirLiteralExpression<T>, data: MutableList<String>) {
+    override fun visitLiteralExpression(literalExpression: FirLiteralExpression, data: MutableList<String>) {
         val element = literalExpression.value
         element?.let { data.add(it.toString()) }
     }
@@ -62,12 +62,14 @@ class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Un
         if (fir is FirProperty) {
             val init = fir.initializer
 
-            if (init is FirLiteralExpression<*>) {
+            if (init is FirLiteralExpression) {
                 init.accept(this, data)
             }
         }
     }
 
+    @OptIn(PrivateConstantEvaluatorAPI::class)
+    // TODO(Look into evaluatePropertyInitializer instead of evaluateExpression)
     override fun visitArgumentList(argumentList: FirArgumentList, data: MutableList<String>) {
 
         if (argumentList is FirResolvedArgumentList) {
@@ -77,7 +79,7 @@ class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Un
                     FirExpressionEvaluator.evaluateExpression(it, session)
                 }.filterIsInstance<FirEvaluatorResult.Evaluated>().map {
                     it.result
-                }.filterIsInstance<FirLiteralExpression<*>>()
+                }.filterIsInstance<FirLiteralExpression>()
 
             g.forEach { it.accept(this, data) }
 
@@ -111,7 +113,7 @@ class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Un
                 v?.resolvedArgumentMapping?.values?.find { it.name.asString() == enumEntryAccessor?.asString() }
             val paramLiteral = v?.resolvedArgumentMapping?.entries?.find { it.value == paramName }?.key
 
-            val queryParam = (paramLiteral as? FirLiteralExpression<*>)?.value
+            val queryParam = (paramLiteral as? FirLiteralExpression)?.value
             queryParam?.let {
                 data.add(queryParam.toString())
             }
@@ -122,7 +124,7 @@ class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Un
                 if (fir is FirProperty) {
                     val init = fir.initializer
 
-                    if (init is FirLiteralExpression<*>) {
+                    if (init is FirLiteralExpression) {
                         init.accept(this, data)
                     }
                 }
