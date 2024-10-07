@@ -9,7 +9,7 @@ Take a look at the [Sample Project](https://github.com/tabilzad/ktor-inspektor-e
 
 ```groovy
 plugins {
-    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.6.2-alpha"
+    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.6.4-alpha"
 }
 
 swagger {
