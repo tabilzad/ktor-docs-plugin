@@ -82,10 +82,10 @@ internal class ExpressionsVisitorK2(
 
             val receiveCall = block.statements.findReceiveCallExpression()
             val queryParam = block.statements.findQueryParameterExpression()
+            if (queryParam.isNotEmpty()) parent.parameters = parent.parameters merge queryParam.toSet()
 
-            if (queryParam.isNotEmpty()) {
-                parent.parameters = parent.parameters merge queryParam.toSet()
-            }
+            val headerParam = block.statements.findHeaderParameterExpression()
+            if (headerParam.isNotEmpty()) parent.parameters = parent.parameters merge headerParam.toSet()
 
             if (receiveCall != null) {
                 val kotlinType = receiveCall.resolvedType
@@ -139,6 +139,13 @@ internal class ExpressionsVisitorK2(
         flatMap { it.allChildren }.filterIsInstance<FirFunctionCall>()
             .forEach { it.accept(QueryParamsVisitor(session), queryParams) }
         return queryParams.map { QueryParamSpec(it) }
+    }
+
+    private fun List<FirStatement>.findHeaderParameterExpression(): List<ParamSpec> {
+        val headerParams = mutableListOf<String>()
+        flatMap { it.allChildren }.filterIsInstance<FirFunctionCall>()
+            .forEach { it.accept(HeaderParamsVisitor(session), headerParams) }
+        return headerParams.map { HeaderParamSpec(it) }
     }
 
     private fun List<FirStatement>.findReceiveCallExpression(): FirFunctionCall? {

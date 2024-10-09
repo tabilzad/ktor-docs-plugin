@@ -26,6 +26,13 @@ internal data class QueryParamSpec(
     val isRequired: Boolean = false
 ) : ParamSpec
 
+internal data class HeaderParamSpec(
+    override val name: String,
+    override val description: String? = null,
+    val isRequired: Boolean = false
+) : ParamSpec
+
+
 internal data class KtorRouteSpec(
     val path: String,
     val parameters: List<ParamSpec>?,

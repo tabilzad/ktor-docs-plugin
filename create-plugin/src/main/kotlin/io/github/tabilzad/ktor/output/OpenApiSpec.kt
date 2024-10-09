@@ -28,7 +28,7 @@ data class OpenApiSpec(
         val description: String? = null,
         val tags: List<String>? = null,
         val responses: Map<String, ResponseDetails>? = null,
-        val parameters: List<PathParam>? = null,
+        val parameters: List<Parameter>? = null,
         val requestBody: RequestBody? = null
     )
 
@@ -58,7 +58,7 @@ data class OpenApiSpec(
         var required: MutableList<String>? = null
     ) : NamedObject
 
-    data class PathParam(
+    data class Parameter(
         override val name: String,
         override val `in`: String,
         override val required: Boolean = true,
