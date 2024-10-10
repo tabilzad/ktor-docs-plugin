@@ -9,9 +9,12 @@ import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
+import org.jetbrains.kotlin.fir.declarations.utils.isEnumClass
 import org.jetbrains.kotlin.fir.declarations.utils.visibility
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
+import org.jetbrains.kotlin.fir.expressions.FirPropertyAccessExpression
 import org.jetbrains.kotlin.fir.expressions.FirStatement
+import org.jetbrains.kotlin.fir.expressions.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.render
 import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
@@ -210,6 +213,11 @@ fun FirRegularClassSymbol.resolveEnumEntries(): List<String> {
 fun FirRegularClassSymbol.findEnumParamValue(value: String): List<String> {
     return declarationSymbols.filterIsInstance<FirEnumEntrySymbol>().map { it.name.asString() }
 }
+
+fun FirPropertyAccessExpression.isEnum(session: FirSession): Boolean = this.dispatchReceiver
+    ?.toResolvedCallableSymbol(session)
+    ?.resolvedReturnType
+    ?.toRegularClassSymbol(session)?.isEnumClass == true
 
 
 

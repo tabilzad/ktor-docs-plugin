@@ -81,6 +81,7 @@ internal class ExpressionsVisitorK2(
         if (parent is EndPoint && parent.body == null) {
 
             val receiveCall = block.statements.findReceiveCallExpression()
+
             val queryParam = block.statements.findQueryParameterExpression()
             if (queryParam.isNotEmpty()) parent.parameters = parent.parameters merge queryParam.toSet()
 
