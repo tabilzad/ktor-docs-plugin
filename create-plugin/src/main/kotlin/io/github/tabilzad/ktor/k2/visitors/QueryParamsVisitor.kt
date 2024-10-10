@@ -1,6 +1,7 @@
 package io.github.tabilzad.ktor.k2.visitors
 
 import io.github.tabilzad.ktor.k2.ClassIds
+import io.github.tabilzad.ktor.k2.isEnum
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirEvaluatorResult
 import org.jetbrains.kotlin.fir.FirSession
@@ -9,7 +10,6 @@ import org.jetbrains.kotlin.fir.declarations.EnumValueArgumentInfo
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.declarations.collectEnumEntries
 import org.jetbrains.kotlin.fir.declarations.extractEnumValueArgumentInfo
-import org.jetbrains.kotlin.fir.declarations.utils.isEnumClass
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.expressions.impl.FirResolvedArgumentList
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.types.toLookupTag
-import org.jetbrains.kotlin.fir.types.toRegularClassSymbol
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 
 class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Unit, MutableList<String>>() {
@@ -71,21 +70,7 @@ class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Un
     @OptIn(PrivateConstantEvaluatorAPI::class)
     // TODO(Look into evaluatePropertyInitializer instead of evaluateExpression)
     override fun visitArgumentList(argumentList: FirArgumentList, data: MutableList<String>) {
-
-        if (argumentList is FirResolvedArgumentList) {
-            val g = argumentList.mapping.keys
-                .filterIsInstance<FirFunctionCall>()
-                .map {
-                    FirExpressionEvaluator.evaluateExpression(it, session)
-                }.filterIsInstance<FirEvaluatorResult.Evaluated>().map {
-                    it.result
-                }.filterIsInstance<FirLiteralExpression>()
-
-            g.forEach { it.accept(this, data) }
-
-        }
-
-        argumentList.acceptChildren(this, data)
+        visitArgumentList(session, argumentList, data)
     }
 
     @OptIn(SymbolInternals::class)
@@ -93,44 +78,67 @@ class QueryParamsVisitor(private val session: FirSession) : FirDefaultVisitor<Un
         propertyAccessExpression: FirPropertyAccessExpression,
         data: MutableList<String>
     ) {
+        visitPropertyAccessExpression(session, propertyAccessExpression, data)
+    }
+}
 
-        val isEnum =
-            propertyAccessExpression.dispatchReceiver?.toResolvedCallableSymbol(session)?.resolvedReturnType?.toRegularClassSymbol(
-                session
-            )?.isEnumClass == true
-        val enumInfo: EnumValueArgumentInfo? = propertyAccessExpression.dispatchReceiver?.extractEnumValueArgumentInfo()
-        val enumEntryAccessor = propertyAccessExpression.calleeReference.toResolvedCallableSymbol()?.name
+@OptIn(PrivateConstantEvaluatorAPI::class)
+fun FirDefaultVisitor<Unit, MutableList<String>>.visitArgumentList(
+    session: FirSession,
+    argumentList: FirArgumentList,
+    data: MutableList<String>,
+) {
+    if (argumentList is FirResolvedArgumentList) {
+        val g = argumentList.mapping.keys
+            .filterIsInstance<FirFunctionCall>()
+            .map {
+                FirExpressionEvaluator.evaluateExpression(it, session)
+            }.filterIsInstance<FirEvaluatorResult.Evaluated>().map {
+                it.result
+            }.filterIsInstance<FirLiteralExpression>()
 
-        if (isEnum) {
+        g.forEach { it.accept(this, data) }
+    }
 
-            val entries = enumInfo?.enumClassId?.toLookupTag()?.toClassSymbol(session)?.collectEnumEntries()
-            val v = entries?.find { it.name.asString() == enumInfo.enumEntryName.asString() }
-                ?.initializerObjectSymbol
-                ?.primaryConstructorSymbol(session)
-                ?.fir?.delegatedConstructor
+    argumentList.acceptChildren(this, data)
+}
 
-            val paramName =
-                v?.resolvedArgumentMapping?.values?.find { it.name.asString() == enumEntryAccessor?.asString() }
-            val paramLiteral = v?.resolvedArgumentMapping?.entries?.find { it.value == paramName }?.key
+@OptIn(SymbolInternals::class)
+fun FirDefaultVisitor<Unit, MutableList<String>>.visitPropertyAccessExpression(
+    session: FirSession,
+    propertyAccessExpression: FirPropertyAccessExpression,
+    data: MutableList<String>
+) {
+    val enumInfo: EnumValueArgumentInfo? = propertyAccessExpression.dispatchReceiver?.extractEnumValueArgumentInfo()
+    val enumEntryAccessor = propertyAccessExpression.calleeReference.toResolvedCallableSymbol()?.name
 
-            val queryParam = (paramLiteral as? FirLiteralExpression)?.value
-            queryParam?.let {
-                data.add(queryParam.toString())
-            }
-        } else {
-            val calleeReference = propertyAccessExpression.calleeReference
-            if (calleeReference is FirResolvedNamedReference) {
-                val fir = calleeReference.resolvedSymbol.fir
-                if (fir is FirProperty) {
-                    val init = fir.initializer
+    if (propertyAccessExpression.isEnum(session)) {
 
-                    if (init is FirLiteralExpression) {
-                        init.accept(this, data)
-                    }
+        val entries = enumInfo?.enumClassId?.toLookupTag()?.toClassSymbol(session)?.collectEnumEntries()
+        val v = entries?.find { it.name.asString() == enumInfo.enumEntryName.asString() }
+            ?.initializerObjectSymbol
+            ?.primaryConstructorSymbol(session)
+            ?.fir?.delegatedConstructor
+
+        val paramName =
+            v?.resolvedArgumentMapping?.values?.find { it.name.asString() == enumEntryAccessor?.asString() }
+        val paramLiteral = v?.resolvedArgumentMapping?.entries?.find { it.value == paramName }?.key
+
+        val queryParam = (paramLiteral as? FirLiteralExpression)?.value
+        queryParam?.let {
+            data.add(queryParam.toString())
+        }
+    } else {
+        val calleeReference = propertyAccessExpression.calleeReference
+        if (calleeReference is FirResolvedNamedReference) {
+            val fir = calleeReference.resolvedSymbol.fir
+            if (fir is FirProperty) {
+                val init = fir.initializer
+
+                if (init is FirLiteralExpression) {
+                    init.accept(this, data)
                 }
             }
-
         }
-
     }
 }
