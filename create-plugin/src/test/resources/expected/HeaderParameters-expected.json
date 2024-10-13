@@ -1,0 +1,163 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/order0" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "my_query_param",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "X_API_KEY",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order1" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "my_query_param",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "my_header_param",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order2" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "my_header_param",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "my_header_param2",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order3" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "orderId",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order4" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "my_string_query_param",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "my_header_param",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order5/{withPath}" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "withPath",
+          "in" : "path",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "my_string_query_param",
+          "in" : "query",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "my_header_param",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order6" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "param_part1param_part2",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order7" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "param_part1_my_header_param",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order8" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "param_part1_my_header_param",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : { }
+  }
+}

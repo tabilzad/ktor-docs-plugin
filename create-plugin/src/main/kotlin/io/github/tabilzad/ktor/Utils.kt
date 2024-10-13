@@ -97,7 +97,7 @@ internal fun List<KtorRouteSpec>.convertToSpec(): Map<String, Map<String, OpenAp
             summary = it.summary,
             description = it.description,
             tags = it.tags?.toList()?.sorted(),
-            parameters = addPathParams(it) merge addQueryParams(it),
+            parameters = mapPathParams(it) merge mapQueryParams(it) merge mapHeaderParams(it),
             requestBody = addPostBody(it),
             responses = it.responses
         )
@@ -108,7 +108,7 @@ infix fun <T> List<T>?.merge(params: List<T>?): List<T>? = this?.plus(params ?: 
 
 infix fun <T> Set<T>?.merge(params: Set<T>?): Set<T>? = this?.plus(params ?: emptyList()) ?: params
 
-private fun addPathParams(spec: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
+private fun mapPathParams(spec: KtorRouteSpec): List<OpenApiSpec.Parameter>? {
     val params = "\\{([^}]*)}".toRegex().findAll(spec.path).toList()
     return if (params.isNotEmpty()) {
         params.mapNotNull {
@@ -118,7 +118,7 @@ private fun addPathParams(spec: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
                     ?.any { it.name == pathParamName } == true
             ) {
                 spec.parameters?.find { it.name == pathParamName }?.let {
-                    OpenApiSpec.PathParam(
+                    OpenApiSpec.Parameter(
                         name = it.name,
                         `in` = "path",
                         required = pathParamName?.contains("?") != true,
@@ -127,7 +127,7 @@ private fun addPathParams(spec: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
                     )
                 }
             } else {
-                OpenApiSpec.PathParam(
+                OpenApiSpec.Parameter(
                     name = pathParamName.replace("?", ""),
                     `in` = "path",
                     required = !pathParamName.contains("?"),
@@ -140,9 +140,9 @@ private fun addPathParams(spec: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
     }
 }
 
-private fun addQueryParams(it: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
+private fun mapQueryParams(it: KtorRouteSpec): List<OpenApiSpec.Parameter>? {
     return it.parameters?.filterIsInstance<QueryParamSpec>()?.map {
-        OpenApiSpec.PathParam(
+        OpenApiSpec.Parameter(
             name = it.name,
             `in` = "query",
             required = it.isRequired,
@@ -151,6 +151,19 @@ private fun addQueryParams(it: KtorRouteSpec): List<OpenApiSpec.PathParam>? {
         )
     }
 }
+
+private fun mapHeaderParams(it: KtorRouteSpec): List<OpenApiSpec.Parameter>? {
+    return it.parameters?.filterIsInstance<HeaderParamSpec>()?.map {
+        OpenApiSpec.Parameter(
+            name = it.name,
+            `in` = "header",
+            required = it.isRequired,
+            schema = OpenApiSpec.SchemaType("string"),
+            description = it.description
+        )
+    }
+}
+
 
 private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
     return if (it.method != "get" && it.body.contentBodyRef != null) {
