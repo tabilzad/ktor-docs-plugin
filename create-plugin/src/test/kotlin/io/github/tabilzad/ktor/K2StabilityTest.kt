@@ -250,6 +250,14 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should generate correct swagger definitions for endpoint with header parameter via function`() {
+        val (source, expected) = loadSourceAndExpected("HeaderParameter")
+        generateCompilerTest(testFile, source)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should include private fields or ones annotated with @Transient`() {
         val (source, expected) = loadSourceAndExpected("PrivateFieldsNegation")
         generateCompilerTest(

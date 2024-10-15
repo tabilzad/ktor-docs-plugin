@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirProperty
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.FirResolvedNamedReference
+import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 
@@ -27,12 +28,14 @@ class HeaderParamsVisitor(private val session: FirSession) : FirDefaultVisitor<U
     }
 
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: MutableList<String>) {
-        val functionFqName = functionCall.dispatchReceiver?.toResolvedCallableSymbol(session)?.callableId?.asSingleFqName()
-        if (functionFqName == ClassIds.KTOR_HEADER_PARAM) {
-            functionCall.acceptChildren(this, data)
-        } else {
-            // skip
-        }
+        // TODO not sure about naming here
+        val getFunctionFqName = functionCall.dispatchReceiver?.toResolvedCallableSymbol(session)?.callableId?.asSingleFqName()
+        if (getFunctionFqName == ClassIds.KTOR_APPREQUEST_HEADER) { functionCall.acceptChildren(this, data) }
+
+        val functionFqName = functionCall.calleeReference.toResolvedCallableSymbol()?.callableId?.asSingleFqName()
+        if (functionFqName == ClassIds.KTOR_REQUEST_HEADER) { functionCall.acceptChildren(this, data) }
+
+        // else skip
     }
 
     override fun visitLiteralExpression(literalExpression: FirLiteralExpression, data: MutableList<String>) {

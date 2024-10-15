@@ -83,16 +83,6 @@ fun Application.queryParametersTest() {
                     println(it)
                 }
             }
-
-            // get("/order9") {
-            //     // Reference to a property inside string template
-            //     call.request.headers["param_part1_${headerParam}"].let{
-            //         println(it)
-            //     }
-            //     call.request.header(HttpHeaders.ContentType).let{
-            //         println(it)
-            //     }
-            // }
 //           not supported yet
 //            get("/order10") {
 //                call.request.queryParameters[MyQueries.ORDER_ID.param + "param2"].let{
