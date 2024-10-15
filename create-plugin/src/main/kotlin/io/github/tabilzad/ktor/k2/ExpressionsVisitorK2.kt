@@ -138,14 +138,21 @@ internal class ExpressionsVisitorK2(
     private fun List<FirStatement>.findQueryParameterExpression(): List<ParamSpec> {
         val queryParams = mutableListOf<String>()
         flatMap { it.allChildren }.filterIsInstance<FirFunctionCall>()
-            .forEach { it.accept(QueryParamsVisitor(session), queryParams) }
+            .forEach {
+                it.accept(
+                    ArrayIndexAccessVisitor(
+                        session,
+                        listOf(ClassIds.KTOR_QUERY_PARAM, ClassIds.KTOR_RAW_QUERY_PARAM)
+                    ), queryParams
+                )
+            }
         return queryParams.map { QueryParamSpec(it) }
     }
 
     private fun List<FirStatement>.findHeaderParameterExpression(): List<ParamSpec> {
         val headerParams = mutableListOf<String>()
         flatMap { it.allChildren }.filterIsInstance<FirFunctionCall>()
-            .forEach { it.accept(HeaderParamsVisitor(session), headerParams) }
+            .forEach { it.accept(ArrayIndexAccessVisitor(session, listOf(ClassIds.KTOR_HEADER_PARAM)), headerParams) }
         return headerParams.map { HeaderParamSpec(it) }
     }
 
