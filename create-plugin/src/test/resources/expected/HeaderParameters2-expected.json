@@ -1,0 +1,49 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/order9" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "my_header",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order10" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "my_header_param",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    },
+    "/v1/order11" : {
+      "get" : {
+        "parameters" : [ {
+          "name" : "Content-Length",
+          "in" : "header",
+          "required" : false,
+          "schema" : {
+            "type" : "string"
+          }
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : { }
+  }
+}

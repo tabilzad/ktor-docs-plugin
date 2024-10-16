@@ -1,6 +1,7 @@
 package io.github.tabilzad.ktor.k2.visitors
 
 import io.github.tabilzad.ktor.k2.isEnum
+import io.ktor.http.*
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirEvaluatorResult
 import org.jetbrains.kotlin.fir.FirSession
@@ -18,8 +19,9 @@ import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.types.toLookupTag
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 import org.jetbrains.kotlin.name.FqName
+import kotlin.reflect.full.memberProperties
 
-class ArrayIndexAccessVisitor(
+class ParametersVisitor(
     private val session: FirSession,
     private val functionIds: List<FqName>
 ) : FirDefaultVisitor<Unit, MutableList<String>>() {
@@ -34,7 +36,7 @@ class ArrayIndexAccessVisitor(
     ) {
         data.add(stringConcatenationCall.argumentList.arguments.flatMap { acc ->
             buildList {
-                acc.accept(this@ArrayIndexAccessVisitor, this)
+                acc.accept(this@ParametersVisitor, this)
             }
         }.joinToString(""))
     }
@@ -43,7 +45,11 @@ class ArrayIndexAccessVisitor(
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: MutableList<String>) {
         val functionFqName =
             functionCall.dispatchReceiver?.toResolvedCallableSymbol(session)?.callableId?.asSingleFqName()
-        if (functionIds.any { it == functionFqName }) {
+
+        val functionFqName2 =
+            functionCall.toResolvedCallableSymbol()?.callableId?.asSingleFqName()
+        if (functionIds.any { it == functionFqName || it == functionFqName2 }
+        ) {
             functionCall.acceptChildren(this, data)
         } else {
             // skip
@@ -120,6 +126,16 @@ class ArrayIndexAccessVisitor(
 
                     if (init is FirLiteralExpression) {
                         init.accept(this, data)
+                    } else if (init == null) {
+                        // if initializer is null it is likely because the value
+                        // is coming from an external library like ktor itself
+
+                        val ktorHeader =
+                            HttpHeaders::class.memberProperties.find { it.name == calleeReference.name.asString() }
+
+                        if (ktorHeader != null) {
+                            data.add(ktorHeader.getter.call(HttpHeaders).toString())
+                        }
                     }
                 }
             }

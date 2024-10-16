@@ -17,6 +17,7 @@ dependencies {
     implementation(libs.kotlinReflect)
     implementation(libs.moshi)
     implementation(libs.serialization)
+    implementation(libs.bundles.ktor)
 
     testImplementation(libs.classGraph)
     testImplementation(libs.compilerTest)
