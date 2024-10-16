@@ -1,0 +1,56 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/wrapped" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.ValueWrapper"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/plain" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.Cents"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.Cents" : {
+        "type" : "integer",
+        "description" : "Value class"
+      },
+      "sources.ValueWrapper" : {
+        "type" : "object",
+        "properties" : {
+          "value" : {
+            "type" : "integer"
+          }
+        },
+        "description" : "Description",
+        "required" : [ "value" ]
+      }
+    }
+  }
+}

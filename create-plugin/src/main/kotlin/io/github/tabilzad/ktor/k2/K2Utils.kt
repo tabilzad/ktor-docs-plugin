@@ -20,6 +20,7 @@ import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirEnumEntrySymbol
+import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.FirVisitorVoid
@@ -137,6 +138,8 @@ fun FirStatement.findAnnotation(classId: ClassId, session: FirSession): FirAnnot
         it.annotationTypeRef.coneType.fullyExpandedClassId(session) == classId
     }
 }
+
+internal fun ConeKotlinType.properties(session: FirSession) = toRegularClassSymbol(session)?.declarationSymbols?.filterIsInstance<FirPropertySymbol>()
 
 
 @OptIn(SymbolInternals::class)

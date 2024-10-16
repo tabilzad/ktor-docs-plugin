@@ -7,6 +7,7 @@ import org.jetbrains.kotlin.descriptors.PropertyDescriptor
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.kdoc.lexer.KDocTokens
 import org.jetbrains.kotlin.lexer.KtTokens
+import org.jetbrains.kotlin.psi.stubs.elements.KtModifierListElementType
 import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyPublicApi
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
@@ -207,12 +208,25 @@ internal fun FirDeclaration.getKDocComments(configuration: PluginConfiguration):
             .trim()
     }
 
-    return source?.treeStructure?.let {
-        source?.lighterASTNode?.getChildren(it)
+    val c = source?.treeStructure?.let {
+        val children = source?.lighterASTNode?.getChildren(it)
+        val directComment = children
             ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT || it.tokenType == KDocTokens.KDOC }
-            ?.toString()
-            ?.sanitizeKDoc()
-    }
+
+        if (directComment == null) {
+
+            children
+                ?.firstOrNull { it.tokenType is KtModifierListElementType<*> }
+                ?.getChildren(it)
+                ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT }
+
+        } else {
+            directComment
+        }
+    }?.toString()
+        ?.sanitizeKDoc()
+
+    return c
 }
 
 

@@ -33,6 +33,8 @@ object ClassIds {
 
     val TRANSIENT_ANNOTATION_FQ = FqName("kotlin.jvm.Transient")
 
+    val KTOR_FIELD_DESCRIPTION = FqName("io.github.tabilzad.ktor.annotations.KtorFieldDescription")
+
 }
 
 enum class SerializationFramework(val fqName: FqName, val identifier: Name) {

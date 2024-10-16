@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
+import org.jetbrains.kotlin.fir.analysis.checkers.isValueClass
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.classId
 import org.jetbrains.kotlin.fir.expressions.*
@@ -109,30 +110,48 @@ internal class ExpressionsVisitorK2(
 
         val jetTypeFqName = fqNameStr()
 
-        val kdocs = this.toRegularClassSymbol(session)
+        val kdocs = toRegularClassSymbol(session)
             ?.toLookupTag()
             ?.toFirRegularClass(session)
             ?.getKDocComments(config)
+
+        val annotatedDescription = findDocsDescription(session)
 
         val objectType = OpenApiSpec.ObjectType(
             type = "object",
             properties = mutableMapOf(),
             fqName = jetTypeFqName,
-            description = kdocs,
+            description = kdocs ?: annotatedDescription?.descr ?: annotatedDescription?.summary,
             contentBodyRef = "#/components/schemas/${jetTypeFqName}",
         )
-        if (!classNames.names.contains(jetTypeFqName)) {
 
-            classNames.add(objectType)
-
-            getMembers(session, config).forEach { d ->
-
-                val classDescriptorVisitor = ClassDescriptorVisitorK2(config, session, context)
-                d.accept(classDescriptorVisitor, objectType)
-                classNames.addAll(classDescriptorVisitor.classNames)
+        if (isValueClass(session)) {
+            return objectType.copy(
+                type = properties(session)?.firstOrNull()
+                    ?.resolvedReturnType
+                    ?.className()
+                    ?.toSwaggerType(),
+                properties = null
+            ).also {
+                if (!classNames.names.contains(jetTypeFqName)) {
+                    classNames.add(it)
+                }
             }
+        } else {
+
+            if (!classNames.names.contains(jetTypeFqName)) {
+
+                classNames.add(objectType)
+
+                getMembers(session, config).forEach { d ->
+
+                    val classDescriptorVisitor = ClassDescriptorVisitorK2(config, session, context)
+                    d.accept(classDescriptorVisitor, objectType)
+                    classNames.addAll(classDescriptorVisitor.classNames)
+                }
+            }
+            return objectType
         }
-        return objectType
     }
 
     private fun List<FirStatement>.findQueryParameterExpression(): List<ParamSpec> {
@@ -152,7 +171,14 @@ internal class ExpressionsVisitorK2(
     private fun List<FirStatement>.findHeaderParameterExpression(): List<ParamSpec> {
         val headerParams = mutableListOf<String>()
         flatMap { it.allChildren }.filterIsInstance<FirFunctionCall>()
-            .forEach { it.accept(ParametersVisitor(session, listOf(ClassIds.KTOR_HEADER_PARAM, ClassIds.KTOR_HEADER_ACCESSOR)), headerParams) }
+            .forEach {
+                it.accept(
+                    ParametersVisitor(
+                        session,
+                        listOf(ClassIds.KTOR_HEADER_PARAM, ClassIds.KTOR_HEADER_ACCESSOR)
+                    ), headerParams
+                )
+            }
 
         filterIsInstance<FirFunctionCall>()
             .forEach {

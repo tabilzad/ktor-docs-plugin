@@ -7,6 +7,7 @@ import io.github.tabilzad.ktor.getKDocComments
 import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
 import io.github.tabilzad.ktor.k2.*
+import io.github.tabilzad.ktor.k2.ClassIds.KTOR_FIELD_DESCRIPTION
 import io.github.tabilzad.ktor.k2.JsonNameResolver.getCustomNameFromAnnotation
 import io.github.tabilzad.ktor.names
 import io.github.tabilzad.ktor.output.OpenApiSpec
@@ -14,11 +15,13 @@ import io.github.tabilzad.ktor.output.OpenApiSpec.ObjectType
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
+import org.jetbrains.kotlin.fir.analysis.checkers.isValueClass
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.isEnumClass
 import org.jetbrains.kotlin.fir.declarations.utils.isSealed
 import org.jetbrains.kotlin.fir.expressions.FirExpressionEvaluator
 import org.jetbrains.kotlin.fir.resolve.defaultType
+import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.types.*
@@ -196,8 +199,18 @@ internal class ClassDescriptorVisitorK2(
                         data
                     }
 
-                    else -> {
+                    type.isValueClass(session) -> {
+                        data.addProperty(
+                            property, ObjectType(
+                                type.properties(session)?.firstOrNull()?.resolvedReturnType?.className()
+                                    ?.toSwaggerType(),
+                                fqName = fqClassName
+                            ), session
+                        )
+                        data
+                    }
 
+                    else -> {
 
                         if (!classNames.names.contains(fqClassName)) {
                             val internal = ObjectType(
@@ -363,5 +376,26 @@ internal fun FirProperty.findDocsDescription(session: FirSession): KtorDescripti
         descr = descr?.accept(StringResolutionVisitor(), ""),
         isRequired = required?.accept(StringResolutionVisitor(), "")?.toBooleanStrictOrNull()
             ?: (returnTypeRef.isMarkedNullable == false)
+    )
+}
+
+@OptIn(PrivateForInline::class)
+internal fun ConeKotlinType.findDocsDescription(session: FirSession): KtorDescriptionBag? {
+
+    val docsAnnotation = this.toRegularClassSymbol(session)?.annotations?.find {
+        it.fqName(session) == KTOR_FIELD_DESCRIPTION
+    }
+
+    if (docsAnnotation == null) return null
+
+    val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(docsAnnotation, session)
+    val summary = resolved?.entries?.find { it.key.asString() == "summary" }?.value?.result
+    val descr = resolved?.entries?.find { it.key.asString() == "description" }?.value?.result
+    val required = resolved?.entries?.find { it.key.asString() == "required" }?.value?.result
+    return KtorDescriptionBag(
+        summary = summary?.accept(StringResolutionVisitor(), ""),
+        descr = descr?.accept(StringResolutionVisitor(), ""),
+        isRequired = required?.accept(StringResolutionVisitor(), "")?.toBooleanStrictOrNull()
+            ?: (!isNullable)
     )
 }

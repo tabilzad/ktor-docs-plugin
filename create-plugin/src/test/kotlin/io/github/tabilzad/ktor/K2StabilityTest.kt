@@ -334,6 +334,14 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should resolve request body schema with value classes`() {
+        val (source, expected) = loadSourceAndExpected("ValueClass")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should resolve endpoint spec from type-safe ktor resources`() {
         val (source, expected) = loadSourceAndExpected("Resources")
         generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
