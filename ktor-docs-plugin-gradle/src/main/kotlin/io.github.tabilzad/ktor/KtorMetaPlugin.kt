@@ -124,16 +124,8 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             saveInBuild -> "$buildPath/openapi"
             else -> "${getProjectResourcesDirectory(modulePath)}/openapi"
         }
-        val directory = createOutputDirectory(directoryPath)
+        val directory = File(directoryPath)
         return File(directory, "openapi.$format")
-    }
-
-    private fun createOutputDirectory(path: String): File {
-        return File(path).apply {
-            if (!exists() && !mkdirs()) {
-                throw IllegalArgumentException("Invalid output directory $path")
-            }
-        }
     }
 
     private fun getProjectResourcesDirectory(modulePath: String): File {

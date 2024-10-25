@@ -13,7 +13,9 @@ import java.io.File
 
 
 internal fun OpenApiSpec.serializeAndWriteTo(configuration: PluginConfiguration) {
-    val file = File(configuration.filePath)
+    val file = File(configuration.filePath).apply {
+        parentFile.mkdirs()
+    }
 
     getJacksonBy(configuration.format).let { mapper ->
         val new = try {
