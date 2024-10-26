@@ -75,6 +75,20 @@
           }
         }
       }
+    },
+    "/v2/postInstantRequest" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.requests.InstantRequest"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components" : {
@@ -125,6 +139,16 @@
               "type" : "array",
               "items" : {
                 "type" : "string"
+              }
+            }
+          },
+          "complexMapValueMap" : {
+            "type" : "object",
+            "properties" : { },
+            "additionalProperties" : {
+              "type" : "object",
+              "additionalProperties" : {
+                "$ref" : "#/components/schemas/sources.requests.ComplexMapValue"
               }
             }
           },
@@ -213,7 +237,21 @@
             }
           }
         },
-        "required" : [ "list", "nestedList", "nestedMutableList", "complexList", "complexNestedList", "complexListStringMap", "complexListMap", "complexNestedListMap", "stringMap", "intValueMap", "complexValueMap", "enumValueMap", "complexEnumValueMap" ]
+        "required" : [ "list", "nestedList", "nestedMutableList", "complexList", "complexNestedList", "complexListStringMap", "complexListMap", "complexNestedListMap", "stringMap", "intValueMap", "complexValueMap", "enumValueMap", "complexEnumValueMap", "complexMapValueMap" ]
+      },
+      "sources.requests.InstantRequest" : {
+        "type" : "object",
+        "properties" : {
+          "date" : {
+            "type" : "string",
+            "format" : "iso 8601"
+          },
+          "formattedInstant" : {
+            "type" : "string",
+            "format" : "date-time"
+          }
+        },
+        "required" : [ "date", "formattedInstant" ]
       },
       "sources.requests.NestedRequest" : {
         "type" : "object",

@@ -5,6 +5,7 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
 import sources.requests.ComplexRequest
+import sources.requests.InstantRequest
 import sources.requests.NestedRequest
 import sources.requests.SimpleRequest
 
@@ -32,6 +33,10 @@ fun Application.requestBodyTest() {
 
             post("/postBodyComplexRequest") {
                 call.receive<ComplexRequest>()
+            }
+
+            post("/postInstantRequest") {
+                call.receive<InstantRequest>()
             }
         }
     }

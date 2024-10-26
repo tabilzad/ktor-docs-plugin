@@ -1,5 +1,8 @@
 package sources.requests
 
+import io.github.tabilzad.ktor.annotations.OpenApiProperty
+import java.time.Instant
+
 data class SimpleRequest(
     val string: String,
     val integer: Int,
@@ -32,6 +35,7 @@ data class ComplexRequest(
     val complexValueMap: Map<String, ComplexMapValue>,
     val enumValueMap: Map<String, MyEnum>,
     val complexEnumValueMap: Map<String, List<MyEnum>>,
+    val complexMapValueMap: Map<String, Map<String, ComplexMapValue>>
 )
 
 data class ComplexMapValue(
@@ -41,6 +45,8 @@ data class ComplexMapValue(
 data class ComplexMapKey(
     val something: Int
 )
+
+data class InstantRequest(@OpenApiProperty(type = "string", format = "iso 8601") val date: Instant, @OpenApiProperty(type = "string", format = "date-time") val formattedInstant: Instant)
 
 enum class MyEnum {
     ONE,

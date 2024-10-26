@@ -45,6 +45,7 @@ data class OpenApiSpec(
         var type: String?,
         var properties: MutableMap<String, ObjectType>? = null,
         var items: ObjectType? = null,
+        var format: String? = null,
         var enum: List<String>? = null,
         @JsonIgnore
         override var fqName: String? = null,
