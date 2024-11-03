@@ -642,9 +642,10 @@ internal class ExpressionsVisitor(
 
 internal data class KtorDescriptionBag(
     val summary: String? = null,
-    val descr: String? = null,
+    val description: String? = null,
     val tags: Set<String>? = null,
-    val isRequired: Boolean = false
+    val operationId: String? = null,
+    val isRequired: Boolean? = false
 )
 
 internal data class KtorResponseBag(

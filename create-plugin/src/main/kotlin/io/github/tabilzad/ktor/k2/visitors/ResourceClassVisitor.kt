@@ -79,12 +79,12 @@ internal class ResourceClassVisitor(
         if (property.isPathParamFrom(resourcePath ?: "")) {
             PathParamSpec(
                 name = property.name.asString(),
-                description = description?.descr ?: description?.summary
+                description = description?.description ?: description?.summary
             )
         } else {
             QueryParamSpec(
                 name = property.name.asString(),
-                description = description?.descr ?: description?.summary,
+                description = description?.description ?: description?.summary,
                 isRequired = description?.isRequired ?: false
             )
         }

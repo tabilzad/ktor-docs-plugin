@@ -154,6 +154,13 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should generate correct descriptions with operationIds`() {
+        val (source, expected) = loadSourceAndExpected("EndpointDescriptionOperationId")
+        generateCompilerTest(testFile, source)
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+    @Test
     fun `should generate correct swagger definitions for endpoint with path parameters`() {
         val (source, expected) = loadSourceAndExpected("PathParameters")
         generateCompilerTest(testFile, source)

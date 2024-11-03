@@ -1,10 +1,17 @@
 package io.github.tabilzad.ktor
 
+import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k2.ClassIds.TRANSIENT_ANNOTATION_FQ
+import io.github.tabilzad.ktor.k2.visitors.StringArrayLiteralVisitor
+import io.github.tabilzad.ktor.k2.visitors.StringResolutionVisitor
 import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirDeclaration
+import org.jetbrains.kotlin.fir.declarations.result
+import org.jetbrains.kotlin.fir.expressions.FirAnnotation
+import org.jetbrains.kotlin.fir.expressions.FirExpressionEvaluator
 import org.jetbrains.kotlin.kdoc.lexer.KDocTokens
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.elements.KtModifierListElementType
@@ -12,6 +19,7 @@ import org.jetbrains.kotlin.resolve.descriptorUtil.isEffectivelyPublicApi
 import org.jetbrains.kotlin.resolve.scopes.DescriptorKindFilter
 import org.jetbrains.kotlin.resolve.scopes.MemberScope
 import org.jetbrains.kotlin.resolve.scopes.getDescriptorsFiltered
+import org.jetbrains.kotlin.util.PrivateForInline
 import org.jetbrains.kotlin.util.getChildren
 import java.io.OutputStream
 
@@ -75,6 +83,7 @@ internal fun reduce(e: DocRoute): List<KtorRouteSpec> = e.children.flatMap { chi
                     description = child.description,
                     parameters = child.parameters?.toList(),
                     responses = child.responses,
+                    operationId = child.operationId,
                     tags = e.tags merge child.tags
                 )
             )
@@ -97,6 +106,7 @@ internal fun List<KtorRouteSpec>.convertToSpec(): Map<String, Map<String, OpenAp
         it.method to OpenApiSpec.Path(
             summary = it.summary,
             description = it.description,
+            operationId = it.operationId,
             tags = it.tags?.toList()?.sorted(),
             parameters = mapPathParams(it) merge mapQueryParams(it) merge mapHeaderParams(it),
             requestBody = addPostBody(it),
@@ -250,3 +260,20 @@ operator fun OutputStream.plusAssign(str: String) {
     this.write(str.toByteArray())
 }
 
+@OptIn(PrivateForInline::class)
+internal fun FirAnnotation.extractDescription(session: FirSession): KtorDescriptionBag {
+    val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(this, session)
+    val summary = resolved?.entries?.find { it.key.asString() == "summary" }?.value?.result
+    val descr = resolved?.entries?.find { it.key.asString() == "description" }?.value?.result
+    val required = resolved?.entries?.find { it.key.asString() == "required" }?.value?.result
+    val operationId = resolved?.entries?.find { it.key.asString() == "operationId" }?.value?.result
+    val tags = resolved?.entries?.find { it.key.asString() == "tags" }?.value?.result
+
+    return KtorDescriptionBag(
+        summary = summary?.accept(StringResolutionVisitor(), ""),
+        description = descr?.accept(StringResolutionVisitor(), ""),
+        operationId = operationId?.accept(StringResolutionVisitor(), ""),
+        tags = tags?.accept(StringArrayLiteralVisitor(), emptyList())?.toSet(),
+        isRequired = required?.accept(StringResolutionVisitor(), "")?.toBooleanStrictOrNull()
+    )
+}

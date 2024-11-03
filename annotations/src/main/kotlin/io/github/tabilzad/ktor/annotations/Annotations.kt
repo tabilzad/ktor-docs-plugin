@@ -37,6 +37,7 @@ annotation class ResponseEntry(
 annotation class KtorDescription(
     val summary: String = "",
     val description: String = "",
+    val operationId: String = "",
     val tags: Array<String> = []
 )
 

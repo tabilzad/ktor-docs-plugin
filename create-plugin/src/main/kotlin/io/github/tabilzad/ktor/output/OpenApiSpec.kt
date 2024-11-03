@@ -8,6 +8,7 @@ import io.github.tabilzad.ktor.OpenApiSpecParam
 internal typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
 
 internal typealias BodyContent = Map<ContentType, ContentSchema>
+
 data class OpenApiSpec(
     val openapi: String = "3.1.0",
     val info: Info,
@@ -26,6 +27,7 @@ data class OpenApiSpec(
     data class Path(
         val summary: String? = null,
         val description: String? = null,
+        val operationId: String? = null,
         val tags: List<String>? = null,
         val responses: Map<String, ResponseDetails>? = null,
         val parameters: List<Parameter>? = null,

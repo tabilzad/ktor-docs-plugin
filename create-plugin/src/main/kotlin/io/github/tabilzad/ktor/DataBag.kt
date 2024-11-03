@@ -40,6 +40,7 @@ internal data class KtorRouteSpec(
     val body: OpenApiSpec.ObjectType,
     val summary: String?,
     val description: String?,
+    val operationId: String?,
     val tags: Set<String>?,
     val responses: Map<String, OpenApiSpec.ResponseDetails>?
 )
@@ -63,6 +64,7 @@ internal data class EndPoint(
     var body: OpenApiSpec.ObjectType? = OpenApiSpec.ObjectType(type = "object"),
     var parameters: Set<ParamSpec>? = null,
     var description: String? = null,
+    var operationId: String? = null,
     var summary: String? = null,
     override var tags: Set<String>? = null,
     var responses: Map<String, OpenApiSpec.ResponseDetails>? = null

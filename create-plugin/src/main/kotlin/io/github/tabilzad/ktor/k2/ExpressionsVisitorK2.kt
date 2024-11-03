@@ -121,7 +121,7 @@ internal class ExpressionsVisitorK2(
             type = "object",
             properties = mutableMapOf(),
             fqName = jetTypeFqName,
-            description = kdocs ?: annotatedDescription?.descr ?: annotatedDescription?.summary,
+            description = kdocs ?: annotatedDescription?.description ?: annotatedDescription?.summary,
             contentBodyRef = "#/components/schemas/${jetTypeFqName}",
         )
 
@@ -331,8 +331,9 @@ internal class ExpressionsVisitorK2(
                 val endpoint = EndPoint(
                     path = null,
                     method = expName,
-                    description = descr.descr,
+                    description = descr.description,
                     summary = descr.summary,
+                    operationId = descr.operationId,
                     tags = descr.tags merge tagsFromAnnotation,
                     responses = responses
                 )
@@ -443,22 +444,11 @@ internal data class KtorK2ResponseBag(
 
 private fun KtorElement?.wrapAsList() = this?.let { listOf(this) } ?: emptyList()
 
-@OptIn(PrivateForInline::class)
 private fun FirFunctionCall.findDocsDescription(session: FirSession): KtorDescriptionBag {
     val docsAnnotation = findAnnotation(KtorDescription::class.simpleName!!)
         ?: return KtorDescriptionBag()
 
-    val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(docsAnnotation, session)
-
-    val summary = resolved?.entries?.find { it.key.asString() == "summary" }?.value?.result
-    val descr = resolved?.entries?.find { it.key.asString() == "description" }?.value?.result
-    val tags = resolved?.entries?.find { it.key.asString() == "tags" }?.value?.result
-
-    return KtorDescriptionBag(
-        summary = summary?.accept(StringResolutionVisitor(), ""),
-        descr = descr?.accept(StringResolutionVisitor(), ""),
-        tags = tags?.accept(StringArrayLiteralVisitor(), emptyList())?.toSet()
-    )
+    return docsAnnotation.extractDescription(session)
 }
 
 @OptIn(PrivateForInline::class)

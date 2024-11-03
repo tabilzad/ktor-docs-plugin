@@ -1,0 +1,31 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/multilineOperationsId" : {
+      "get" : {
+        "description" : "getOrdersFromPreviousDay",
+        "operationId" : "thisisOpertaionId"
+      }
+    },
+    "/v1/else/endpointWithOperationId" : {
+      "get" : {
+        "summary" : "My Summary",
+        "operationId" : "getOrdersAndCart"
+      }
+    },
+    "/v1/else/endpointWithOperationId2" : {
+      "get" : {
+        "description" : "getOrdersFromPreviousDay",
+        "operationId" : "getOrdersAndCart2"
+      }
+    }
+  },
+  "components" : {
+    "schemas" : { }
+  }
+}

@@ -3,6 +3,7 @@ package io.github.tabilzad.ktor.k2.visitors
 import io.github.tabilzad.ktor.PluginConfiguration
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorFieldDescription
+import io.github.tabilzad.ktor.extractDescription
 import io.github.tabilzad.ktor.getKDocComments
 import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
@@ -19,7 +20,6 @@ import org.jetbrains.kotlin.fir.analysis.checkers.isValueClass
 import org.jetbrains.kotlin.fir.declarations.*
 import org.jetbrains.kotlin.fir.declarations.utils.isEnumClass
 import org.jetbrains.kotlin.fir.declarations.utils.isSealed
-import org.jetbrains.kotlin.fir.expressions.FirExpressionEvaluator
 import org.jetbrains.kotlin.fir.resolve.defaultType
 import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.util.PrivateForInline
 import org.jetbrains.kotlin.util.getValueOrNull
 
 data class GenericParameter(
@@ -330,7 +329,7 @@ internal class ClassDescriptorVisitorK2(
     private fun ObjectType.addProperty(fir: FirProperty, objectType: ObjectType?, session: FirSession) {
         val kdoc = fir.getKDocComments(config)
         val resolvedDescription = fir.findDocsDescription(session)
-        val docsDescription = resolvedDescription.let { it?.summary ?: it?.descr }
+        val docsDescription = resolvedDescription.let { it?.summary ?: it?.description }
         val name = fir.findName()
         val spec = objectType ?: ObjectType("object")
         if (properties == null) {
@@ -361,41 +360,24 @@ internal class ClassDescriptorVisitorK2(
 
 }
 
-@OptIn(PrivateForInline::class)
 internal fun FirProperty.findDocsDescription(session: FirSession): KtorDescriptionBag? {
     val docsAnnotation =
         findAnnotation(KtorDescription::class.simpleName) ?: findAnnotation(KtorFieldDescription::class.simpleName)
         ?: return null
 
-    val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(docsAnnotation, session)
-    val summary = resolved?.entries?.find { it.key.asString() == "summary" }?.value?.result
-    val descr = resolved?.entries?.find { it.key.asString() == "description" }?.value?.result
-    val required = resolved?.entries?.find { it.key.asString() == "required" }?.value?.result
-    return KtorDescriptionBag(
-        summary = summary?.accept(StringResolutionVisitor(), ""),
-        descr = descr?.accept(StringResolutionVisitor(), ""),
-        isRequired = required?.accept(StringResolutionVisitor(), "")?.toBooleanStrictOrNull()
-            ?: (returnTypeRef.isMarkedNullable == false)
+    val dataBag = docsAnnotation.extractDescription(session)
+    return dataBag.copy(
+        isRequired = dataBag.isRequired ?: (returnTypeRef.isMarkedNullable == false)
     )
 }
 
-@OptIn(PrivateForInline::class)
 internal fun ConeKotlinType.findDocsDescription(session: FirSession): KtorDescriptionBag? {
-
-    val docsAnnotation = this.toRegularClassSymbol(session)?.annotations?.find {
-        it.fqName(session) == KTOR_FIELD_DESCRIPTION
-    }
+    val docsAnnotation = toRegularClassSymbol(session)?.annotations
+        ?.find { it.fqName(session) == KTOR_FIELD_DESCRIPTION }
 
     if (docsAnnotation == null) return null
-
-    val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(docsAnnotation, session)
-    val summary = resolved?.entries?.find { it.key.asString() == "summary" }?.value?.result
-    val descr = resolved?.entries?.find { it.key.asString() == "description" }?.value?.result
-    val required = resolved?.entries?.find { it.key.asString() == "required" }?.value?.result
-    return KtorDescriptionBag(
-        summary = summary?.accept(StringResolutionVisitor(), ""),
-        descr = descr?.accept(StringResolutionVisitor(), ""),
-        isRequired = required?.accept(StringResolutionVisitor(), "")?.toBooleanStrictOrNull()
-            ?: (!isNullable)
+    val dataBag = docsAnnotation.extractDescription(session)
+    return dataBag.copy(
+        isRequired = dataBag.isRequired ?: (!isNullable)
     )
 }
