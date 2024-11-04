@@ -28,7 +28,7 @@ internal class ResourceClassVisitor(
     override fun visitRegularClass(regularClass: FirRegularClass, data: KtorElement?): KtorElement? {
 
         val resourceAnnotation = regularClass.findAnnotation(ClassIds.KTOR_RESOURCE_ANNOTATION, session)
-        val resourcePath = resourceAnnotation?.accept(ResourceAnnotationVisitor(), null)
+        val resourcePath = resourceAnnotation?.accept(ResourceAnnotationVisitor(session), null)
 
         val (parents, params) = regularClass.symbol.defaultType()
             .getMembers(session, config)

@@ -1,11 +1,12 @@
 package io.github.tabilzad.ktor.k2.visitors
 
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationArgumentMapping
 import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 
-internal class ResourceAnnotationVisitor : FirDefaultVisitor<String?, String?>() {
+internal class ResourceAnnotationVisitor(private val session: FirSession) : FirDefaultVisitor<String?, String?>() {
 
     override fun visitElement(element: FirElement, data: String?): String? = data
 
@@ -17,7 +18,7 @@ internal class ResourceAnnotationVisitor : FirDefaultVisitor<String?, String?>()
         data: String?
     ): String? {
         return annotationArgumentMapping.mapping.entries.firstOrNull()?.let { (_, value) ->
-            value.accept(StringResolutionVisitor(), "")
+            value.accept(StringResolutionVisitor(session), "")
         } ?: data
     }
 }

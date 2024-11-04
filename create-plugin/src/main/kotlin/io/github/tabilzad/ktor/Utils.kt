@@ -270,10 +270,10 @@ internal fun FirAnnotation.extractDescription(session: FirSession): KtorDescript
     val tags = resolved?.entries?.find { it.key.asString() == "tags" }?.value?.result
 
     return KtorDescriptionBag(
-        summary = summary?.accept(StringResolutionVisitor(), ""),
-        description = descr?.accept(StringResolutionVisitor(), ""),
-        operationId = operationId?.accept(StringResolutionVisitor(), ""),
+        summary = summary?.accept(StringResolutionVisitor(session), ""),
+        description = descr?.accept(StringResolutionVisitor(session), ""),
+        operationId = operationId?.accept(StringResolutionVisitor(session), ""),
         tags = tags?.accept(StringArrayLiteralVisitor(), emptyList())?.toSet(),
-        isRequired = required?.accept(StringResolutionVisitor(), "")?.toBooleanStrictOrNull()
+        isRequired = required?.accept(StringResolutionVisitor(session), "")?.toBooleanStrictOrNull()
     )
 }

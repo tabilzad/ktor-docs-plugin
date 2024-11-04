@@ -1,0 +1,31 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/order/get" : {
+      "post" : { }
+    },
+    "/v1/global/v2/order/get" : {
+      "get" : { }
+    },
+    "/v1/globalPath/v3/global/somethingElse/order" : {
+      "get" : { }
+    },
+    "/v1/order" : {
+      "get" : { }
+    },
+    "/v1/order/another/order" : {
+      "get" : { }
+    },
+    "/v1/order/yetAnother/order" : {
+      "get" : { }
+    }
+  },
+  "components" : {
+    "schemas" : { }
+  }
+}

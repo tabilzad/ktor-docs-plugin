@@ -223,18 +223,16 @@ internal class ExpressionsVisitorK2(
 
 
     @OptIn(SymbolInternals::class)
-    private fun FirFunctionCall.extractArguments(): Map<String, String> {
+    private fun FirFunctionCall.resolvePath(): String? {
         val expression = this
-        val names = (expression.calleeReference.resolved?.resolvedSymbol?.fir as FirFunction).valueParameters.map {
-            it.name.asString()
+        val pathExpressionIndex = (expression.calleeReference.resolved?.resolvedSymbol?.fir as FirFunction)
+            .valueParameters.indexOfFirst { it.name.asString() == "path" }
+
+        val pathExpression = expression.arguments.getOrElse(pathExpressionIndex) {
+            expression.arguments.find { it is FirLiteralExpression }
         }
-
-        val values = expression.arguments
-            .filterIsInstance<FirLiteralExpression>()
-            .filter { it.value is String }
-            .map { it.value as String }
-
-        return names.zip(values).toMap()
+        val resolvedPathValue = pathExpression?.accept(StringResolutionVisitor(session), "")
+        return resolvedPathValue
     }
 
     private fun FirFunctionCall.findLambda(): FirAnonymousFunctionExpression? {
@@ -253,21 +251,19 @@ internal class ExpressionsVisitorK2(
         val tagsFromAnnotation = functionCall.findTags(session)
         if (functionCall.isARouteDefinition() || ExpType.METHOD.labels.contains(expName)) {
 
-            val args = functionCall.extractArguments()
-
-            val routePathArg = args.entries.find { it.key == "path" }?.value
+            val pathValue = functionCall.resolvePath()
 
             if (ExpType.ROUTE.labels.contains(expName)) {
                 if (parent == null) {
-                    resultElement = routePathArg?.let {
-                        DocRoute(routePathArg, tags = tagsFromAnnotation)
+                    resultElement = pathValue?.let {
+                        DocRoute(pathValue, tags = tagsFromAnnotation)
                     } ?: run {
                         DocRoute(expName, tags = tagsFromAnnotation)
                     }
                 } else {
                     if (parent is DocRoute) {
                         val newElement = DocRoute(
-                            routePathArg.toString(),
+                            pathValue.toString(),
                             tags = parent.tags merge tagsFromAnnotation
                         )
 
@@ -355,12 +351,12 @@ internal class ExpressionsVisitorK2(
                 }
 
                 resultElement = when (parent) {
-                    null -> resource ?: routePathArg?.let {
-                        endpoint.copy(path = routePathArg, body = body)
+                    null -> resource ?: pathValue?.let {
+                        endpoint.copy(path = pathValue, body = body)
                     }
 
                     is DocRoute -> {
-                        val element = resource ?: endpoint.copy(path = routePathArg, body = body)
+                        val element = resource ?: endpoint.copy(path = pathValue, body = body)
                         parent.children.add(element)
                         element
                     }
@@ -457,6 +453,6 @@ private fun FirFunctionCall.findRespondsAnnotation(session: FirSession): List<Kt
     return annotation?.let {
         val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(annotation, session)
         val mapping = resolved?.entries?.find { it.key.asString() == "mapping" }?.value?.result
-        mapping?.accept(RespondsAnnotationVisitor(), null)
+        mapping?.accept(RespondsAnnotationVisitor(session), null)
     }
 }

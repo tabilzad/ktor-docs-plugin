@@ -78,6 +78,16 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should extract endpoint path names from variables`() {
+        val (source, expected) = loadSourceAndExpected("Paths6")
+        generateCompilerTest(testFile, source)
+
+        testFile.readText().let { generatedSwagger ->
+            generatedSwagger.assertWith(expected)
+        }
+    }
+
+    @Test
     fun `should generate correct post request body`() {
         val (source, expected) = loadSourceAndExpected("RequestBody")
         generateCompilerTest(testFile, source)

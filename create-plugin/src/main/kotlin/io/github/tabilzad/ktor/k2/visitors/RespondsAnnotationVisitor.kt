@@ -2,13 +2,14 @@ package io.github.tabilzad.ktor.k2.visitors
 
 import io.github.tabilzad.ktor.k2.KtorK2ResponseBag
 import org.jetbrains.kotlin.fir.FirElement
+import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.types.type
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 
-internal class RespondsAnnotationVisitor : FirDefaultVisitor<List<KtorK2ResponseBag>, KtorK2ResponseBag?>() {
+internal class RespondsAnnotationVisitor(private val session: FirSession) : FirDefaultVisitor<List<KtorK2ResponseBag>, KtorK2ResponseBag?>() {
 
     // if we don't override a particular visit, it will come here by default
     override fun visitElement(element: FirElement, data: KtorK2ResponseBag?): List<KtorK2ResponseBag> {
@@ -27,8 +28,8 @@ internal class RespondsAnnotationVisitor : FirDefaultVisitor<List<KtorK2Response
 
         return listOf(
             KtorK2ResponseBag(
-                descr = description?.accept(StringResolutionVisitor(), "") ?: "",
-                status = status?.accept(StringResolutionVisitor(), "") ?: "UNKNOWN",
+                descr = description?.accept(StringResolutionVisitor(session), "") ?: "",
+                status = status?.accept(StringResolutionVisitor(session), "") ?: "UNKNOWN",
                 type = type?.resolvedType?.typeArguments?.firstOrNull()?.type,
                 isCollection = isCollection?.value as? Boolean ?: false
             )
