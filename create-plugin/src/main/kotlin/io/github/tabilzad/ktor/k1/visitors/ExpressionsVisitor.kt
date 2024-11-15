@@ -442,7 +442,6 @@ internal class ExpressionsVisitor(
         return if (source is KtFunction) {
             val newTags = mutableSetOf<String>()
             if (source.hasAnnotation(KtorDocs::class.simpleName)) {
-                println()
                 val annotation = source.findAnnotation(KtorDocs::class.simpleName)
                 var tags =
                     annotation?.valueArguments?.find { it.getArgumentName()?.asName?.asString() == "tags" }

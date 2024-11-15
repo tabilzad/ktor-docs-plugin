@@ -34,26 +34,22 @@ class StringResolutionVisitor(private val session: FirSession) : FirDefaultVisit
     }
 
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: String): String {
-        println()
-
         return data + functionCall.children.map {
             it.accept(this, data)
         }.concat()
     }
 
-    @OptIn(PrivateConstantEvaluatorAPI::class)
-    // TODO(Look into evaluatePropertyInitializer instead of evaluateExpression)
+
+    // TODO(Look into evaluatePropertyInitializer or evaluateExpression)
     override fun visitArgumentList(argumentList: FirArgumentList, data: String): String {
         return if (argumentList is FirResolvedArgumentList) {
 
             data + argumentList.mapping.keys.map {
-                println()
                 it.accept(this, data)
             }.concat()
         } else {
             data
         }
-        //argumentList.acceptChildren(this, data)
     }
 
     override fun visitLiteralExpression(literalExpression: FirLiteralExpression, data: String): String =

@@ -238,8 +238,6 @@ internal class ClassDescriptorVisitorK2(
                                                 }), internal
                                         )
                                     }
-
-                                println()
                             }
                         }
 
