@@ -405,7 +405,6 @@ class K2StabilityTest {
         val (source, expected) = loadSourceAndExpected("ReturnExpressionRoute")
         generateCompilerTest(testFile, source)
 
-        println(testFile.readText())
         testFile.readText().assertWith(expected)
     }
 
