@@ -394,6 +394,11 @@ internal class ExpressionsVisitorK2(
         return (resultElement ?: parent).wrapAsList()
     }
 
+    override fun visitReturnExpression(returnExpression: FirReturnExpression, data: KtorElement?): List<KtorElement> {
+        val funCall = returnExpression.result as? FirFunctionCall
+        funCall?.accept(this, data)
+        return super.visitReturnExpression(returnExpression, data)
+    }
 
     override fun visitAnonymousFunctionExpression(
         anonymousFunctionExpression: FirAnonymousFunctionExpression,

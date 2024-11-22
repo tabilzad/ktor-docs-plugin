@@ -400,6 +400,14 @@ class K2StabilityTest {
         assertThat(result.servers).isNull()
     }
 
+    @Test
+    fun `should include routes in return expression`() {
+        val (source, expected) = loadSourceAndExpected("ReturnExpressionRoute")
+        generateCompilerTest(testFile, source)
+
+        testFile.readText().assertWith(expected)
+    }
+
     private fun String?.assertWith(expected: String) {
         assertThat(this).isNotNull.withFailMessage {
             "swagger file was not generated"
