@@ -17,7 +17,10 @@ import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.isValueClass
-import org.jetbrains.kotlin.fir.declarations.*
+import org.jetbrains.kotlin.fir.declarations.FirClass
+import org.jetbrains.kotlin.fir.declarations.FirProperty
+import org.jetbrains.kotlin.fir.declarations.SealedClassInheritorsProviderInternals
+import org.jetbrains.kotlin.fir.declarations.sealedInheritorsAttr
 import org.jetbrains.kotlin.fir.declarations.utils.isEnumClass
 import org.jetbrains.kotlin.fir.declarations.utils.isSealed
 import org.jetbrains.kotlin.fir.resolve.defaultType
@@ -42,8 +45,6 @@ internal class ClassDescriptorVisitorK2(
     val classNames: MutableList<ObjectType> = mutableListOf(),
 ) : FirDefaultVisitor<ObjectType, ObjectType>() {
 
-
-    @OptIn(SealedClassInheritorsProviderInternals::class, SymbolInternals::class)
     override fun visitProperty(property: FirProperty, data: ObjectType): ObjectType {
         val coneTypeOrNull = property.returnTypeRef.coneTypeOrNull!!
         val type = if (coneTypeOrNull is ConeTypeParameterType && genericParameters.isNotEmpty()) {
@@ -51,213 +52,186 @@ internal class ClassDescriptorVisitorK2(
         } else {
             coneTypeOrNull
         }
-        val typeSymbol = type.toRegularClassSymbol(session)
 
-        val result = when {
-            type.isPrimitiveOrNullablePrimitive || type.isString || type.isNullableString -> {
-                if (data.type == "object") {
-                    data.addProperty(
-                        property,
-                        objectType = ObjectType(
-                            type = type.className()?.toSwaggerType() ?: "Unknown",
-                        ), session
-                    )
-                }
-                if (data.type == "array") {
+        return data.apply { addProperty(property, type.collectDataTypes(), session) }
+    }
 
-                    val thisPrimitiveObj = ObjectType(
-                        type.toString().toSwaggerType(),
-                    )
-                    data.items = thisPrimitiveObj
+
+    @OptIn(SealedClassInheritorsProviderInternals::class, SymbolInternals::class)
+    private fun ConeKotlinType.collectDataTypes(): ObjectType? {
+        val fqClassName = fqNameStr()
+        val typeSymbol = toRegularClassSymbol(session)
+
+        return when {
+            isPrimitive || isPrimitiveOrNullablePrimitive || type.isString || type.isNullableString -> {
+                ObjectType(type = type.className()?.toSwaggerType() ?: "Unknown")
+            }
+
+            isMap() -> {
+                val valueType = typeArguments.last()
+
+                fun ConeTypeProjection.createMapDefinition(): ObjectType? {
+                    return this.type?.let { valueClassType ->
+                        val typeSymbol = valueClassType.toRegularClassSymbol(session)
+                        val acc = ObjectType("object", mutableMapOf())
+
+                        when {
+                            valueClassType.isPrimitiveOrNullablePrimitive || valueClassType.isString || valueClassType.isNullableString -> {
+                                acc.additionalProperties =
+                                    ObjectType(valueClassType.className()?.toSwaggerType())
+                            }
+
+                            valueClassType.isIterable() -> {
+                                acc.type = "object"
+                                acc.additionalProperties = valueClassType.collectDataTypes()
+                            }
+
+                            valueClassType.isEnum || typeSymbol?.isEnumClass == true -> {
+                                acc.type = "object"
+                                acc.additionalProperties = ObjectType(
+                                    "string", enum = typeSymbol?.resolveEnumEntries()
+                                )
+                            }
+
+                            valueClassType.isAny -> {
+                                acc.type = "object"
+                            }
+
+                            else -> {
+                                val gName = valueClassType.fqNameStr()
+                                if (!classNames.names.contains(gName)) {
+                                    val q = ObjectType(
+                                        "object",
+                                        null,
+                                        fqName = gName,
+                                        //description = docsDescription
+                                    )
+                                    classNames.add(q)
+
+                                    valueClassType.getMembers(session, config).forEach { it ->
+                                        it.accept(this@ClassDescriptorVisitorK2, q)
+                                    }
+                                }
+
+                                acc.additionalProperties = ObjectType(
+                                    type = null, ref = "#/components/schemas/${gName}"
+                                )
+                            }
+                        }
+
+                        acc
+                    }
                 }
-                data
+
+                val item = valueType.createMapDefinition()
+
+                item
+            }
+
+            isIterable() -> {
+                val arrayItemType = typeArguments.firstNotNullOfOrNull { it.type }
+                // list only take a single generic type
+                val array = ObjectType("array", items = arrayItemType?.collectDataTypes())
+                array
+            }
+
+            isEnum || typeSymbol?.isEnumClass == true -> {
+
+                val enumValues = typeSymbol?.resolveEnumEntries()
+
+
+                ObjectType(
+                    type = "string",
+                    enum = enumValues,
+                    //description = docsDescription
+                )
+            }
+
+            typeSymbol?.isSealed == true -> {
+
+                if (!classNames.names.contains(fqClassName)) {
+                    val inheritorClassIds = typeSymbol.fir.sealedInheritorsAttr?.getValueOrNull()
+                    val internal = ObjectType("object",
+                        fqName = fqClassName,
+                        oneOf = inheritorClassIds?.map { OpenApiSpec.SchemaRef("#/components/schemas/${it.asFqNameString()}") })
+                    classNames.add(internal)
+                    getMembers(session, config).forEach { nestedDescr ->
+                        nestedDescr.accept(this@ClassDescriptorVisitorK2, internal)
+                    }
+
+                    inheritorClassIds?.forEach { it: ClassId ->
+
+                        val inheritorType = ObjectType(
+                            "object",
+                            fqName = it.asFqNameString(),
+                        )
+                        classNames.add(inheritorType)
+                        val fir: FirClass? = it.toLookupTag().toClassSymbol(session)?.fir
+                        fir?.accept(this@ClassDescriptorVisitorK2, inheritorType)
+                    }
+                }
+
+                ObjectType(
+                    type = null,
+                    fqName = fqClassName,
+                    //description = docsDescription,
+                    ref = "#/components/schemas/${fqClassName}"
+                )
+            }
+
+            isAny -> {
+                null
+            }
+
+            isValueClass(session) -> {
+                ObjectType(
+                    properties(session)?.firstOrNull()?.resolvedReturnType?.className()
+                        ?.toSwaggerType(),
+                    fqName = fqClassName
+                )
             }
 
             else -> {
-                val fqClassName = type.fqNameStr()
 
-                when {
-                    type.isMap() -> {
+                if (!classNames.names.contains(fqClassName)) {
+                    val internal = ObjectType(
+                        "object",
+                        fqName = fqClassName
+                    )
+                    classNames.add(internal)
 
-                        val valueType = type.typeArguments.last()
-
-                        fun ConeTypeProjection.createMapDefinition(): ObjectType? {
-                            return this.type?.let { valueClassType ->
-                                val typeSymbol = valueClassType.toRegularClassSymbol(session)
-                                val acc = ObjectType("object", mutableMapOf())
-
-                                when {
-                                    valueClassType.isPrimitiveOrNullablePrimitive || valueClassType.isString || valueClassType.isNullableString -> {
-                                        acc.additionalProperties =
-                                            ObjectType(valueClassType.className()?.toSwaggerType())
-                                    }
-
-                                    valueClassType.isIterable() -> {
-                                        acc.type = "object"
-                                        acc.additionalProperties = valueClassType.toNestedSwagger()
-                                    }
-
-                                    valueClassType.isEnum || typeSymbol?.isEnumClass == true -> {
-                                        acc.type = "object"
-                                        acc.additionalProperties = ObjectType(
-                                            "string", enum = typeSymbol?.resolveEnumEntries()
-                                        )
-                                    }
-
-                                    valueClassType.isAny -> {
-                                        acc.type = "object"
-                                    }
-
-                                    else -> {
-                                        val gName = valueClassType.fqNameStr()
-                                        if (!classNames.names.contains(gName)) {
-                                            val q = ObjectType(
-                                                "object",
-                                                null,
-                                                fqName = gName,
-                                                //description = docsDescription
+                    if (typeArguments.isEmpty()) {
+                        getMembers(session, config).forEach { nestedDescr ->
+                            nestedDescr.accept(this@ClassDescriptorVisitorK2, internal)
+                        }
+                    } else {
+                        val things = getMembers(session, config)
+                            .map { nestedDescr ->
+                                nestedDescr.accept(
+                                    ClassDescriptorVisitorK2(
+                                        config, session, context,
+                                        classNames = classNames,
+                                        genericParameters = typeArguments.zip(
+                                            typeSymbol?.typeParameterSymbols ?: emptyList()
+                                        ).map { (specifiedType, genericType) ->
+                                            GenericParameter(
+                                                genericTypeRef = specifiedType.type,
+                                                genericName = genericType.name.asString()
                                             )
-                                            classNames.add(q)
-
-                                            valueClassType.getMembers(session, config).forEach { it ->
-                                                it.accept(this@ClassDescriptorVisitorK2, q)
-                                            }
-                                        }
-
-                                        acc.additionalProperties = ObjectType(
-                                            type = null, ref = "#/components/schemas/${gName}"
-                                        )
-                                    }
-                                }
-
-                                acc
-                            }
-                        }
-
-                        val item = valueType.createMapDefinition()
-                        data.addProperty(property, item, session)
-                        data
-                    }
-
-                    type.isIterable() -> {
-                        data.addProperty(property, type.toNestedSwagger(), session)
-                        data
-                    }
-
-                    type.isEnum || typeSymbol?.isEnumClass == true -> {
-
-                        val enumValues = typeSymbol?.resolveEnumEntries()
-                        data.addProperty(
-                            property, ObjectType(
-                                type = "string",
-                                enum = enumValues,
-                                //description = docsDescription
-                            ),
-                            session
-                        )
-                        data
-                    }
-
-                    typeSymbol?.isSealed == true -> {
-
-                        if (!classNames.names.contains(fqClassName)) {
-                            val inheritorClassIds = typeSymbol.fir.sealedInheritorsAttr?.getValueOrNull()
-                            val internal = ObjectType("object",
-                                fqName = fqClassName,
-                                oneOf = inheritorClassIds?.map { OpenApiSpec.SchemaRef("#/components/schemas/${it.asFqNameString()}") })
-                            classNames.add(internal)
-                            type.getMembers(session, config).forEach { nestedDescr ->
-                                nestedDescr.accept(this, internal)
-                            }
-
-                            inheritorClassIds?.forEach { it: ClassId ->
-
-                                val inheritorType = ObjectType(
-                                    "object",
-                                    fqName = it.asFqNameString(),
+                                        }), internal
                                 )
-                                classNames.add(inheritorType)
-                                val fir: FirClass? = it.toLookupTag().toClassSymbol(session)?.fir
-                                fir?.accept(this, inheritorType)
                             }
-                        }
-
-                        data.addProperty(
-                            property, ObjectType(
-                                type = null,
-                                fqName = fqClassName,
-                                //description = docsDescription,
-                                ref = "#/components/schemas/${fqClassName}"
-                            ), session
-                        )
-
-                        data
-                    }
-
-                    type.isAny -> {
-                        data
-                    }
-
-                    type.isValueClass(session) -> {
-                        data.addProperty(
-                            property, ObjectType(
-                                type.properties(session)?.firstOrNull()?.resolvedReturnType?.className()
-                                    ?.toSwaggerType(),
-                                fqName = fqClassName
-                            ), session
-                        )
-                        data
-                    }
-
-                    else -> {
-
-                        if (!classNames.names.contains(fqClassName)) {
-                            val internal = ObjectType(
-                                "object",
-                                fqName = fqClassName
-                            )
-                            classNames.add(internal)
-
-                            if (type.typeArguments.isEmpty()) {
-                                type.getMembers(session, config).forEach { nestedDescr ->
-                                    nestedDescr.accept(this, internal)
-                                }
-                            } else {
-                                val things = type.getMembers(session, config)
-                                    .map { nestedDescr ->
-                                        nestedDescr.accept(
-                                            ClassDescriptorVisitorK2(config, session, context,
-                                                classNames = classNames,
-                                                genericParameters = type.typeArguments.zip(
-                                                    typeSymbol?.typeParameterSymbols ?: emptyList()
-                                                ).map { (specifiedType, genericType) ->
-                                                    GenericParameter(
-                                                        genericTypeRef = specifiedType.type,
-                                                        genericName = genericType.name.asString()
-                                                    )
-                                                }), internal
-                                        )
-                                    }
-                            }
-                        }
-
-                        data.addProperty(
-                            property, ObjectType(
-                                type = null,
-                                fqName = fqClassName,
-                                //description = docsDescription,
-                                ref = "#/components/schemas/${fqClassName}"
-                            ), session
-                        )
-
-                        data
                     }
                 }
+
+                ObjectType(
+                    type = null,
+                    fqName = fqClassName,
+                    //description = docsDescription,
+                    ref = "#/components/schemas/${fqClassName}"
+                )
             }
         }
-
-
-        return result
     }
 
     override fun visitClass(klass: FirClass, data: ObjectType): ObjectType {
@@ -265,64 +239,7 @@ internal class ClassDescriptorVisitorK2(
         return data
     }
 
-    override fun visitElement(element: FirElement, data: ObjectType): ObjectType {
-        return data
-    }
-
-    private fun ConeKotlinType.toNestedSwagger(): ObjectType {
-        val arrayItems = type.typeArguments.mapNotNull { it.type }.map {
-            convertSubTree(it)
-        }
-        return ObjectType("array", items = arrayItems.firstOrNull())// list only take a single generic type
-    }
-
-    private fun convertSubTree(type: ConeKotlinType?): ObjectType? {
-        type?.typeArguments?.mapNotNull { it.type }?.map { convertSubTree(it) }
-        return type?.resolveItems()
-    }
-
-
-    private fun ConeKotlinType.resolveItems(
-    ): ObjectType? {
-        val type = this
-        val typeSymbol = toRegularClassSymbol(session)
-        val jetTypeFqName = fqNameStr()
-        return if (type.isPrimitive || type.isString || type.isPrimitiveOrNullablePrimitive || isNullableString) {
-            ObjectType(type.className()?.toSwaggerType())
-        } else if (type.isIterable()) {
-            ObjectType("array", items = this.typeArguments.firstNotNullOfOrNull { it.type }?.resolveItems())
-        } else if (type.isEnum || typeSymbol?.isEnumClass == true) {
-            ObjectType("string").apply {
-                enum = typeSymbol?.resolveEnumEntries()
-            }
-        } else {
-            if (!classNames.names.contains(jetTypeFqName)) {
-
-                val refObject = ObjectType(
-                    "object", properties = null, fqName = jetTypeFqName
-                )
-                classNames.add(refObject)
-                type.getMembers(session, config).forEach { it: FirDeclaration ->
-                    // it.accept(this@ClassDescriptorVisitorK2, q)
-                    it.accept(
-                        ClassDescriptorVisitorK2(config, session, context,
-                            classNames = classNames,
-                            genericParameters = type.typeArguments.zip(
-                                typeSymbol?.typeParameterSymbols ?: emptyList()
-                            ).map { (specifiedType, genericType) ->
-                                GenericParameter(
-                                    genericTypeRef = specifiedType.type,
-                                    genericName = genericType.name.asString()
-                                )
-                            }), refObject
-                    )
-                }
-            }
-            ObjectType(null).apply {
-                ref = "#/components/schemas/${jetTypeFqName}"
-            }
-        }
-    }
+    override fun visitElement(element: FirElement, data: ObjectType) = data
 
     private fun ObjectType.addProperty(fir: FirProperty, objectType: ObjectType?, session: FirSession) {
         val kdoc = fir.getKDocComments(config)

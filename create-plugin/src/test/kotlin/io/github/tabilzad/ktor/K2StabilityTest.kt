@@ -319,6 +319,22 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should handle sealed classes under collections`() {
+        val (source, expected) = loadSourceAndExpected("Abstractions2")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should handle sealed interfaces under collections`() {
+        val (source, expected) = loadSourceAndExpected("Abstractions3")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should handle Moshi annotated properties and data class constructor parameters`() {
         val (source, expected) = loadSourceAndExpected("MoshiAnnotated")
         generateCompilerTest(testFile, source, PluginConfiguration.createDefault())

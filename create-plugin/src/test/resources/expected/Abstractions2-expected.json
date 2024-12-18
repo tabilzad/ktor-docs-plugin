@@ -1,0 +1,80 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/sealed" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.Request"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.Request" : {
+        "type" : "object",
+        "properties" : {
+          "types" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/sources.TopSealedClass"
+            }
+          }
+        },
+        "required" : [ "types" ]
+      },
+      "sources.SunSealedClass2" : {
+        "type" : "object",
+        "properties" : {
+          "property" : {
+            "type" : "integer"
+          }
+        },
+        "required" : [ "property" ]
+      },
+      "sources.SunSealedClass3" : {
+        "type" : "object",
+        "properties" : {
+          "list" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          }
+        },
+        "required" : [ "list" ]
+      },
+      "sources.TopSealedClass" : {
+        "type" : "object",
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/sources.SunSealedClass2"
+        }, {
+          "$ref" : "#/components/schemas/sources.SunSealedClass3"
+        }, {
+          "$ref" : "#/components/schemas/sources.TopSealedClass.SunSealedClass1"
+        } ]
+      },
+      "sources.TopSealedClass.SunSealedClass1" : {
+        "type" : "object",
+        "properties" : {
+          "property" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "property" ]
+      }
+    }
+  }
+}

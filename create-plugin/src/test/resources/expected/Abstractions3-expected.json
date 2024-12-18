@@ -1,0 +1,89 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/sealed" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.InterfaceRequest"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.InterfaceRequest" : {
+        "type" : "object",
+        "properties" : {
+          "types" : {
+            "type" : "array",
+            "items" : {
+              "$ref" : "#/components/schemas/sources.TopSealedInterface"
+            }
+          }
+        },
+        "required" : [ "types" ]
+      },
+      "sources.SubSealedInterface1" : {
+        "type" : "object",
+        "properties" : {
+          "property" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "property" ]
+      },
+      "sources.SubSealedInterface2" : {
+        "type" : "object",
+        "properties" : {
+          "property" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "property" ]
+      },
+      "sources.SubSealedInterface3" : {
+        "type" : "object",
+        "properties" : {
+          "list" : {
+            "type" : "array",
+            "items" : {
+              "type" : "string"
+            }
+          },
+          "property" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "list", "property" ]
+      },
+      "sources.TopSealedInterface" : {
+        "type" : "object",
+        "properties" : {
+          "property" : {
+            "type" : "string"
+          }
+        },
+        "oneOf" : [ {
+          "$ref" : "#/components/schemas/sources.SubSealedInterface1"
+        }, {
+          "$ref" : "#/components/schemas/sources.SubSealedInterface2"
+        }, {
+          "$ref" : "#/components/schemas/sources.SubSealedInterface3"
+        } ],
+        "required" : [ "property" ]
+      }
+    }
+  }
+}
