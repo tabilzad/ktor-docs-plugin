@@ -57,7 +57,8 @@ data class OpenApiSpec(
         var contentBodyRef: String? = null,
         var additionalProperties: ObjectType? = null,
         var oneOf: List<SchemaRef>? = null,
-        var required: MutableList<String>? = null
+        var required: MutableList<String>? = null,
+        var format: String? = null
     ) : NamedObject
 
     data class Parameter(

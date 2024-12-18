@@ -41,7 +41,7 @@ internal class ExpressionsVisitor(
     override fun visitProperty(property: KtProperty, data: KtorElement?): List<KtorElement> {
         val dotQualified = property.children.filterIsInstance<KtDotQualifiedExpression>()
         val arrayAccess = property.children.filterIsInstance<KtArrayAccessExpression>()
-        return dotQualified.plus(arrayAccess).flatMap { it.accept(this, data) ?: emptyList() }
+        return dotQualified.plus(arrayAccess).flatMap { it.accept(this, data) }
     }
 
     override fun visitArrayAccessExpression(
@@ -509,7 +509,8 @@ internal class ExpressionsVisitor(
                         // we are under some base route definition
                         val newElement = DocRoute(
                             routePathArg.toString(),
-                            tags = parent.tags)
+                            tags = parent.tags
+                        )
 
                         resultElement = newElement
                         parent.children.add(newElement)
@@ -584,17 +585,17 @@ internal class ExpressionsVisitor(
         }
 
         val lambda = expression.lambdaArguments.lastOrNull()
-        if (lambda != null) { // visiting lambda of call expression
+        return if (lambda != null) { // visiting lambda of call expression
 
             val res = lambda.getLambdaExpression()?.accept(this, resultElement)
 
-            return resultElement.wrapAsList().ifEmpty {
+            resultElement.wrapAsList().ifEmpty {
                 res.orEmpty()
             }
 
         } else { // the expression doesn't have lambda so visit its implementation to look for potential routes
             val res = expression.visitFunctionDeclaration(resultElement)
-            return resultElement.wrapAsList().ifEmpty {
+            resultElement.wrapAsList().ifEmpty {
                 res.orEmpty()
             }
         }
@@ -644,7 +645,10 @@ internal data class KtorDescriptionBag(
     val description: String? = null,
     val tags: Set<String>? = null,
     val operationId: String? = null,
-    val isRequired: Boolean? = false
+    val isRequired: Boolean? = false,
+    val type: String? = null,
+    val format: String? = null,
+    val generateSchema: Boolean? = null
 )
 
 internal data class KtorResponseBag(

@@ -39,9 +39,14 @@
           "field3" : {
             "description" : "this is field 3 (int)",
             "$ref" : "#/components/schemas/sources.NestedObject"
+          },
+          "field4" : {
+            "type" : "string",
+            "description" : "this is field 4 (instant)",
+            "format" : "iso 8601"
           }
         },
-        "required" : [ "field1", "field3" ]
+        "required" : [ "field1", "field3", "field4" ]
       },
       "sources.NestedObject" : {
         "type" : "object",

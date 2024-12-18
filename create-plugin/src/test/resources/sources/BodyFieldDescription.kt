@@ -6,6 +6,7 @@ import io.github.tabilzad.ktor.annotations.KtorFieldDescription
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.routing.*
+import java.time.Instant
 
 
 data class MyDescribedPayload(
@@ -14,7 +15,9 @@ data class MyDescribedPayload(
     @KtorFieldDescription("this is field 2 (int)", required = false)
     val field2: Int,
     @KtorFieldDescription("this is field 3 (int)")
-    val field3: NestedObject
+    val field3: NestedObject,
+    @KtorFieldDescription("this is field 4 (instant)", type = "string", format = "iso 8601", generateSchema = false)
+    val field4: Instant
 )
 
 data class NestedObject(
