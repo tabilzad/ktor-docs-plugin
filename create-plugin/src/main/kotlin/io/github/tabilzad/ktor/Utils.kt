@@ -101,7 +101,7 @@ internal fun List<KtorRouteSpec>.cleanPaths() = map {
 
 internal fun List<KtorRouteSpec>.convertToSpec(): Map<String, Map<String, OpenApiSpec.Path>> = groupBy { it ->
     it.path
-}.mapValues { (key, value) ->
+}.mapValues { (_, value) ->
     value.associate {
         it.method to OpenApiSpec.Path(
             summary = it.summary,
@@ -268,12 +268,18 @@ internal fun FirAnnotation.extractDescription(session: FirSession): KtorDescript
     val required = resolved?.entries?.find { it.key.asString() == "required" }?.value?.result
     val operationId = resolved?.entries?.find { it.key.asString() == "operationId" }?.value?.result
     val tags = resolved?.entries?.find { it.key.asString() == "tags" }?.value?.result
+    val type = resolved?.entries?.find { it.key.asString() == "type" }?.value?.result
+    val format = resolved?.entries?.find { it.key.asString() == "format" }?.value?.result
+    val generateSchema = resolved?.entries?.find { it.key.asString() == "generateSchema" }?.value?.result
 
     return KtorDescriptionBag(
         summary = summary?.accept(StringResolutionVisitor(session), ""),
         description = descr?.accept(StringResolutionVisitor(session), ""),
         operationId = operationId?.accept(StringResolutionVisitor(session), ""),
         tags = tags?.accept(StringArrayLiteralVisitor(), emptyList())?.toSet(),
-        isRequired = required?.accept(StringResolutionVisitor(session), "")?.toBooleanStrictOrNull()
+        isRequired = required?.accept(StringResolutionVisitor(session), "")?.toBooleanStrictOrNull(),
+        type = type?.accept(StringResolutionVisitor(session), ""),
+        format = format?.accept(StringResolutionVisitor(session), ""),
+        generateSchema = generateSchema?.accept(StringResolutionVisitor(session), "")?.toBooleanStrictOrNull()
     )
 }

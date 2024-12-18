@@ -46,5 +46,8 @@ annotation class KtorDescription(
 annotation class KtorFieldDescription(
     val summary: String = "",
     val description: String = "",
-    val required: Boolean = false
+    val required: Boolean = false,
+    val type : String = "",
+    val format: String = "",
+    val generateSchema: Boolean = true
 )
