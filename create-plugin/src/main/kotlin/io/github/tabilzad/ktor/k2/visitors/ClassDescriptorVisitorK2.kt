@@ -68,83 +68,25 @@ internal class ClassDescriptorVisitorK2(
             }
 
             isMap() -> {
+                // map keys are assumed to be strings,
+                // so getting the last type which is the value type
                 val valueType = typeArguments.last()
-
-                fun ConeTypeProjection.createMapDefinition(): ObjectType? {
-                    return this.type?.let { valueClassType ->
-                        val typeSymbol = valueClassType.toRegularClassSymbol(session)
-                        val acc = ObjectType("object", mutableMapOf())
-
-                        when {
-                            valueClassType.isPrimitiveOrNullablePrimitive || valueClassType.isString || valueClassType.isNullableString -> {
-                                acc.additionalProperties =
-                                    ObjectType(valueClassType.className()?.toSwaggerType())
-                            }
-
-                            valueClassType.isIterable() -> {
-                                acc.type = "object"
-                                acc.additionalProperties = valueClassType.collectDataTypes()
-                            }
-
-                            valueClassType.isEnum || typeSymbol?.isEnumClass == true -> {
-                                acc.type = "object"
-                                acc.additionalProperties = ObjectType(
-                                    "string", enum = typeSymbol?.resolveEnumEntries()
-                                )
-                            }
-
-                            valueClassType.isAny -> {
-                                acc.type = "object"
-                            }
-
-                            else -> {
-                                val gName = valueClassType.fqNameStr()
-                                if (!classNames.names.contains(gName)) {
-                                    val q = ObjectType(
-                                        "object",
-                                        null,
-                                        fqName = gName,
-                                        //description = docsDescription
-                                    )
-                                    classNames.add(q)
-
-                                    valueClassType.getMembers(session, config).forEach { it ->
-                                        it.accept(this@ClassDescriptorVisitorK2, q)
-                                    }
-                                }
-
-                                acc.additionalProperties = ObjectType(
-                                    type = null, ref = "#/components/schemas/${gName}"
-                                )
-                            }
-                        }
-
-                        acc
+                valueType.type?.let { valueClassType ->
+                    ObjectType("object", mutableMapOf()).apply {
+                        additionalProperties = valueClassType.collectDataTypes()
                     }
                 }
-
-                val item = valueType.createMapDefinition()
-
-                item
             }
 
             isIterable() -> {
                 val arrayItemType = typeArguments.firstNotNullOfOrNull { it.type }
-                // list only take a single generic type
-                val array = ObjectType("array", items = arrayItemType?.collectDataTypes())
-                array
+                // lists only take a single generic type
+                ObjectType("array", items = arrayItemType?.collectDataTypes())
             }
 
             isEnum || typeSymbol?.isEnumClass == true -> {
-
                 val enumValues = typeSymbol?.resolveEnumEntries()
-
-
-                ObjectType(
-                    type = "string",
-                    enum = enumValues,
-                    //description = docsDescription
-                )
+                ObjectType(type = "string", enum = enumValues)
             }
 
             typeSymbol?.isSealed == true -> {
@@ -174,19 +116,17 @@ internal class ClassDescriptorVisitorK2(
                 ObjectType(
                     type = null,
                     fqName = fqClassName,
-                    //description = docsDescription,
                     ref = "#/components/schemas/${fqClassName}"
                 )
             }
 
             isAny -> {
-                null
+                ObjectType("object")
             }
 
             isValueClass(session) -> {
                 ObjectType(
-                    properties(session)?.firstOrNull()?.resolvedReturnType?.className()
-                        ?.toSwaggerType(),
+                    properties(session)?.firstOrNull()?.resolvedReturnType?.className()?.toSwaggerType(),
                     fqName = fqClassName
                 )
             }

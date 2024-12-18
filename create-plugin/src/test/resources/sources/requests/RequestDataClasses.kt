@@ -32,6 +32,7 @@ data class ComplexRequest(
     val complexValueMap: Map<String, ComplexMapValue>,
     val enumValueMap: Map<String, MyEnum>,
     val complexEnumValueMap: Map<String, List<MyEnum>>,
+    val complexMapValueMap: Map<String, Map<String, ComplexMapValue>>
 )
 
 data class ComplexMapValue(
