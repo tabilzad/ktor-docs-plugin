@@ -53,7 +53,7 @@ internal class ClassDescriptorVisitorK2(
             coneTypeOrNull
         }
         val resolvedDescription = property.findDocsDescription(session)
-        return if (resolvedDescription != null && resolvedDescription.generateSchema == false) {
+        return if (resolvedDescription != null && resolvedDescription.explicitType?.isNotEmpty() == true) {
             data.apply { addProperty(property, null, resolvedDescription) }
 
         } else {
@@ -218,8 +218,8 @@ internal class ClassDescriptorVisitorK2(
         if (resolvedDescription?.format != null) {
             spec.format = resolvedDescription.format
         }
-        if (resolvedDescription?.type != null) {
-            spec.type = resolvedDescription.type
+        if (resolvedDescription?.explicitType != null) {
+            spec.type = resolvedDescription.explicitType
         }
     }
 

@@ -268,9 +268,8 @@ internal fun FirAnnotation.extractDescription(session: FirSession): KtorDescript
     val required = resolved?.entries?.find { it.key.asString() == "required" }?.value?.result
     val operationId = resolved?.entries?.find { it.key.asString() == "operationId" }?.value?.result
     val tags = resolved?.entries?.find { it.key.asString() == "tags" }?.value?.result
-    val type = resolved?.entries?.find { it.key.asString() == "type" }?.value?.result
+    val explicitType = resolved?.entries?.find { it.key.asString() == "explicitType" }?.value?.result
     val format = resolved?.entries?.find { it.key.asString() == "format" }?.value?.result
-    val generateSchema = resolved?.entries?.find { it.key.asString() == "generateSchema" }?.value?.result
 
     return KtorDescriptionBag(
         summary = summary?.accept(StringResolutionVisitor(session), ""),
@@ -278,8 +277,7 @@ internal fun FirAnnotation.extractDescription(session: FirSession): KtorDescript
         operationId = operationId?.accept(StringResolutionVisitor(session), ""),
         tags = tags?.accept(StringArrayLiteralVisitor(), emptyList())?.toSet(),
         isRequired = required?.accept(StringResolutionVisitor(session), "")?.toBooleanStrictOrNull(),
-        type = type?.accept(StringResolutionVisitor(session), ""),
-        format = format?.accept(StringResolutionVisitor(session), ""),
-        generateSchema = generateSchema?.accept(StringResolutionVisitor(session), "")?.toBooleanStrictOrNull()
+        explicitType = explicitType?.accept(StringResolutionVisitor(session), ""),
+        format = format?.accept(StringResolutionVisitor(session), "")
     )
 }

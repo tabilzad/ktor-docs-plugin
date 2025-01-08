@@ -646,9 +646,8 @@ internal data class KtorDescriptionBag(
     val tags: Set<String>? = null,
     val operationId: String? = null,
     val isRequired: Boolean? = false,
-    val type: String? = null,
-    val format: String? = null,
-    val generateSchema: Boolean? = null
+    val explicitType: String? = null,
+    val format: String? = null
 )
 
 internal data class KtorResponseBag(

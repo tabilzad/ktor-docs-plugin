@@ -117,7 +117,9 @@ data class RequestSample(
     @KtorFieldDescription("this is a string")
     val string: String,
     val int: Int,
-    val double: Double
+    val double: Double,
+    @KtorFieldDescription(summary = "this is instant", explicitType = "string", format = "date-time")
+    val date: Instant
 )
 
 @GenerateOpenApi

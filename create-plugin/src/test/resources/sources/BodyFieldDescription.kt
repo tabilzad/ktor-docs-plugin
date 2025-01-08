@@ -16,7 +16,7 @@ data class MyDescribedPayload(
     val field2: Int,
     @KtorFieldDescription("this is field 3 (int)")
     val field3: NestedObject,
-    @KtorFieldDescription("this is field 4 (instant)", type = "string", format = "iso 8601", generateSchema = false)
+    @KtorFieldDescription("this is field 4 (instant)", explicitType = "string", format = "iso 8601")
     val field4: Instant
 )
 
