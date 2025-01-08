@@ -52,8 +52,13 @@ internal class ClassDescriptorVisitorK2(
         } else {
             coneTypeOrNull
         }
+        val resolvedDescription = property.findDocsDescription(session)
+        return if (resolvedDescription != null && resolvedDescription.explicitType?.isNotEmpty() == true) {
+            data.apply { addProperty(property, null, resolvedDescription) }
 
-        return data.apply { addProperty(property, type.collectDataTypes(), session) }
+        } else {
+            data.apply { addProperty(property, type.collectDataTypes(), resolvedDescription) }
+        }
     }
 
 
@@ -145,7 +150,7 @@ internal class ClassDescriptorVisitorK2(
                             nestedDescr.accept(this@ClassDescriptorVisitorK2, internal)
                         }
                     } else {
-                        val things = getMembers(session, config)
+                        getMembers(session, config)
                             .map { nestedDescr ->
                                 nestedDescr.accept(
                                     ClassDescriptorVisitorK2(
@@ -181,9 +186,12 @@ internal class ClassDescriptorVisitorK2(
 
     override fun visitElement(element: FirElement, data: ObjectType) = data
 
-    private fun ObjectType.addProperty(fir: FirProperty, objectType: ObjectType?, session: FirSession) {
+    private fun ObjectType.addProperty(
+        fir: FirProperty,
+        objectType: ObjectType?,
+        resolvedDescription: KtorDescriptionBag?
+    ) {
         val kdoc = fir.getKDocComments(config)
-        val resolvedDescription = fir.findDocsDescription(session)
         val docsDescription = resolvedDescription.let { it?.summary ?: it?.description }
         val name = fir.findName()
         val spec = objectType ?: ObjectType("object")
@@ -193,7 +201,7 @@ internal class ClassDescriptorVisitorK2(
             properties?.put(name, spec)
         }
 
-        objectType?.description = docsDescription ?: kdoc
+        spec.description = docsDescription ?: kdoc
 
         val isRequiredFromExplicitDesc = resolvedDescription?.isRequired
         if (isRequiredFromExplicitDesc != null && isRequiredFromExplicitDesc) {
@@ -206,6 +214,12 @@ internal class ClassDescriptorVisitorK2(
             required?.add(name) ?: run {
                 required = mutableListOf(name)
             }
+        }
+        if (resolvedDescription?.format != null) {
+            spec.format = resolvedDescription.format
+        }
+        if (resolvedDescription?.explicitType != null) {
+            spec.type = resolvedDescription.explicitType
         }
     }
 
