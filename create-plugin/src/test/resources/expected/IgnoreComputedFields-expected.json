@@ -1,0 +1,40 @@
+{
+  "openapi" : "3.1.0",
+  "info" : {
+    "title" : "Open API Specification",
+    "description" : "test",
+    "version" : "1.0.0"
+  },
+  "paths" : {
+    "/v1/postWithComputedFields" : {
+      "post" : {
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.ClassWithComputedFields"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "sources.ClassWithComputedFields" : {
+        "type" : "object",
+        "properties" : {
+          "a" : {
+            "type" : "string"
+          },
+          "b" : {
+            "type" : "string"
+          }
+        },
+        "required" : [ "a", "b" ]
+      }
+    }
+  }
+}

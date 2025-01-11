@@ -121,7 +121,7 @@ fun FirStatement.findAnnotation(name: String): FirAnnotation? {
 }
 
 fun FirProperty.findAnnotation(name: String?): FirAnnotation? {
-    if(name == null) return null
+    if (name == null) return null
     return backingField?.annotations?.firstOrNull {
         it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
     }
@@ -139,7 +139,8 @@ fun FirStatement.findAnnotation(classId: ClassId, session: FirSession): FirAnnot
     }
 }
 
-internal fun ConeKotlinType.properties(session: FirSession) = toRegularClassSymbol(session)?.declarationSymbols?.filterIsInstance<FirPropertySymbol>()
+internal fun ConeKotlinType.properties(session: FirSession) =
+    toRegularClassSymbol(session)?.declarationSymbols?.filterIsInstance<FirPropertySymbol>()
 
 
 @OptIn(SymbolInternals::class)
@@ -151,10 +152,12 @@ internal fun ConeKotlinType.getMembers(session: FirSession, config: PluginConfig
 
     val abstractDeclarations = this.toRegularClassSymbol(session)?.resolvedSuperTypes?.flatMap {
         it.toRegularClassSymbol(session)?.toLookupTag()?.toClassSymbol(session)?.fir?.declarations ?: emptyList()
-    }?.filterIsInstance<FirProperty>()?.filter { !concreteDeclarations.map { it.name.asString() }.contains(it.name.asString()) } ?: emptyList()
+    }?.filterIsInstance<FirProperty>()
+        ?.filter { !concreteDeclarations.map { it.name.asString() }.contains(it.name.asString()) } ?: emptyList()
 
     return (concreteDeclarations + abstractDeclarations).asSequence()
         .filter { !it.isLocal }
+        .filter { it.getter?.body == null }
         .filter {
             it.visibility.isPublicAPI.byFeatureFlag(config.hidePrivateFields)
         }

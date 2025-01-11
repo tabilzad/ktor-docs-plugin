@@ -399,6 +399,14 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should ignore computed fields with a getter block`() {
+        val (source, expected) = loadSourceAndExpected("IgnoreComputedFields")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should append servers from gradle config`() {
         val source = loadSourceCodeFrom("BlankSource")
         val input = listOf("server1", "server2")
