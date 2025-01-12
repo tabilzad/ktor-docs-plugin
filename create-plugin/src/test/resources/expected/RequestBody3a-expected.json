@@ -34,12 +34,9 @@
           },
           "concreteField" : {
             "type" : "string"
-          },
-          "fieldWithGetter" : {
-            "type" : "string"
           }
         },
-        "required" : [ "concreteField", "abstractField1", "abstractField2", "fieldWithGetter" ]
+        "required" : [ "concreteField", "abstractField1", "abstractField2" ]
       }
     }
   }

@@ -8,8 +8,6 @@ import io.ktor.server.routing.*
 interface MyInterface {
     val abstractField1: String
     val abstractField2: Int
-    val fieldWithGetter: String
-        get() = abstractField1 + abstractField2.toString()
 }
 
 data class LocalSampleRequest(
