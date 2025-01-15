@@ -1,15 +1,17 @@
 [versions]
-kotlinVersion = "2.1.0"
+kotlinVersion = "2.0.20"
+dokkaVersion = "2.0.0"
 classgraph = "4.8.157"
 jacksonVersion = "2.15.2"
 ktorVersion = "2.3.12"
-compilerTestingVersion = "0.7.0"
+compilerTestingVersion = "0.5.1"
 assertJVerison = "3.24.2"
 
 [plugins]
-dokka = { id = "org.jetbrains.dokka", version.ref = "kotlinVersion" }
-mavenPublish = { id = "com.vanniktech.maven.publish", version = "0.28.0" }
-
+dokka = { id = "org.jetbrains.dokka", version.ref = "dokkaVersion" }
+mavenPublish-base = { id = "com.vanniktech.maven.publish.base", version = "0.28.0" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlinVersion" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlinVersion" }
 
 [bundles]
 jackson = ["jacksonKotlin", "jacksonYaml"]

@@ -3,8 +3,8 @@ import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-    kotlin("jvm")
-    id("com.vanniktech.maven.publish.base")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.mavenPublish.base)
 }
 
 mavenPublishing {
