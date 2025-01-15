@@ -4,9 +4,10 @@ import com.vanniktech.maven.publish.KotlinJvm
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-    kotlin("jvm")
-    kotlin("plugin.serialization") version "2.0.20"
-    id("com.vanniktech.maven.publish.base")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.mavenPublish.base)
+    alias(libs.plugins.dokka)
 }
 
 dependencies {

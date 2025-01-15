@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.result
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirExpressionEvaluator
+import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.kdoc.lexer.KDocTokens
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.elements.KtModifierListElementType
@@ -202,6 +203,40 @@ private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
     } else {
         null
     }
+}
+
+internal fun FirRegularClassSymbol.getKDocComments(configuration: PluginConfiguration): String? {
+    if (!configuration.useKDocsForDescriptions) return null
+
+    fun String.sanitizeKDoc(): String {
+        return removePrefix("/**")
+            .removeSuffix("*/")
+            .lineSequence()
+            .joinToString("\n") { line ->
+                line.trim().removePrefix("*")
+            }
+            .trim()
+    }
+
+    val c = source?.treeStructure?.let {
+        val children = source?.lighterASTNode?.getChildren(it)
+        val directComment = children
+            ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT || it.tokenType == KDocTokens.KDOC }
+
+        if (directComment == null) {
+
+            children
+                ?.firstOrNull { it.tokenType is KtModifierListElementType<*> }
+                ?.getChildren(it)
+                ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT }
+
+        } else {
+            directComment
+        }
+    }?.toString()
+        ?.sanitizeKDoc()
+
+    return c
 }
 
 internal fun FirDeclaration.getKDocComments(configuration: PluginConfiguration): String? {

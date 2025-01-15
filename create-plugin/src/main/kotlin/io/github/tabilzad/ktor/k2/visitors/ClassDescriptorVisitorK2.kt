@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.fir.declarations.utils.isSealed
 import org.jetbrains.kotlin.fir.resolve.defaultType
 import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.resolve.toClassSymbol
+import org.jetbrains.kotlin.fir.resolve.toRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
@@ -45,6 +46,7 @@ internal class ClassDescriptorVisitorK2(
     val classNames: MutableList<ObjectType> = mutableListOf(),
 ) : FirDefaultVisitor<ObjectType, ObjectType>() {
 
+    @OptIn(UnexpandedTypeCheck::class)
     override fun visitProperty(property: FirProperty, data: ObjectType): ObjectType {
         val coneTypeOrNull = property.returnTypeRef.coneTypeOrNull!!
         val type = if (coneTypeOrNull is ConeTypeParameterType && genericParameters.isNotEmpty()) {
@@ -68,8 +70,8 @@ internal class ClassDescriptorVisitorK2(
         val typeSymbol = toRegularClassSymbol(session)
 
         return when {
-            isPrimitive || isPrimitiveOrNullablePrimitive || type.isString || type.isNullableString -> {
-                ObjectType(type = type.className()?.toSwaggerType() ?: "Unknown")
+            isPrimitive || isPrimitiveOrNullablePrimitive || isString || isNullableString -> {
+                ObjectType(type = className()?.toSwaggerType() ?: "Unknown")
             }
 
             isMap() -> {
@@ -186,6 +188,7 @@ internal class ClassDescriptorVisitorK2(
 
     override fun visitElement(element: FirElement, data: ObjectType) = data
 
+    @UnexpandedTypeCheck
     private fun ObjectType.addProperty(
         fir: FirProperty,
         objectType: ObjectType?,
@@ -208,8 +211,7 @@ internal class ClassDescriptorVisitorK2(
             required?.add(name) ?: run {
                 required = mutableListOf(name)
             }
-        } else if ((isRequiredFromExplicitDesc == null && fir.returnTypeRef.isMarkedNullable == false)
-            && config.deriveFieldRequirementFromTypeNullability
+        } else if ((isRequiredFromExplicitDesc == null && !fir.returnTypeRef.isNullableAny) && config.deriveFieldRequirementFromTypeNullability
         ) {
             required?.add(name) ?: run {
                 required = mutableListOf(name)
@@ -229,6 +231,7 @@ internal class ClassDescriptorVisitorK2(
 
 }
 
+@UnexpandedTypeCheck
 internal fun FirProperty.findDocsDescription(session: FirSession): KtorDescriptionBag? {
     val docsAnnotation =
         findAnnotation(KtorDescription::class.simpleName) ?: findAnnotation(KtorFieldDescription::class.simpleName)
@@ -236,7 +239,7 @@ internal fun FirProperty.findDocsDescription(session: FirSession): KtorDescripti
 
     val dataBag = docsAnnotation.extractDescription(session)
     return dataBag.copy(
-        isRequired = dataBag.isRequired ?: (returnTypeRef.isMarkedNullable == false)
+        isRequired = dataBag.isRequired ?: (returnTypeRef.isNullableAny == false)
     )
 }
 
@@ -247,6 +250,6 @@ internal fun ConeKotlinType.findDocsDescription(session: FirSession): KtorDescri
     if (docsAnnotation == null) return null
     val dataBag = docsAnnotation.extractDescription(session)
     return dataBag.copy(
-        isRequired = dataBag.isRequired ?: (!isNullable)
+        isRequired = dataBag.isRequired ?: (!isNullableAny)
     )
 }

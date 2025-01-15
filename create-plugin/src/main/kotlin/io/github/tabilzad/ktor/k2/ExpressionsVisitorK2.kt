@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.fir.references.resolved
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 import org.jetbrains.kotlin.fir.resolve.firClassLike
 import org.jetbrains.kotlin.fir.resolve.fqName
-import org.jetbrains.kotlin.fir.resolve.toFirRegularClass
+import org.jetbrains.kotlin.fir.resolve.toRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
 import org.jetbrains.kotlin.fir.types.*
@@ -112,7 +112,7 @@ internal class ExpressionsVisitorK2(
 
         val kdocs = toRegularClassSymbol(session)
             ?.toLookupTag()
-            ?.toFirRegularClass(session)
+            ?.toRegularClassSymbol(session)
             ?.getKDocComments(config)
 
         val annotatedDescription = findDocsDescription(session)

@@ -4,9 +4,10 @@ import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
-    kotlin("jvm")
     id("java-gradle-plugin")
-    id("com.vanniktech.maven.publish.base")
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.mavenPublish.base)
+    alias(libs.plugins.dokka)
 }
 
 dependencies {

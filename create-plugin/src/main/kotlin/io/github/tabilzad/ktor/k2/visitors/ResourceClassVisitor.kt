@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.resolve.defaultType
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
 import org.jetbrains.kotlin.fir.symbols.impl.FirRegularClassSymbol
+import org.jetbrains.kotlin.fir.types.UnexpandedTypeCheck
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 import org.jetbrains.kotlin.utils.mapToSetOrEmpty
 
@@ -72,6 +73,7 @@ internal class ResourceClassVisitor(
         return next
     }
 
+    @OptIn(UnexpandedTypeCheck::class)
     private fun List<Pair<FirProperty, FirRegularClassSymbol>>.mapParams(
         resourcePath: String?
     ) = mapToSetOrEmpty { (property, _) ->
