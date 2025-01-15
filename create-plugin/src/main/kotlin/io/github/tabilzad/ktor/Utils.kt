@@ -218,25 +218,17 @@ internal fun FirDeclaration.getKDocComments(configuration: PluginConfiguration):
             .trim()
     }
 
-    val c = source?.treeStructure?.let {
+    return source?.treeStructure?.let {
         val children = source?.lighterASTNode?.getChildren(it)
-        val directComment = children
+
+        children
             ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT || it.tokenType == KDocTokens.KDOC }
-
-        if (directComment == null) {
-
-            children
+            ?: children
                 ?.firstOrNull { it.tokenType is KtModifierListElementType<*> }
                 ?.getChildren(it)
                 ?.firstOrNull { it.tokenType == KtTokens.DOC_COMMENT }
-
-        } else {
-            directComment
-        }
     }?.toString()
         ?.sanitizeKDoc()
-
-    return c
 }
 
 

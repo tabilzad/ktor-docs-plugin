@@ -35,7 +35,7 @@ object JsonNameResolver {
     private fun getMoshiNameFromDataClassConstructorParamAnnotation(
         property: FirProperty,
         session: FirSession,
-    ): String? = property.getContainingClass(session)
+    ): String? = property.getContainingClass()
         ?.takeIf { it.isData }
         ?.primaryConstructorIfAny(session)
         ?.valueParameterSymbols
