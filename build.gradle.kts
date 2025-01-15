@@ -2,7 +2,10 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "2.1.0"
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.mavenPublish.base) apply false
+    alias(libs.plugins.dokka) apply false
 }
 
 buildscript {
@@ -13,8 +16,6 @@ buildscript {
     }
     dependencies {
         classpath(kotlin("gradle-plugin", version = libs.versions.kotlinVersion.get()))
-        classpath ("com.vanniktech:gradle-maven-publish-plugin:0.28.0")
-        classpath ("org.jetbrains.dokka:dokka-gradle-plugin:1.5.30")
     }
 }
 
@@ -41,6 +42,8 @@ subprojects {
             }
         )
     }
+
+    apply(plugin = "org.jetbrains.dokka")
 }
 
 allprojects {
