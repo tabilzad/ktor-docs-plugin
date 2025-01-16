@@ -78,6 +78,19 @@ internal fun convertInternalToOpenSpec(
             acc.plus(route)
         }.mapKeys { it.key.replace("//", "/") }
 
+    val securityScheme = OpenApiSpec.SecurityScheme(
+        type = "http",
+        scheme = "bearer",
+    )
+
+    val oauthSecurityScheme = OpenApiSpec.SecurityScheme(
+        type = "oauth2",
+        description = "OAuth 2.0",
+        flows = mapOf("implicit" to OpenApiSpec.OAuthFlow(
+            authorizationUrl = "test://test.test.test",
+            scopes = mapOf("read_pets" to "read pets", "write_pets" to "write the pets")
+        ))
+    )
     return OpenApiSpec(
         info = OpenApiSpec.Info(
             title = configuration.title,
@@ -86,7 +99,11 @@ internal fun convertInternalToOpenSpec(
         ),
         servers = configuration.servers.map { OpenApiSpec.Server(it) }.ifEmpty { null },
         paths = reducedRoutes,
-        components = OpenApiSpec.OpenApiComponents(schemas)
+        components = OpenApiSpec.OpenApiComponents(
+            schemas = schemas,
+            securitySchemes = mapOf("bearerAuth" to securityScheme, "oauthSample" to oauthSecurityScheme)
+        ),
+        security = listOf(mapOf("bearerAuth" to listOf("read", "write"), "oauthSample" to listOf("read_pets", "write_pets")))
     )
 }
 

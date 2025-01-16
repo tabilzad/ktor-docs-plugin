@@ -57,7 +57,8 @@ fun OpenApiSpec.mergeAndResolveConflicts(newSpec: OpenApiSpec): OpenApiSpec {
         info = newSpec.info,
         servers = newSpec.servers,
         paths = paths + newDistinctPaths + resolvedConflicts,
-        components = OpenApiSpec.OpenApiComponents(components.schemas.plus(newSpec.components.schemas))
+        components = OpenApiSpec.OpenApiComponents(
+            components.schemas.plus(newSpec.components.schemas))
     )
 }
 

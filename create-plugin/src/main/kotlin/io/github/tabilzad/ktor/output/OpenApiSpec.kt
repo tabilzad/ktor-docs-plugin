@@ -14,7 +14,8 @@ data class OpenApiSpec(
     val info: Info,
     val servers: List<Server>? = null,
     val paths: Map<String, Map<String, Path>>,
-    val components: OpenApiComponents
+    val components: OpenApiComponents,
+    val security: List<Map<String, List<String>>>? = null
 ) {
     data class Info(
         val title: String,
@@ -31,7 +32,24 @@ data class OpenApiSpec(
         val tags: List<String>? = null,
         val responses: Map<String, ResponseDetails>? = null,
         val parameters: List<Parameter>? = null,
-        val requestBody: RequestBody? = null
+        val requestBody: RequestBody? = null,
+        val security: List<SecurityScheme>? = null
+    )
+
+    data class SecurityScheme(
+        val type: String, // "apiKey", "http", "oauth2", etc.
+        val scheme: String? = null, // "basic", "bearer", etc. (for "http")
+        val `in`: String? = null, // can be "header", "query" or "cookie"
+        val name: String? = null, // name of the header, query parameter or cookie
+        val bearerFormat: String? = null, // optional, arbitrary value for documentation purposes, eg. JWT
+        val description: String? = null,
+        val flows: Map<String, OAuthFlow>? = null, // Used for OAuth flow specs
+        val openIdConnectUrl: String? = null,
+    )
+
+    data class OAuthFlow(
+        val authorizationUrl: String,
+        val scopes: Map<String, String>? = null,
     )
 
     data class RequestBody(
@@ -87,7 +105,8 @@ data class OpenApiSpec(
     )
 
     data class OpenApiComponents(
-        val schemas: Map<String, ObjectType>
+        val schemas: Map<String, ObjectType>,
+        val securitySchemes: Map<String, SecurityScheme>? = null
     )
 
 }
