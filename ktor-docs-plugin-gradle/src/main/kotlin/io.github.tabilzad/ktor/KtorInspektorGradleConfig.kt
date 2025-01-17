@@ -9,7 +9,8 @@ open class DocumentationOptions(
     var hidePrivateAndInternalFields: Boolean = true,
     var deriveFieldRequirementFromTypeNullability: Boolean = true,
     var useKDocsForDescriptions: Boolean = true,
-    var servers: List<String> = emptyList()
+    var servers: List<String> = emptyList(),
+    var security: Map<String, List<String>> = emptyMap()
 )
 
 open class PluginOptions(

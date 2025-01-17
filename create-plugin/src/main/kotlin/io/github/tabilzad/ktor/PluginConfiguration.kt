@@ -12,6 +12,7 @@ internal data class PluginConfiguration(
     val hideTransients: Boolean,
     val hidePrivateFields: Boolean,
     val servers: List<String>,
+    val security: Map<String, List<String>>,
     val deriveFieldRequirementFromTypeNullability: Boolean,
     val useKDocsForDescriptions: Boolean
 ) {
@@ -27,6 +28,7 @@ internal data class PluginConfiguration(
             hideTransients: Boolean? = null,
             hidePrivateFields: Boolean? = null,
             servers: List<String>? = null,
+            security: Map<String, List<String>>? = null,
             deriveFieldRequirementFromTypeNullability: Boolean? = null,
             useKDocsForDescriptions: Boolean? = null
         ): PluginConfiguration = PluginConfiguration(
@@ -41,6 +43,7 @@ internal data class PluginConfiguration(
             hidePrivateFields = hidePrivateFields ?: true,
             deriveFieldRequirementFromTypeNullability = deriveFieldRequirementFromTypeNullability ?: true,
             servers = servers ?: emptyList(),
+            security = security ?: emptyMap(),
             useKDocsForDescriptions = useKDocsForDescriptions ?: true
         )
     }
