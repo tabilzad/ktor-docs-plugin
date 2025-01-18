@@ -60,8 +60,6 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             // However, setting a KotlinCompile output task.outputs.file("foo") always creates a *directory* named foo
         }
 
-//        println("This is the security string: $securityString")
-
         val subpluginOptions = listOf(
             SubpluginOption(
                 key = "enabled",
@@ -95,7 +93,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
                 value = swaggerExtension.documentation.deriveFieldRequirementFromTypeNullability.toString()
             ),
             SubpluginOption(
-                key = "server",
+                key = "servers",
                 value = swaggerExtension.documentation.servers.joinToString("||")
             ),
             SubpluginOption(
@@ -106,17 +104,17 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
                 key = "format",
                 value = swaggerExtension.pluginOptions.format
             ),
-            FilesSubpluginOption(
+            SubpluginOption(
                 key = "filePath",
-                files = listOf(File(openApiOutputFile.path))
+                value = openApiOutputFile.path
             ),
             SubpluginOption(
                 key = "securityConfig",
-                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.securityConfig).toByteArray())
+                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.getSecurityConfig()).toByteArray())
             ),
             SubpluginOption(
                 key = "securitySchemes",
-                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.securitySchemes).toByteArray())
+                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.getSecuritySchemes()).toByteArray())
             )
         )
         return project.provider { subpluginOptions }

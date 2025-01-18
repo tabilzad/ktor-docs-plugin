@@ -32,8 +32,6 @@
         },
         "required" : [ "visible" ]
       }
-    },
-    "securitySchemes" : { }
-  },
-  "security" : [ ]
+    }
+  }
 }

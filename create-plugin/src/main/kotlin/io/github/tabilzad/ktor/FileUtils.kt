@@ -60,7 +60,8 @@ fun OpenApiSpec.mergeAndResolveConflicts(newSpec: OpenApiSpec): OpenApiSpec {
         paths = paths + newDistinctPaths + resolvedConflicts,
         components = OpenApiSpec.OpenApiComponents(
             components.schemas.plus(newSpec.components.schemas),
-            components.securitySchemes.plus(newSpec.components.securitySchemes)
+            ((components.securitySchemes ?: emptyMap()) + (newSpec.components.securitySchemes ?: emptyMap()))
+                .takeIf { it.isNotEmpty() }
         )
     )
 }

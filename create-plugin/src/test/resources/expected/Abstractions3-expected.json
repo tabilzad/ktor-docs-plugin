@@ -84,8 +84,6 @@
         } ],
         "required" : [ "property" ]
       }
-    },
-    "securitySchemes" : { }
-  },
-  "security" : [ ]
+    }
+  }
 }

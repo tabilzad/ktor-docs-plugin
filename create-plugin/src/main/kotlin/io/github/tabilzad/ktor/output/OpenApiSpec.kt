@@ -114,7 +114,7 @@ data class OpenApiSpec(
 
     data class OpenApiComponents(
         val schemas: Map<String, ObjectType>,
-        val securitySchemes: Map<String, SecurityScheme>
+        val securitySchemes: Map<String, SecurityScheme>? = null
     )
 
 }

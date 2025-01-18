@@ -51,7 +51,7 @@ object SwaggerConfigurationKeys {
     const val OPTION_HIDE_PRIVATE = "hidePrivateAndInternalFields"
     const val OPTION_DERIVE_PROP_REQ = "deriveFieldRequirementFromTypeNullability"
     const val OPTION_USE_KDOCS = "useKDocs"
-    const val OPTION_SERVERS = "server"
+    const val OPTION_SERVERS = "servers"
     const val OPTION_SECURITY = "securityConfig"
     const val OPTION_SECURITY_SCHEMES = "securitySchemes"
     const val OPTION_FORMAT = "format"
@@ -153,8 +153,7 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
         val security = CliOption(
             OPTION_SECURITY,
             "Swagger global security configuration",
-            "Security config in the form of security_name:scope1,scope2||security_name_other:scope1 to include in openapi.yaml",
-            // should try collecting occurrences instead of parsing maps
+            "Security config in the form of base64 serialized JSON of List<Map<String, List<String>>>",
             allowMultipleOccurrences = false,
             required = false
         )
@@ -162,7 +161,6 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             OPTION_SECURITY_SCHEMES,
             "Swagger security scheme configuration",
             "Security scheme config in the form of a base64 serialized JSON of Map<String, OpenApiSpec.SecurityRequirement>",
-            // should try collecting occurrences instead of parsing maps
             allowMultipleOccurrences = false,
             required = false
         )

@@ -35,8 +35,6 @@
         },
         "required" : [ "a", "b" ]
       }
-    },
-    "securitySchemes" : { }
-  },
-  "security" : [ ]
+    }
+  }
 }

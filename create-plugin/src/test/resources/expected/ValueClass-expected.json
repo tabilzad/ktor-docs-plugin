@@ -51,8 +51,6 @@
         "description" : "Description",
         "required" : [ "value" ]
       }
-    },
-    "securitySchemes" : { }
-  },
-  "security" : [ ]
+    }
+  }
 }

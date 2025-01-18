@@ -44,8 +44,6 @@
         },
         "required" : [ "status", "other" ]
       }
-    },
-    "securitySchemes" : { }
-  },
-  "security" : [ ]
+    }
+  }
 }

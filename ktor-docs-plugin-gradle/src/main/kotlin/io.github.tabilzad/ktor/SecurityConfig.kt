@@ -4,6 +4,23 @@ import kotlinx.serialization.Serializable
 
 
 class SecurityConfigBuilder {
+    private val scopes = mutableMapOf<String, List<String>>()
+    private val schemes = mutableMapOf<String, Scheme>()
+
+    fun scopes(init: ScopeConfigBuilder.() -> Unit) {
+        val scopeConfig = ScopeConfigBuilder().apply(init).build()
+        scopes.putAll(scopeConfig)
+    }
+
+    fun schemes(init: SchemeConfigBuilder.() -> Unit) {
+        val schemeConfig = SchemeConfigBuilder().apply(init).build()
+        schemes.putAll(schemeConfig)
+    }
+
+    fun build(): SecurityConfig = SecurityConfig(scopes, schemes)
+}
+
+class ScopeConfigBuilder {
     private val configs = mutableMapOf<String, List<String>>()
 
     infix fun String.to(scopes: List<String>) {
@@ -16,6 +33,21 @@ class SecurityConfigBuilder {
 
     fun build(): Map<String, List<String>> = configs
 }
+
+class SchemeConfigBuilder {
+    private val configs = mutableMapOf<String, Scheme>()
+
+    infix fun String.to(scheme: Scheme) {
+        configs[this] = scheme
+    }
+
+    fun build(): Map<String, Scheme> = configs
+}
+
+data class SecurityConfig(
+    val scopes: Map<String, List<String>>,
+    val schemes: Map<String, Scheme>
+)
 
 @Serializable
 open class Scheme(

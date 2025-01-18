@@ -38,8 +38,6 @@
         },
         "required" : [ "concreteField", "abstractField1", "abstractField2" ]
       }
-    },
-    "securitySchemes" : { }
-  },
-  "security" : [ ]
+    }
+  }
 }

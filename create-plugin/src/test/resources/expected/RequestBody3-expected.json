@@ -34,8 +34,6 @@
         },
         "required" : [ "myEnum" ]
       }
-    },
-    "securitySchemes" : { }
-  },
-  "security" : [ ]
+    }
+  }
 }

@@ -50,8 +50,6 @@
         },
         "required" : [ "generic" ]
       }
-    },
-    "securitySchemes" : { }
-  },
-  "security" : [ ]
+    }
+  }
 }
