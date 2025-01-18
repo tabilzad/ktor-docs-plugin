@@ -2,8 +2,12 @@ package io.github.tabilzad.ktor.output
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import com.sun.security.ntlm.Server
 import io.github.tabilzad.ktor.ContentType
 import io.github.tabilzad.ktor.OpenApiSpecParam
+import kotlinx.serialization.Serializable
+import java.nio.file.Path
+import java.security.Security
 
 internal typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
 
@@ -33,9 +37,10 @@ data class OpenApiSpec(
         val responses: Map<String, ResponseDetails>? = null,
         val parameters: List<Parameter>? = null,
         val requestBody: RequestBody? = null,
-        val security: List<SecurityScheme>? = null
+        val security: Map<String, List<String>>? = null
     )
 
+    @Serializable
     data class SecurityScheme(
         val type: String, // "apiKey", "http", "oauth2", etc.
         val scheme: String? = null, // "basic", "bearer", etc. (for "http")
@@ -47,8 +52,11 @@ data class OpenApiSpec(
         val openIdConnectUrl: String? = null,
     )
 
+    @Serializable
     data class OAuthFlow(
         val authorizationUrl: String,
+        val tokenUrl: String? = null,
+        val refreshUrl: String? = null,
         val scopes: Map<String, String>? = null,
     )
 
@@ -106,7 +114,7 @@ data class OpenApiSpec(
 
     data class OpenApiComponents(
         val schemas: Map<String, ObjectType>,
-        val securitySchemes: Map<String, SecurityScheme>? = null
+        val securitySchemes: Map<String, SecurityScheme>
     )
 
 }

@@ -24,6 +24,8 @@
     }
   },
   "components" : {
-    "schemas" : { }
-  }
+    "schemas" : { },
+    "securitySchemes" : { }
+  },
+  "security" : [ ]
 }

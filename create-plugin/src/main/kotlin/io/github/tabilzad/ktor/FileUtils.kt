@@ -56,9 +56,12 @@ fun OpenApiSpec.mergeAndResolveConflicts(newSpec: OpenApiSpec): OpenApiSpec {
     return copy(
         info = newSpec.info,
         servers = newSpec.servers,
+        security = newSpec.security,
         paths = paths + newDistinctPaths + resolvedConflicts,
         components = OpenApiSpec.OpenApiComponents(
-            components.schemas.plus(newSpec.components.schemas))
+            components.schemas.plus(newSpec.components.schemas),
+            components.securitySchemes.plus(newSpec.components.securitySchemes)
+        )
     )
 }
 

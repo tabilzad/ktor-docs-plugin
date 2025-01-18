@@ -110,10 +110,13 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
                 key = "filePath",
                 files = listOf(File(openApiOutputFile.path))
             ),
-
             SubpluginOption(
-                key = "security",
-                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.security).toByteArray())
+                key = "securityConfig",
+                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.securityConfig).toByteArray())
+            ),
+            SubpluginOption(
+                key = "securitySchemes",
+                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.securitySchemes).toByteArray())
             )
         )
         return project.provider { subpluginOptions }

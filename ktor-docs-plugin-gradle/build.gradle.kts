@@ -7,10 +7,14 @@ plugins {
     id("java-gradle-plugin")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.mavenPublish.base)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 dependencies {
     compileOnly(libs.bundles.kotlinGradle)
+
+    implementation(libs.serialization.json)
+    implementation(libs.serialization)
 }
 
 gradlePlugin {

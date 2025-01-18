@@ -12,6 +12,7 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintStream
 import java.nio.file.Paths
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 object TestSourceUtil {
     fun loadSourceCodeFrom(fileName: String): String =
@@ -83,7 +84,7 @@ fun File.parseSpec(): OpenApiSpec {
     }
 }
 
-@OptIn(ExperimentalCompilerApi::class)
+@OptIn(ExperimentalCompilerApi::class, ExperimentalEncodingApi::class)
 internal fun generateCompilerTest(
     testFile: File,
     testSubjectSource: String,

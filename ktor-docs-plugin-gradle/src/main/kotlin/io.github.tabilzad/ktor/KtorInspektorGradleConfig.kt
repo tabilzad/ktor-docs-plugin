@@ -10,8 +10,17 @@ open class DocumentationOptions(
     var deriveFieldRequirementFromTypeNullability: Boolean = true,
     var useKDocsForDescriptions: Boolean = true,
     var servers: List<String> = emptyList(),
-    var security: Map<String, List<String>> = emptyMap()
-)
+    var securityConfig: MutableList<Map<String, List<String>>> = mutableListOf(),
+    var securitySchemes: Map<String, Scheme>? = emptyMap(),
+) {
+    fun securityConfig(block: SecurityConfigBuilder.() -> Unit) {
+        val builder = SecurityConfigBuilder()
+        builder.block()
+        builder.build().forEach { authSchemeName, authScopes ->
+            securityConfig.add(mapOf(authSchemeName to authScopes))
+        }
+    }
+}
 
 open class PluginOptions(
     var enabled: Boolean = true,

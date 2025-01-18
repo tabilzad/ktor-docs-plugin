@@ -54,6 +54,8 @@
         },
         "required" : [ "string", "integer", "float" ]
       }
-    }
-  }
+    },
+    "securitySchemes" : { }
+  },
+  "security" : [ ]
 }

@@ -49,6 +49,8 @@
         "description" : "This class contains fields with kdocs.",
         "required" : [ "kdocsConstructorParameter", "noKdocs", "kdocsConstructorDerivedProperty", "kdocsLateinitVar" ]
       }
-    }
-  }
+    },
+    "securitySchemes" : { }
+  },
+  "security" : [ ]
 }

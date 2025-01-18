@@ -38,6 +38,8 @@
         },
         "required" : [ "visible", "invisible", "transientFieldInvisible" ]
       }
-    }
-  }
+    },
+    "securitySchemes" : { }
+  },
+  "security" : [ ]
 }
