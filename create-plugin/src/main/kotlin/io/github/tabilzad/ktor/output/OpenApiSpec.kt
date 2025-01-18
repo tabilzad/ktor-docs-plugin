@@ -37,7 +37,7 @@ data class OpenApiSpec(
         val responses: Map<String, ResponseDetails>? = null,
         val parameters: List<Parameter>? = null,
         val requestBody: RequestBody? = null,
-        val security: Map<String, List<String>>? = null
+        val security: List<Map<String, List<String>>>? = null
     )
 
     @Serializable
