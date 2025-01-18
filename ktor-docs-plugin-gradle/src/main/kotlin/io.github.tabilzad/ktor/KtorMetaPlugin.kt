@@ -2,11 +2,11 @@ package io.github.tabilzad.ktor
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
-import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
-import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
-import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.plugin.*
 import java.io.File
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlinx.serialization.json.Json
 
 const val PLUGIN_ID = "io.github.tabilzad.ktor-docs-plugin-gradle"
 
@@ -31,6 +31,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
         }
     }
 
+    @OptIn(ExperimentalEncodingApi::class)
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
         val swaggerExtension = project.extensions.findByType(KtorInspectorGradleConfig::class.java) ?: KtorInspectorGradleConfig()
@@ -106,9 +107,16 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             SubpluginOption(
                 key = "filePath",
                 value = openApiOutputFile.path
+            ),
+            SubpluginOption(
+                key = "securityConfig",
+                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.getSecurityConfig()).toByteArray())
+            ),
+            SubpluginOption(
+                key = "securitySchemes",
+                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.getSecuritySchemes()).toByteArray())
             )
         )
-
         return project.provider { subpluginOptions }
     }
 

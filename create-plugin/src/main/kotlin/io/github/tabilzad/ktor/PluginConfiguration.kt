@@ -1,5 +1,8 @@
 package io.github.tabilzad.ktor
 
+import io.github.tabilzad.ktor.KtorDocsCommandLineProcessor.Companion.security
+import io.github.tabilzad.ktor.output.OpenApiSpec
+
 // Internal
 internal data class PluginConfiguration(
     val isEnabled: Boolean,
@@ -12,6 +15,8 @@ internal data class PluginConfiguration(
     val hideTransients: Boolean,
     val hidePrivateFields: Boolean,
     val servers: List<String>,
+    val securityConfig: List<Map<String, List<String>>>,
+    val securitySchemes: Map<String, OpenApiSpec.SecurityScheme>,
     val deriveFieldRequirementFromTypeNullability: Boolean,
     val useKDocsForDescriptions: Boolean
 ) {
@@ -27,6 +32,8 @@ internal data class PluginConfiguration(
             hideTransients: Boolean? = null,
             hidePrivateFields: Boolean? = null,
             servers: List<String>? = null,
+            securityConfig: List<Map<String, List<String>>>? = null,
+            securitySchemes: Map<String, OpenApiSpec.SecurityScheme>? = null,
             deriveFieldRequirementFromTypeNullability: Boolean? = null,
             useKDocsForDescriptions: Boolean? = null
         ): PluginConfiguration = PluginConfiguration(
@@ -41,6 +48,8 @@ internal data class PluginConfiguration(
             hidePrivateFields = hidePrivateFields ?: true,
             deriveFieldRequirementFromTypeNullability = deriveFieldRequirementFromTypeNullability ?: true,
             servers = servers ?: emptyList(),
+            securityConfig = securityConfig ?: emptyList(),
+            securitySchemes = securitySchemes ?: emptyMap(),
             useKDocsForDescriptions = useKDocsForDescriptions ?: true
         )
     }

@@ -9,6 +9,8 @@ import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_HIDE_TRANSIENTS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_KDOCS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_REQUEST_FEATURE
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_SECURITY
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_SECURITY_SCHEMES
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_SERVERS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_TITLE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_VER
@@ -20,16 +22,22 @@ import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_HIDE_TRANSIENT
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_IS_ENABLED
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_REQUEST_BODY
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_SECURITY
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_SECURITY_SCHEMES
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_SERVERS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_TITLE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_USE_KDOCS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_VER
+import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
+import kotlinx.serialization.json.Json
 
 
 object SwaggerConfigurationKeys {
@@ -44,6 +52,8 @@ object SwaggerConfigurationKeys {
     const val OPTION_DERIVE_PROP_REQ = "deriveFieldRequirementFromTypeNullability"
     const val OPTION_USE_KDOCS = "useKDocs"
     const val OPTION_SERVERS = "servers"
+    const val OPTION_SECURITY = "securityConfig"
+    const val OPTION_SECURITY_SCHEMES = "securitySchemes"
     const val OPTION_FORMAT = "format"
 
     val ARG_ENABLED = CompilerConfigurationKey.create<Boolean>(OPTION_IS_ENABLED)
@@ -57,9 +67,12 @@ object SwaggerConfigurationKeys {
     val ARG_DERIVE_PROP_REQ = CompilerConfigurationKey.create<Boolean>(OPTION_DERIVE_PROP_REQ)
     val ARG_FORMAT = CompilerConfigurationKey.create<String>(OPTION_FORMAT)
     val ARG_SERVERS = CompilerConfigurationKey.create<List<String>>(OPTION_SERVERS)
+    val ARG_SECURITY = CompilerConfigurationKey.create<List<Map<String, List<String>>>>(OPTION_SECURITY)
+    val ARG_SECURITY_SCHEMES = CompilerConfigurationKey.create<Map<String, OpenApiSpec.SecurityScheme>>(OPTION_SECURITY_SCHEMES)
     val ARG_KDOCS = CompilerConfigurationKey.create<Boolean>(OPTION_USE_KDOCS)
 }
 
+@ExperimentalEncodingApi
 @OptIn(ExperimentalCompilerApi::class)
 class KtorDocsCommandLineProcessor : CommandLineProcessor {
     companion object {
@@ -137,6 +150,20 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             allowMultipleOccurrences = true,
             required = false
         )
+        val security = CliOption(
+            OPTION_SECURITY,
+            "Swagger global security configuration",
+            "Security config in the form of base64 serialized JSON of List<Map<String, List<String>>>",
+            allowMultipleOccurrences = false,
+            required = false
+        )
+        val securitySchemes = CliOption(
+            OPTION_SECURITY_SCHEMES,
+            "Swagger security scheme configuration",
+            "Security scheme config in the form of a base64 serialized JSON of Map<String, OpenApiSpec.SecurityRequirement>",
+            allowMultipleOccurrences = false,
+            required = false
+        )
     }
 
     override val pluginId: String
@@ -155,7 +182,9 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             derivePropRequirement,
             formatOption,
             serverUrls,
-            useKDocs
+            useKDocs,
+            security,
+            securitySchemes
         )
 
 
@@ -188,6 +217,20 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             useKDocs -> configuration.put(ARG_KDOCS, value.toBooleanStrictOrNull() ?: true)
 
             serverUrls -> configuration.put(ARG_SERVERS, value.split("||").filter { it.isNotBlank() })
+
+            security -> configuration.put(
+                ARG_SECURITY,
+                Base64.decode(value).toString(Charsets.UTF_8).let { decodedJson ->
+                    Json.decodeFromString<List<Map<String, List<String>>>>(decodedJson)
+                }
+            )
+
+            securitySchemes -> configuration.put(
+                ARG_SECURITY_SCHEMES,
+                Base64.decode(value).toString(Charsets.UTF_8).let { decodedJson ->
+                    Json.decodeFromString<Map<String, OpenApiSpec.SecurityScheme>>(decodedJson)
+                }
+            )
 
             else -> throw IllegalArgumentException("Unexpected config option ${option.optionName}")
         }

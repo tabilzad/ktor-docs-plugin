@@ -245,7 +245,9 @@ internal fun CompilerConfiguration?.buildPluginConfiguration(): PluginConfigurat
     hideTransients = this?.get(SwaggerConfigurationKeys.ARG_HIDE_TRANSIENTS),
     hidePrivateFields = this?.get(SwaggerConfigurationKeys.ARG_HIDE_PRIVATE),
     deriveFieldRequirementFromTypeNullability = this?.get(SwaggerConfigurationKeys.ARG_DERIVE_PROP_REQ),
-    servers = this?.get(SwaggerConfigurationKeys.ARG_SERVERS) ?: emptyList()
+    servers = this?.get(SwaggerConfigurationKeys.ARG_SERVERS) ?: emptyList(),
+    securityConfig = this?.get(SwaggerConfigurationKeys.ARG_SECURITY) ?: emptyList(),
+    securitySchemes = this?.get(SwaggerConfigurationKeys.ARG_SECURITY_SCHEMES) ?: emptyMap(),
 )
 
 operator fun OutputStream.plusAssign(str: String) {
