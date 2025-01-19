@@ -62,7 +62,7 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 
 mavenPublishing {
     configure(GradlePlugin(
-        javadocJar = JavadocJar.Javadoc(),
+        javadocJar = JavadocJar.Dokka("dokkaHtml"),
         sourcesJar = true
     ))
     publishToMavenCentral(SonatypeHost.S01, automaticRelease = false)

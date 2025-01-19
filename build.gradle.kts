@@ -1,3 +1,4 @@
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -6,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.mavenPublish.base) apply false
     alias(libs.plugins.dokka) apply false
+    alias(libs.plugins.detekt) apply false
 }
 
 buildscript {
@@ -50,6 +52,24 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+
+    apply(plugin = rootProject.libs.plugins.detekt.get().pluginId)
+
+    configure<DetektExtension>{
+        autoCorrect = true
+        parallel = true
+        toolVersion = rootProject.libs.versions.detekt.get()
+        source.from(fileTree("src") {
+            include("*/java/")
+            include("*/kotlin/")
+        })
+        config.from("$rootDir/config/detekt/detekt.yaml")
+        //baseline = file("$rootDir/config/detekt/baseline.xml")
+    }
+    dependencies {
+        "detektPlugins"(rootProject.libs.detekt.formatting)
+        "detektPlugins"(rootProject.libs.detekt.libraries)
     }
 }
 

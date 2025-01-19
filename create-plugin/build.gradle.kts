@@ -11,7 +11,7 @@ plugins {
 }
 
 dependencies {
-    implementation(project(":annotations"))
+    implementation(projects.annotations)
 
     compileOnly(libs.kotlinCompiler)
     implementation(libs.bundles.jackson)
@@ -35,7 +35,7 @@ tasks.test {
 
 mavenPublishing {
     configure(KotlinJvm(
-        javadocJar = JavadocJar.Javadoc(),
+        javadocJar = JavadocJar.Dokka("dokkaHtml"),
         sourcesJar = true
     ))
     publishToMavenCentral(SonatypeHost.S01, automaticRelease = false)
