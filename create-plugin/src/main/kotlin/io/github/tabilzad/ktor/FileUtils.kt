@@ -10,8 +10,6 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import io.github.tabilzad.ktor.output.OpenApiSpec
 import java.io.File
 
-
-
 internal fun OpenApiSpec.serializeAndWriteTo(configuration: PluginConfiguration) {
     val file = File(configuration.filePath).apply {
         parentFile.mkdirs()

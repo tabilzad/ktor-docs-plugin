@@ -57,5 +57,4 @@ object HttpCodeResolver {
         "VariantAlsoNegotiates" to "506",
         "InsufficientStorage" to "507"
     )
-
 }

@@ -41,7 +41,6 @@ internal class ResourceClassVisitor(
                 symbol.hasAnnotation(ClassIds.KTOR_RESOURCE_ANNOTATION, session)
             }
 
-
         pathlessEndpoint.apply {
             parameters = if (data == null) {
                 // retrieve path and query params from endpoint
@@ -56,7 +55,6 @@ internal class ResourceClassVisitor(
             }
         }
 
-
         val parent = parents.firstOrNull()?.let { (_, symbol) ->
             symbol.fir.accept(this, data ?: DocRoute("/"))
         }
@@ -67,7 +65,6 @@ internal class ResourceClassVisitor(
             is DocRoute -> parent.replaceLeafAsEndpoint(pathlessEndpoint.copy(path = resourcePath))
 
             is EndPoint -> DocRoute(parent.path, children = mutableListOf(parent.copy(resourcePath)))
-
         }
         return next
     }

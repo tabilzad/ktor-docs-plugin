@@ -29,7 +29,6 @@ import org.jetbrains.kotlin.load.kotlin.internalName
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.StandardClassIds
 
-
 internal class FirstLevelNodeCollector(private val elements: MutableSet<FirElement>) : FirVisitorVoid() {
     override fun visitElement(element: FirElement) {
         elements.add(element)
@@ -80,7 +79,6 @@ internal class HierarchyResolver(private val root: ExpressionTree) : FirVisitorV
     }
 }
 
-
 val FirElement.buildHierarchy: ExpressionTree
     get() {
         val root = ExpressionTree(this)
@@ -101,7 +99,6 @@ internal val FirElement.allChildren: MutableSet<FirElement>
         acceptChildren(AllNestedNodeCollector(elements))
         return elements
     }
-
 
 @OptIn(SymbolInternals::class)
 internal val FirTypeRef.getKotlinTypeFqName
@@ -143,7 +140,6 @@ fun FirStatement.findAnnotation(classId: ClassId, session: FirSession): FirAnnot
 
 internal fun ConeKotlinType.properties(session: FirSession) =
     toRegularClassSymbol(session)?.declarationSymbols?.filterIsInstance<FirPropertySymbol>()
-
 
 @OptIn(SymbolInternals::class)
 internal fun ConeKotlinType.getMembers(session: FirSession, config: PluginConfiguration): List<FirDeclaration> {
@@ -226,6 +222,3 @@ fun FirPropertyAccessExpression.isEnum(session: FirSession): Boolean = this.disp
     ?.toResolvedCallableSymbol(session)
     ?.resolvedReturnType
     ?.toRegularClassSymbol(session)?.isEnumClass == true
-
-
-

@@ -102,7 +102,6 @@ internal class ClassDescriptorVisitor(val config: PluginConfiguration, val conte
                             val valueClassType = classDescriptor.defaultType
                             val acc = ObjectType("object", mutableMapOf())
 
-
                             when {
                                 KotlinBuiltIns.isPrimitiveType(valueClassType) || KotlinBuiltIns.isString(
                                     valueClassType
@@ -150,7 +149,7 @@ internal class ClassDescriptorVisitor(val config: PluginConfiguration, val conte
 
                                     acc.additionalProperties = ObjectType(
                                         type = null,
-                                        ref = "#/components/schemas/${gName}"
+                                        ref = "#/components/schemas/$gName"
                                     )
                                 }
                             }
@@ -191,7 +190,7 @@ internal class ClassDescriptorVisitor(val config: PluginConfiguration, val conte
                                     type = null,
                                     fqName = fqClassName,
                                     description = docsDescription,
-                                    ref = "#/components/schemas/${fqClassName}"
+                                    ref = "#/components/schemas/$fqClassName"
                                 )
                             )
                         } else {
@@ -201,7 +200,7 @@ internal class ClassDescriptorVisitor(val config: PluginConfiguration, val conte
                                             type = null,
                                             fqName = fqClassName,
                                             description = docsDescription,
-                                            ref = "#/components/schemas/${fqClassName}"
+                                            ref = "#/components/schemas/$fqClassName"
                                         )
                             )
                         }
@@ -261,15 +260,13 @@ internal class ClassDescriptorVisitor(val config: PluginConfiguration, val conte
                         }
                 }
                 t.apply {
-                    ref = "#/components/schemas/${jetTypeFqName}"
+                    ref = "#/components/schemas/$jetTypeFqName"
                     properties = null
                 }
-
             }
             acc
         }
     }
-
 
     private fun PropertyDescriptor.resolvePropertyName(): String {
         val moshiJsonName = getMoshiNameFromBackingField() ?: getMoshiNameFromDataClassConstructorParameter()
@@ -302,9 +299,7 @@ internal class ClassDescriptorVisitor(val config: PluginConfiguration, val conte
     companion object {
         private val MOSHI_JSON_ANNOTATION_FQ_NAME = FqName("com.squareup.moshi.Json")
         private val MOSHI_JSON_ANNOTATION_NAME_ARGUMENT_IDENTIFIER: Name = Name.identifier("name")
-
     }
-
 }
 
 private fun PropertyDescriptor.findDocsDescription(): String? {
@@ -365,7 +360,7 @@ fun String.toSwaggerType(): String {
         "double", "kotlin/double" -> "number"
         "float", "kotlin/float" -> "number"
         "long", "kotlin/long" -> "integer"
-        "string", "kotlin/string"-> "string"
+        "string", "kotlin/string" -> "string"
         else -> type
     }
 }

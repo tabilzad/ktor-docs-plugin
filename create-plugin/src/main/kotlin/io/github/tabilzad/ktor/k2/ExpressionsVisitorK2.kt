@@ -66,7 +66,6 @@ internal class ExpressionsVisitorK2(
         return c.wrapAsList()
     }
 
-
     // Evaluation Order 2
     override fun visitDeclaration(declaration: FirDeclaration, parent: KtorElement?): List<KtorElement> {
         return if (declaration is FirSimpleFunction) {
@@ -120,7 +119,7 @@ internal class ExpressionsVisitorK2(
             properties = mutableMapOf(),
             fqName = jetTypeFqName,
             description = kdocs ?: annotatedDescription?.description ?: annotatedDescription?.summary,
-            contentBodyRef = "#/components/schemas/${jetTypeFqName}",
+            contentBodyRef = "#/components/schemas/$jetTypeFqName",
         )
 
         if (isValueClass(session)) {
@@ -201,7 +200,6 @@ internal class ExpressionsVisitorK2(
         return receiveFunctionCall
     }
 
-
     private fun FirElement?.isKtorApplicationCall(): Boolean {
         return if (this is FirQualifiedAccessExpression) {
             extensionReceiver?.resolvedType?.classId == ClassIds.KTOR_APPLICATION
@@ -218,7 +216,6 @@ internal class ExpressionsVisitorK2(
     private fun FirQualifiedAccessExpression?.isARouteDefinition(): Boolean {
         return this?.resolvedType?.classId == ClassIds.KTOR_ROUTE
     }
-
 
     @OptIn(SymbolInternals::class)
     private fun FirFunctionCall.resolvePath(): String? {
@@ -238,7 +235,6 @@ internal class ExpressionsVisitorK2(
             .filterIsInstance<FirAnonymousFunctionExpression>()
             .lastOrNull()
     }
-
 
     @OptIn(SymbolInternals::class)
     override fun visitFunctionCall(functionCall: FirFunctionCall, parent: KtorElement?): List<KtorElement> {
@@ -343,7 +339,6 @@ internal class ExpressionsVisitorK2(
                                 session, config, endpoint
                             ), null
                         )
-
                 } else if (functionCall.isInPackage(ClassIds.KTOR_ROUTING_PACKAGE)) {
                     body = type?.toEndpointBody()
                 }
@@ -364,7 +359,6 @@ internal class ExpressionsVisitorK2(
                         null
                     }
                 }
-
             }
         }
 
@@ -408,7 +402,6 @@ internal class ExpressionsVisitorK2(
         parent: KtorElement?
     ): List<KtorElement> = anonymousFunction.body?.accept(this, parent) ?: parent.wrapAsList()
 
-
     private fun ConeKotlinType.toEndpointBody(): OpenApiSpec.ObjectType? {
         return if (isPrimitiveOrNullablePrimitive || isString || isNullableString) {
             OpenApiSpec.ObjectType(type = toString().toSwaggerType())
@@ -430,9 +423,7 @@ internal class ExpressionsVisitorK2(
 
     private fun FirFunctionCall.isInPackage(fqName: FqName): Boolean =
         toResolvedCallableSymbol()?.callableId?.packageName == fqName
-
 }
-
 
 internal data class KtorK2ResponseBag(
     val descr: String,

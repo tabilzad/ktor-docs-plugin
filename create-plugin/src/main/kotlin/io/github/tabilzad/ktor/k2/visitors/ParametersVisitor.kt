@@ -41,7 +41,6 @@ class ParametersVisitor(
         }.joinToString(""))
     }
 
-
     override fun visitFunctionCall(functionCall: FirFunctionCall, data: MutableList<String>) {
         val functionFqName =
             functionCall.dispatchReceiver?.toResolvedCallableSymbol(session)?.callableId?.asSingleFqName()
@@ -55,7 +54,6 @@ class ParametersVisitor(
             // skip
         }
     }
-
 
     override fun visitLiteralExpression(literalExpression: FirLiteralExpression, data: MutableList<String>) {
         val element = literalExpression.value
@@ -142,4 +140,3 @@ class ParametersVisitor(
         }
     }
 }
-

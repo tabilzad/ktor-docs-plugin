@@ -112,7 +112,6 @@ data class OpenApiSpec(
         val schema: SchemaType,
     ) : OpenApiSpecParam
 
-
     data class SchemaRef(
         val `$ref`: String? = null,
         val type: String? = null
@@ -133,5 +132,4 @@ data class OpenApiSpec(
         val schemas: Map<String, ObjectType>,
         val securitySchemes: Map<String, SecurityScheme>? = null
     )
-
 }

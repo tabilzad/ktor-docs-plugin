@@ -21,10 +21,8 @@ object TestSourceUtil {
         this.javaClass.getResource("/sources/$fileName.kt")?.readText()
             ?: throw FileNotFoundException("$fileName does not exist")
 
-
     fun loadSourceAndExpected(fileName: String): Pair<String, String> =
-        loadSourceCodeFrom(fileName) to loadExpectation("${fileName}-expected")
-
+        loadSourceCodeFrom(fileName) to loadExpectation("$fileName-expected")
 
     val loadNativeAnnotations by lazy {
         Paths.get("src/main/kotlin/io/github/tabilzad/ktor/annotations/Annotations.kt").toFile()

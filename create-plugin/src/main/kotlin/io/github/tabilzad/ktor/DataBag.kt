@@ -32,7 +32,6 @@ internal data class HeaderParamSpec(
     val isRequired: Boolean = false
 ) : ParamSpec
 
-
 internal data class KtorRouteSpec(
     val path: String,
     val parameters: List<ParamSpec>?,
@@ -89,6 +88,5 @@ enum class ContentType {
     APPLICATION_JSON,
 
     @JsonProperty("text/plain")
-    TEXT_PLAIN;
+    TEXT_PLAIN
 }
-

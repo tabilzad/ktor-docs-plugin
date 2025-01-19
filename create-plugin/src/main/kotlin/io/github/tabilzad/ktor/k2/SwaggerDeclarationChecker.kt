@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirSimpleFunctionC
 import org.jetbrains.kotlin.fir.declarations.FirSimpleFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 
-
 /**
  * check function visits all declarations in the code and searches for those annotated with @GenerateOpenApi.
  * Then the ExpressionVisitor walks through all expressions in the function body to extract Ktor dsl related data
@@ -61,7 +60,5 @@ class SwaggerDeclarationChecker(
                 schemas = components
             ).serializeAndWriteTo(config)
         }
-
-
     }
 }

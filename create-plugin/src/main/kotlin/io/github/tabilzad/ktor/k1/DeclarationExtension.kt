@@ -16,7 +16,6 @@ internal class DeclarationExtension(
     private val configuration: PluginConfiguration
 ) : StorageComponentContainerContributor {
 
-
     override fun registerModuleComponents(
         container: StorageComponentContainer,
         platform: TargetPlatform,

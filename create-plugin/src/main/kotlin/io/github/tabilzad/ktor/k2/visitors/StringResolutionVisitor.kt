@@ -22,7 +22,6 @@ class StringResolutionVisitor(private val session: FirSession) : FirDefaultVisit
 
     override fun visitElement(element: FirElement, data: String): String = data
 
-
     // string template like "$variable-string"
     override fun visitStringConcatenationCall(
         stringConcatenationCall: FirStringConcatenationCall,
@@ -38,7 +37,6 @@ class StringResolutionVisitor(private val session: FirSession) : FirDefaultVisit
             it.accept(this, data)
         }.concat()
     }
-
 
     // TODO(Look into evaluatePropertyInitializer or evaluateExpression)
     override fun visitArgumentList(argumentList: FirArgumentList, data: String): String {
@@ -77,7 +75,6 @@ class StringResolutionVisitor(private val session: FirSession) : FirDefaultVisit
 
             val value = paramLiteral?.accept(this, data)
             return value ?: data
-
         } else {
             return data + propertyAccessExpression.calleeReference.accept(this, data)
         }

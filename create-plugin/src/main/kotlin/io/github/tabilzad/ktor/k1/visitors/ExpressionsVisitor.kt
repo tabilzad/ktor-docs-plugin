@@ -112,7 +112,6 @@ internal class ExpressionsVisitor(
             .filterIsInstance<KtLambdaArgument>()
             .mapNotNull { it.getLambdaExpression() }
 
-
         for (subExpression in deepSearchInExpressions) {
             val findReceiveCallExpression = subExpression.findReceiveCallExpression()
             if (findReceiveCallExpression != null) {
@@ -144,7 +143,6 @@ internal class ExpressionsVisitor(
             .filterIsInstance<KtLambdaArgument>()
             .mapNotNull { it.getLambdaExpression() }
 
-
         for (subExpression in deepSearchInExpressions) {
             subExpression.findArrayAccessExpressions(params)
         }
@@ -160,7 +158,6 @@ internal class ExpressionsVisitor(
         return KotlinBuiltIns.isPrimitiveType(this) || KotlinBuiltIns.isString(this)
     }
 
-
     private fun KtDotQualifiedExpression.getKtorApplicationCallReferenceExpression(): KtReferenceExpression? {
         return children
             .firstIsInstanceOrNull<KtReferenceExpression>()
@@ -169,7 +166,6 @@ internal class ExpressionsVisitor(
                     ?.endsWith("ApplicationCall") == true
             }
     }
-
 
     private fun KtExpression.isKtorApplicationCall(): Boolean {
         return (children
@@ -190,7 +186,6 @@ internal class ExpressionsVisitor(
                     ?.getKotlinTypeFqName(false)
                     ?.endsWith("ApplicationCall") == true
                 )
-
     }
 
     private fun resolveQueryParamFromArrayAccessIndex(
@@ -214,7 +209,6 @@ internal class ExpressionsVisitor(
                             }
                         }
                     }
-
 
                     is KtStringTemplateExpression -> {
 
@@ -375,7 +369,7 @@ internal class ExpressionsVisitor(
         val r = OpenApiSpec.ObjectType(
             type = "object",
             fqName = jetTypeFqName,
-            contentBodyRef = "#/components/schemas/${jetTypeFqName}",
+            contentBodyRef = "#/components/schemas/$jetTypeFqName",
         )
         if (!classNames.names.contains(jetTypeFqName)) {
 
@@ -391,7 +385,6 @@ internal class ExpressionsVisitor(
         return r
     }
 
-
     private fun ResolvedCall<out CallableDescriptor>?.isARouteDefinition(): Boolean {
 
         val doesExtendRoute = this?.resultingDescriptor
@@ -405,7 +398,6 @@ internal class ExpressionsVisitor(
             ?.contains("path") == true
 
         return doesExtendRoute && doesContainPathValue
-
     }
 
     override fun visitAnnotatedExpression(exp: KtAnnotatedExpression, parent: KtorElement?): List<KtorElement> {
@@ -592,7 +584,6 @@ internal class ExpressionsVisitor(
             resultElement.wrapAsList().ifEmpty {
                 res.orEmpty()
             }
-
         } else { // the expression doesn't have lambda so visit its implementation to look for potential routes
             val res = expression.visitFunctionDeclaration(resultElement)
             resultElement.wrapAsList().ifEmpty {
@@ -632,12 +623,10 @@ internal class ExpressionsVisitor(
         return super.visitNamedFunction(function, newParent)
     }
 
-
     override fun visitLambdaExpression(lambdaExpression: KtLambdaExpression, parent: KtorElement?): List<KtorElement> {
         println("visitLambdaExpression $parent")
         return lambdaExpression.bodyExpression?.accept(this, parent) ?: parent.wrapAsList()
     }
-
 }
 
 internal data class KtorDescriptionBag(
@@ -690,7 +679,6 @@ private fun KtExpression.findDocsDescription(): KtorDescriptionBag {
             tags?.getArgumentExpression().extractTags()
         )
     } ?: KtorDescriptionBag()
-
 }
 
 private fun KtCallExpression.findArgumentWithName(name: String): KtValueArgument? =
@@ -782,4 +770,3 @@ val ClassDescriptor.enumEntries: Set<ClassDescriptor>
         .filter(DescriptorUtils::isEnumEntry)
         .filterIsInstance<ClassDescriptor>()
         .toSet()
-

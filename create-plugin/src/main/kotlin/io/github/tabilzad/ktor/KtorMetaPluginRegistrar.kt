@@ -17,7 +17,6 @@ import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtensi
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
-
 open class KtorMetaPluginRegistrar : CompilerPluginRegistrar() {
     override val supportsK2: Boolean
         get() = true
@@ -32,7 +31,6 @@ open class KtorMetaPluginRegistrar : CompilerPluginRegistrar() {
         FirExtensionRegistrarAdapter.registerExtension(SwaggerCheckers(configuration))
     }
 }
-
 
 class FirCheckers(session: FirSession, configuration: CompilerConfiguration) : FirAdditionalCheckersExtension(session) {
     override val declarationCheckers: DeclarationCheckers = object : DeclarationCheckers() {
@@ -53,4 +51,3 @@ class SwaggerCheckers(private val configuration: CompilerConfiguration) : FirExt
         +FirCheckers.getFactory(configuration)
     }
 }
-

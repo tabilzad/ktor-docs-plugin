@@ -56,12 +56,10 @@ internal class ClassDescriptorVisitorK2(
         val resolvedDescription = property.findDocsDescription(session)
         return if (resolvedDescription != null && resolvedDescription.explicitType?.isNotEmpty() == true) {
             data.apply { addProperty(property, null, resolvedDescription) }
-
         } else {
             data.apply { addProperty(property, type.collectDataTypes(), resolvedDescription) }
         }
     }
-
 
     @OptIn(SealedClassInheritorsProviderInternals::class, SymbolInternals::class)
     private fun ConeKotlinType.collectDataTypes(): ObjectType? {
@@ -122,7 +120,7 @@ internal class ClassDescriptorVisitorK2(
                 ObjectType(
                     type = null,
                     fqName = fqClassName,
-                    ref = "#/components/schemas/${fqClassName}"
+                    ref = "#/components/schemas/$fqClassName"
                 )
             }
 
@@ -173,8 +171,8 @@ internal class ClassDescriptorVisitorK2(
                 ObjectType(
                     type = null,
                     fqName = fqClassName,
-                    //description = docsDescription,
-                    ref = "#/components/schemas/${fqClassName}"
+                    // description = docsDescription,
+                    ref = "#/components/schemas/$fqClassName"
                 )
             }
         }
@@ -228,7 +226,6 @@ internal class ClassDescriptorVisitorK2(
     private fun FirProperty.findName(): String {
         return getCustomNameFromAnnotation(this, session) ?: name.asString()
     }
-
 }
 
 internal fun FirProperty.findDocsDescription(session: FirSession): KtorDescriptionBag? {
