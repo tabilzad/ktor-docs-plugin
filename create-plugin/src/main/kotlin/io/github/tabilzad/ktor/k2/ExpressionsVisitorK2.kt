@@ -14,11 +14,9 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.isValueClass
 import org.jetbrains.kotlin.fir.declarations.*
-import org.jetbrains.kotlin.fir.declarations.utils.classId
 import org.jetbrains.kotlin.fir.expressions.*
 import org.jetbrains.kotlin.fir.references.resolved
 import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
-import org.jetbrains.kotlin.fir.resolve.firClassLike
 import org.jetbrains.kotlin.fir.resolve.fqName
 import org.jetbrains.kotlin.fir.resolve.toRegularClassSymbol
 import org.jetbrains.kotlin.fir.symbols.SymbolInternals
@@ -76,6 +74,7 @@ internal class ExpressionsVisitorK2(
     }
 
     // Evaluation Order 3
+    @Suppress("NestedBlockDepth")
     override fun visitBlock(block: FirBlock, parent: KtorElement?): List<KtorElement> {
 
         if (parent is EndPoint && parent.body == null) {
@@ -200,19 +199,6 @@ internal class ExpressionsVisitorK2(
         return receiveFunctionCall
     }
 
-    private fun FirElement?.isKtorApplicationCall(): Boolean {
-        return if (this is FirQualifiedAccessExpression) {
-            extensionReceiver?.resolvedType?.classId == ClassIds.KTOR_APPLICATION
-        } else {
-            false
-        }
-    }
-
-    private fun FirSimpleFunction.isKtorApplicationCall(): Boolean {
-        val classId = receiverParameter?.typeRef?.firClassLike(session)?.classId
-        return classId == ClassIds.KTOR_APPLICATION || classId == ClassIds.KTOR_ROUTE
-    }
-
     private fun FirQualifiedAccessExpression?.isARouteDefinition(): Boolean {
         return this?.resolvedType?.classId == ClassIds.KTOR_ROUTE
     }
@@ -237,6 +223,7 @@ internal class ExpressionsVisitorK2(
     }
 
     @OptIn(SymbolInternals::class)
+    @Suppress("LongMethod", "NestedBlockDepth", "CyclomaticComplexMethod")
     override fun visitFunctionCall(functionCall: FirFunctionCall, parent: KtorElement?): List<KtorElement> {
         var resultElement: KtorElement? = null
         val resolvedExp = functionCall.toResolvedCallableReference(session)
@@ -273,7 +260,10 @@ internal class ExpressionsVisitorK2(
                     val kotlinType = response.type
 
                     val schema =
-                        if (kotlinType?.isPrimitiveOrNullablePrimitive == true || kotlinType?.isString == true || kotlinType?.isNullableString == true) {
+                        if (kotlinType?.isPrimitiveOrNullablePrimitive == true
+                            || kotlinType?.isString == true
+                            || kotlinType?.isNullableString == true
+                        ) {
                             OpenApiSpec.SchemaType(
                                 type = kotlinType.toString().toSwaggerType()
                             )

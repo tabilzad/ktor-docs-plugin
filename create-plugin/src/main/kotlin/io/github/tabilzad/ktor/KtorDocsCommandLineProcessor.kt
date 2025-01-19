@@ -141,6 +141,7 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             initConfig
         )
 
+    @Suppress("CyclomaticComplexMethod")
     override fun processOption(
         option: AbstractCliOption,
         value: String,

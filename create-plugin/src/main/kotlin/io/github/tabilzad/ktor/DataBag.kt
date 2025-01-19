@@ -5,6 +5,7 @@ import io.github.tabilzad.ktor.output.OpenApiSpec
 
 interface OpenApiSpecParam {
     val name: String
+    @Suppress("VariableNaming")
     val `in`: String
     val required: Boolean
     val description: String?

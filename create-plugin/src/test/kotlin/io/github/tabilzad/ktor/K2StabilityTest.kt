@@ -1,7 +1,7 @@
 package io.github.tabilzad.ktor
 
-import io.github.tabilzad.ktor.TestSourceUtil.loadSourceAndExpected
-import io.github.tabilzad.ktor.TestSourceUtil.loadSourceCodeFrom
+import io.github.tabilzad.ktor.TestUtils.loadSourceAndExpected
+import io.github.tabilzad.ktor.TestUtils.loadSourceCodeFrom
 import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach

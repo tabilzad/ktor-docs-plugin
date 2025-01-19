@@ -62,6 +62,7 @@ internal class ClassDescriptorVisitorK2(
     }
 
     @OptIn(SealedClassInheritorsProviderInternals::class, SymbolInternals::class)
+    @Suppress("LongMethod", "NestedBlockDepth", "CyclomaticComplexMethod")
     private fun ConeKotlinType.collectDataTypes(): ObjectType? {
         val fqClassName = fqNameStr()
         val typeSymbol = toRegularClassSymbol(session)
@@ -185,6 +186,7 @@ internal class ClassDescriptorVisitorK2(
 
     override fun visitElement(element: FirElement, data: ObjectType) = data
 
+    @Suppress("CyclomaticComplexMethod")
     private fun ObjectType.addProperty(
         fir: FirProperty,
         objectType: ObjectType?,

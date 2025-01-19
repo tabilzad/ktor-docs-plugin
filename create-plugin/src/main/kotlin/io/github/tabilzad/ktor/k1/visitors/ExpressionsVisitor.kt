@@ -128,7 +128,9 @@ internal class ExpressionsVisitor(
         return null
     }
 
-    private fun KtExpression.findArrayAccessExpressions(params: MutableList<KtArrayAccessExpression> = mutableListOf()): List<KtArrayAccessExpression> {
+    private fun KtExpression.findArrayAccessExpressions(
+        params: MutableList<KtArrayAccessExpression> = mutableListOf()
+    ): List<KtArrayAccessExpression> {
 
         if (this is KtArrayAccessExpression && isKtorQueryParam()) {
             return params.apply {
@@ -158,15 +160,6 @@ internal class ExpressionsVisitor(
         return KotlinBuiltIns.isPrimitiveType(this) || KotlinBuiltIns.isString(this)
     }
 
-    private fun KtDotQualifiedExpression.getKtorApplicationCallReferenceExpression(): KtReferenceExpression? {
-        return children
-            .firstIsInstanceOrNull<KtReferenceExpression>()
-            .takeIf { it ->
-                it?.getType(this@ExpressionsVisitor.context)?.getKotlinTypeFqName(false)
-                    ?.endsWith("ApplicationCall") == true
-            }
-    }
-
     private fun KtExpression.isKtorApplicationCall(): Boolean {
         return (children
             .firstIsInstanceOrNull<KtReferenceExpression>()
@@ -188,6 +181,7 @@ internal class ExpressionsVisitor(
                 )
     }
 
+    @Suppress("LongMethod", "CyclomaticComplexMethod")
     private fun resolveQueryParamFromArrayAccessIndex(
         arrayAccessExpression: KtArrayAccessExpression?,
         bindingContext: BindingContext
@@ -313,6 +307,7 @@ internal class ExpressionsVisitor(
     // check for package path
     private fun KtExpression.hasKtorReceive() = text.contains("call.receive")
 
+    @Suppress("NestedBlockDepth")
     override fun visitDotQualifiedExpression(
         expression: KtDotQualifiedExpression,
         parent: KtorElement?
@@ -470,6 +465,7 @@ internal class ExpressionsVisitor(
         }
     }
 
+    @Suppress("LongMethod", "NestedBlockDepth", "CyclomaticComplexMethod")
     private fun visitCallExpressionInternal(expression: KtCallExpression, parent: KtorElement?): List<KtorElement> {
         println("visitCallExpression $parent")
         val expName = expression.getCallNameExpression()?.text.toString()
@@ -685,6 +681,7 @@ private fun KtCallExpression.findArgumentWithName(name: String): KtValueArgument
     valueArguments.find { it.getArgumentName()?.asName?.asString() == name }
 
 @OptIn(UnsafeCastFunction::class)
+@Suppress("MagicNumber")
 private fun KtExpression.findRespondsAnnotation(context: BindingContext): List<KtorResponseBag>? {
     return getAnnotationEntries().find { it ->
         it.typeReference?.typeElement.safeAs<KtUserType>()?.referencedName == KtorResponds::class.simpleName!!

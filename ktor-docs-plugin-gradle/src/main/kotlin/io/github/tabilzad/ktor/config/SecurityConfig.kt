@@ -2,7 +2,6 @@ package io.github.tabilzad.ktor.config
 
 import kotlinx.serialization.Serializable
 
-
 class SecurityConfigBuilder {
     private val scopes = mutableMapOf<String, List<String>>()
     private val schemes = mutableMapOf<String, Scheme>()
@@ -19,7 +18,6 @@ class SecurityConfigBuilder {
 
     fun build(): SecurityConfig = SecurityConfig(scopes, schemes)
 }
-
 
 class InfoConfigBuilder {
     var title: String? = null

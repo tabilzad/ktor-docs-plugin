@@ -92,6 +92,7 @@ internal class ResourceClassVisitor(
         return names.contains(name.asString())
     }
 
+    @Suppress("NestedBlockDepth")
     private fun KtorElement.replaceLeafAsEndpoint(newEndPoint: EndPoint): KtorElement {
         when (this) {
             is DocRoute -> {

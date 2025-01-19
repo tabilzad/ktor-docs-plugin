@@ -16,7 +16,7 @@ import java.nio.file.Paths
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-object TestSourceUtil {
+object TestUtils {
     fun loadSourceCodeFrom(fileName: String): String =
         this.javaClass.getResource("/sources/$fileName.kt")?.readText()
             ?: throw FileNotFoundException("$fileName does not exist")
@@ -84,6 +84,7 @@ fun File.parseSpec(): OpenApiSpec {
 }
 
 @OptIn(ExperimentalCompilerApi::class, ExperimentalEncodingApi::class)
+@Suppress("LongMethod")
 internal fun generateCompilerTest(
     testFile: File,
     testSubjectSource: String,
@@ -164,7 +165,7 @@ internal fun generateCompilerTest(
 }
 
 private fun loadBaseSources(source: String): List<SourceFile> {
-    val requestsDefinitions = TestSourceUtil.loadRequests
+    val requestsDefinitions = TestUtils.loadRequests
     return listOf(
         SourceFile.kotlin(requestsDefinitions.file, requestsDefinitions.readText().trimMargin()),
         SourceFile.kotlin("TestSubject.kt", source)

@@ -36,6 +36,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
     }
 
     @OptIn(ExperimentalEncodingApi::class)
+    @Suppress("LongMethod")
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val project = kotlinCompilation.target.project
         val swaggerExtension = project.extensions.findByType(KtorInspectorGradleConfig::class.java) ?: KtorInspectorGradleConfig()
@@ -49,7 +50,9 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             getOpenApiOutputFile(
                 filePath = filePath,
                 saveInBuild = saveInBuild,
-                buildPath = kotlinCompilation.output.resourcesDir.absolutePath, // TODO: This is build/processedResources/release, do we want /build instead? kotlinCompilation.target.project.buildDir.absolutePath
+                // This is build/processedResources/release,
+                // do we want /build instead? kotlinCompilation.target.project.buildDir.absolutePath
+                buildPath = kotlinCompilation.output.resourcesDir.absolutePath,
                 modulePath = project.projectDir.absolutePath,
                 format = format
             )
@@ -122,7 +125,7 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
         modulePath: String,
         format: String,
     ): File {
-        val directoryPath =  when {
+        val directoryPath = when {
             filePath != null -> filePath
             saveInBuild -> "$buildPath/openapi"
             else -> "${getProjectResourcesDirectory(modulePath)}/openapi"

@@ -180,6 +180,7 @@ fun ConeKotlinType.fqNameStr(): String? {
     return (this as? ConeClassLikeType)?.lookupTag?.classId?.asFqNameString()
 }
 
+@Suppress("CyclomaticComplexMethod")
 fun ConeKotlinType.isIterable(): Boolean {
     return isArrayTypeOrNullableArrayType
             || isArrayType

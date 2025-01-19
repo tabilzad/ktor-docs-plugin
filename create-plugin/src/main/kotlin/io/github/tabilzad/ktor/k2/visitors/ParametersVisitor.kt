@@ -93,6 +93,7 @@ class ParametersVisitor(
     }
 
     @OptIn(SymbolInternals::class)
+    @Suppress("NestedBlockDepth")
     override fun visitPropertyAccessExpression(
         propertyAccessExpression: FirPropertyAccessExpression,
         data: MutableList<String>

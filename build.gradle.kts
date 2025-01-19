@@ -65,7 +65,7 @@ allprojects {
             include("*/kotlin/")
         })
         config.from("$rootDir/config/detekt/detekt.yaml")
-        //baseline = file("$rootDir/config/detekt/baseline.xml")
+        // baseline = file("$rootDir/config/detekt/baseline.xml")
     }
     dependencies {
         "detektPlugins"(rootProject.libs.detekt.formatting)

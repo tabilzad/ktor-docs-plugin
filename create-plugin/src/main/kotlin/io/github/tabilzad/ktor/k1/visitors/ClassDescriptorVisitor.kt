@@ -1,10 +1,10 @@
 package io.github.tabilzad.ktor.k1.visitors
 
-import io.github.tabilzad.ktor.output.OpenApiSpec.ObjectType
 import io.github.tabilzad.ktor.PluginConfiguration
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.forEachVariable
 import io.github.tabilzad.ktor.names
+import io.github.tabilzad.ktor.output.OpenApiSpec.ObjectType
 import org.jetbrains.kotlin.builtins.DefaultBuiltIns
 import org.jetbrains.kotlin.builtins.KotlinBuiltIns
 import org.jetbrains.kotlin.descriptors.ClassDescriptor
@@ -34,6 +34,7 @@ internal class ClassDescriptorVisitor(val config: PluginConfiguration, val conte
 
     val classNames = mutableListOf<ObjectType>()
 
+    @Suppress("CyclomaticComplexMethod", "LongMethod", "NestedBlockDepth")
     override fun visitPropertyDescriptor(
         descriptor: PropertyDescriptor,
         parent: ObjectType

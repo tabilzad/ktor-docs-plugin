@@ -113,6 +113,7 @@ data class OpenApiSpec(
     ) : OpenApiSpecParam
 
     data class SchemaRef(
+        @Suppress("ConstructorParameterNaming")
         val `$ref`: String? = null,
         val type: String? = null
     )
@@ -120,6 +121,7 @@ data class OpenApiSpec(
     data class SchemaType(
         val type: String? = null,
         val items: SchemaRef? = null,
+        @Suppress("ConstructorParameterNaming")
         val `$ref`: String? = null,
     )
 
