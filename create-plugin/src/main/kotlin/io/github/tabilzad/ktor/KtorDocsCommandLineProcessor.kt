@@ -1,34 +1,27 @@
 package io.github.tabilzad.ktor
 
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_DERIVE_PROP_REQ
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_DESCR
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_ENABLED
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_FORMAT
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_HIDE_PRIVATE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_HIDE_TRANSIENTS
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_INIT_CONFIG
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_KDOCS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_REQUEST_FEATURE
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_SECURITY
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_SECURITY_SCHEMES
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_SERVERS
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_TITLE
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.ARG_VER
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_DERIVE_PROP_REQ
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_DESCR
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_FORMAT
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_HIDE_PRIVATE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_HIDE_TRANSIENT
+import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_INIT_CONFIG
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_IS_ENABLED
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_REQUEST_BODY
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_SECURITY
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_SECURITY_SCHEMES
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_SERVERS
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_TITLE
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_USE_KDOCS
-import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_VER
-import io.github.tabilzad.ktor.output.OpenApiSpec
+import io.github.tabilzad.ktor.input.ConfigInput
+import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
@@ -37,14 +30,9 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlinx.serialization.json.Json
-
 
 object SwaggerConfigurationKeys {
-    const val OPTION_TITLE = "title"
     const val OPTION_IS_ENABLED = "enabled"
-    const val OPTION_DESCR = "description"
-    const val OPTION_VER = "version"
     const val OPTION_PATH = "filePath"
     const val OPTION_REQUEST_BODY = "generateRequestSchemas"
     const val OPTION_HIDE_TRANSIENT = "hideTransientFields"
@@ -52,14 +40,10 @@ object SwaggerConfigurationKeys {
     const val OPTION_DERIVE_PROP_REQ = "deriveFieldRequirementFromTypeNullability"
     const val OPTION_USE_KDOCS = "useKDocs"
     const val OPTION_SERVERS = "servers"
-    const val OPTION_SECURITY = "securityConfig"
-    const val OPTION_SECURITY_SCHEMES = "securitySchemes"
+    const val OPTION_INIT_CONFIG = "initialConfig"
     const val OPTION_FORMAT = "format"
 
     val ARG_ENABLED = CompilerConfigurationKey.create<Boolean>(OPTION_IS_ENABLED)
-    val ARG_TITLE = CompilerConfigurationKey.create<String>(OPTION_TITLE)
-    val ARG_DESCR = CompilerConfigurationKey.create<String>(OPTION_DESCR)
-    val ARG_VER = CompilerConfigurationKey.create<String>(OPTION_VER)
     val ARG_PATH = CompilerConfigurationKey.create<String>(OPTION_PATH)
     val ARG_REQUEST_FEATURE = CompilerConfigurationKey.create<Boolean>(OPTION_REQUEST_BODY)
     val ARG_HIDE_TRANSIENTS = CompilerConfigurationKey.create<Boolean>(OPTION_HIDE_TRANSIENT)
@@ -67,8 +51,7 @@ object SwaggerConfigurationKeys {
     val ARG_DERIVE_PROP_REQ = CompilerConfigurationKey.create<Boolean>(OPTION_DERIVE_PROP_REQ)
     val ARG_FORMAT = CompilerConfigurationKey.create<String>(OPTION_FORMAT)
     val ARG_SERVERS = CompilerConfigurationKey.create<List<String>>(OPTION_SERVERS)
-    val ARG_SECURITY = CompilerConfigurationKey.create<List<Map<String, List<String>>>>(OPTION_SECURITY)
-    val ARG_SECURITY_SCHEMES = CompilerConfigurationKey.create<Map<String, OpenApiSpec.SecurityScheme>>(OPTION_SECURITY_SCHEMES)
+    val ARG_INIT_CONFIG = CompilerConfigurationKey.create<ConfigInput>(OPTION_INIT_CONFIG)
     val ARG_KDOCS = CompilerConfigurationKey.create<Boolean>(OPTION_USE_KDOCS)
 }
 
@@ -80,24 +63,6 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             OPTION_IS_ENABLED,
             "Should plugin run",
             "Is plugin enabled",
-            false
-        )
-        private val titleOption = CliOption(
-            OPTION_TITLE,
-            "Server title/name",
-            "Ktor Swagger page title",
-            false
-        )
-        val descOption = CliOption(
-            OPTION_DESCR,
-            "Description of the server",
-            "Description of Ktor Server",
-            false
-        )
-        private val versionOption = CliOption(
-            OPTION_VER,
-            "Server version",
-            "Ktor Server version",
             false
         )
         val pathOption = CliOption(
@@ -150,17 +115,10 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             allowMultipleOccurrences = true,
             required = false
         )
-        val security = CliOption(
-            OPTION_SECURITY,
+        val initConfig = CliOption(
+            OPTION_INIT_CONFIG,
             "Swagger global security configuration",
             "Security config in the form of base64 serialized JSON of List<Map<String, List<String>>>",
-            allowMultipleOccurrences = false,
-            required = false
-        )
-        val securitySchemes = CliOption(
-            OPTION_SECURITY_SCHEMES,
-            "Swagger security scheme configuration",
-            "Security scheme config in the form of a base64 serialized JSON of Map<String, OpenApiSpec.SecurityRequirement>",
             allowMultipleOccurrences = false,
             required = false
         )
@@ -172,9 +130,6 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
     override val pluginOptions: Collection<AbstractCliOption>
         get() = listOf(
             isEnabled,
-            titleOption,
-            descOption,
-            versionOption,
             pathOption,
             requestSchema,
             hideTransientFields,
@@ -183,10 +138,8 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             formatOption,
             serverUrls,
             useKDocs,
-            security,
-            securitySchemes
+            initConfig
         )
-
 
     override fun processOption(
         option: AbstractCliOption,
@@ -195,12 +148,6 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
     ) {
         when (option) {
             isEnabled -> configuration.put(ARG_ENABLED, value.toBooleanStrictOrNull() ?: true)
-
-            titleOption -> configuration.put(ARG_TITLE, value)
-
-            descOption -> configuration.put(ARG_DESCR, value)
-
-            versionOption -> configuration.put(ARG_VER, value)
 
             pathOption -> configuration.put(ARG_PATH, value)
 
@@ -218,17 +165,10 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
 
             serverUrls -> configuration.put(ARG_SERVERS, value.split("||").filter { it.isNotBlank() })
 
-            security -> configuration.put(
-                ARG_SECURITY,
+            initConfig -> configuration.put(
+                ARG_INIT_CONFIG,
                 Base64.decode(value).toString(Charsets.UTF_8).let { decodedJson ->
-                    Json.decodeFromString<List<Map<String, List<String>>>>(decodedJson)
-                }
-            )
-
-            securitySchemes -> configuration.put(
-                ARG_SECURITY_SCHEMES,
-                Base64.decode(value).toString(Charsets.UTF_8).let { decodedJson ->
-                    Json.decodeFromString<Map<String, OpenApiSpec.SecurityScheme>>(decodedJson)
+                    Json.decodeFromString<ConfigInput>(decodedJson)
                 }
             )
 

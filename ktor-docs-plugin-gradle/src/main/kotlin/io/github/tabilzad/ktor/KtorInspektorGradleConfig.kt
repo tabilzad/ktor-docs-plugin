@@ -1,9 +1,11 @@
 package io.github.tabilzad.ktor
 
+import io.github.tabilzad.ktor.config.Info
+import io.github.tabilzad.ktor.config.InfoConfigBuilder
+import io.github.tabilzad.ktor.config.Scheme
+import io.github.tabilzad.ktor.config.SecurityConfigBuilder
+
 open class DocumentationOptions(
-    var docsTitle: String = "Open API Specification",
-    var docsDescription: String = "Generated using Ktor Docs Plugin",
-    var docsVersion: String = "1.0.0",
     var generateRequestSchemas: Boolean = true,
     var hideTransientFields: Boolean = true,
     var hidePrivateAndInternalFields: Boolean = true,
@@ -12,8 +14,8 @@ open class DocumentationOptions(
     var servers: List<String> = emptyList(),
 ) {
     private val securityConfig: MutableList<Map<String, List<String>>> = mutableListOf()
-
     private val securitySchemes: MutableMap<String, Scheme> = mutableMapOf()
+    private var info = Info()
 
     fun security(block: SecurityConfigBuilder.() -> Unit) {
         val builder = SecurityConfigBuilder()
@@ -28,6 +30,14 @@ open class DocumentationOptions(
             }
         }
     }
+
+    fun info(block: InfoConfigBuilder.() -> Unit) {
+        val builder = InfoConfigBuilder()
+        builder.block()
+        info = builder.build()
+    }
+
+    internal fun getInfo() = info
 
     internal fun getSecurityConfig(): List<Map<String, List<String>>> = securityConfig.toList()
 

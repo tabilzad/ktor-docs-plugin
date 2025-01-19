@@ -1,12 +1,16 @@
 package io.github.tabilzad.ktor
 
+import io.github.tabilzad.ktor.config.ConfigInput
+import kotlinx.serialization.json.Json
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
-import org.jetbrains.kotlin.gradle.plugin.*
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
+import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
+import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
+import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 import java.io.File
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
-import kotlinx.serialization.json.Json
 
 const val PLUGIN_ID = "io.github.tabilzad.ktor-docs-plugin-gradle"
 
@@ -60,21 +64,16 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
             // However, setting a KotlinCompile output task.outputs.file("foo") always creates a *directory* named foo
         }
 
+        val initialConfig = ConfigInput(
+            securityConfig = swaggerExtension.documentation.getSecurityConfig(),
+            securitySchemes = swaggerExtension.documentation.getSecuritySchemes(),
+            info = swaggerExtension.documentation.getInfo()
+        )
+
         val subpluginOptions = listOf(
             SubpluginOption(
                 key = "enabled",
                 value = swaggerExtension.pluginOptions.enabled.toString()
-            ),
-            SubpluginOption(
-                key = "title",
-                value = swaggerExtension.documentation.docsTitle
-            ), SubpluginOption(
-                key = "description",
-                value = swaggerExtension.documentation.docsDescription
-            ),
-            SubpluginOption(
-                key = "version",
-                value = swaggerExtension.documentation.docsVersion
             ),
             SubpluginOption(
                 key = "generateRequestSchemas",
@@ -109,12 +108,8 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
                 value = openApiOutputFile.path
             ),
             SubpluginOption(
-                key = "securityConfig",
-                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.getSecurityConfig()).toByteArray())
-            ),
-            SubpluginOption(
-                key = "securitySchemes",
-                value = Base64.encode(Json.encodeToString(swaggerExtension.documentation.getSecuritySchemes()).toByteArray())
+                key = "initialConfig",
+                value = Base64.encode(Json.encodeToString<ConfigInput>(initialConfig).toByteArray())
             )
         )
         return project.provider { subpluginOptions }

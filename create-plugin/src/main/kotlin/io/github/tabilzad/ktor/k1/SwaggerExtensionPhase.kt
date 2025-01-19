@@ -1,9 +1,11 @@
 package io.github.tabilzad.ktor.k1
 
-import io.github.tabilzad.ktor.*
+import io.github.tabilzad.ktor.DocRoute
+import io.github.tabilzad.ktor.PluginConfiguration
 import io.github.tabilzad.ktor.annotations.KtorDocs
 import io.github.tabilzad.ktor.k1.visitors.ExpressionsVisitor
-import io.github.tabilzad.ktor.output.OpenApiSpec
+import io.github.tabilzad.ktor.output.convertInternalToOpenSpec
+import io.github.tabilzad.ktor.serializeAndWriteTo
 import org.jetbrains.kotlin.descriptors.DeclarationDescriptor
 import org.jetbrains.kotlin.psi.KtAnnotated
 import org.jetbrains.kotlin.psi.KtAnnotationEntry
@@ -61,37 +63,6 @@ private fun KtDeclaration.startVisiting(
             schemas = components
         ).serializeAndWriteTo(configuration)
     }
-}
-
-internal fun convertInternalToOpenSpec(
-    routes: List<DocRoute>,
-    configuration: PluginConfiguration,
-    schemas: Map<String, OpenApiSpec.ObjectType>
-): OpenApiSpec {
-    val reducedRoutes = routes
-        .map {
-            reduce(it)
-                .cleanPaths()
-                .convertToSpec()
-        }
-        .reduce { acc, route ->
-            acc.plus(route)
-        }.mapKeys { it.key.replace("//", "/") }
-
-    return OpenApiSpec(
-        info = OpenApiSpec.Info(
-            title = configuration.title,
-            description = configuration.description,
-            version = configuration.version
-        ),
-        servers = configuration.servers.map { OpenApiSpec.Server(it) }.ifEmpty { null },
-        paths = reducedRoutes,
-        components = OpenApiSpec.OpenApiComponents(
-            schemas = schemas,
-            securitySchemes = configuration.securitySchemes.takeIf { it.isNotEmpty() },
-        ),
-        security = configuration.securityConfig.takeIf { it.isNotEmpty() }
-    )
 }
 
 @OptIn(UnsafeCastFunction::class)

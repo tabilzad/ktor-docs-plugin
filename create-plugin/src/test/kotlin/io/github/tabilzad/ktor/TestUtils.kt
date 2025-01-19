@@ -6,12 +6,14 @@ import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.SourceFile
 import io.github.classgraph.ClassGraph
 import io.github.tabilzad.ktor.output.OpenApiSpec
+import kotlinx.serialization.json.Json
 import org.assertj.core.api.Assertions
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import java.io.File
 import java.io.FileNotFoundException
 import java.io.PrintStream
 import java.nio.file.Paths
+import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
 object TestSourceUtil {
@@ -69,7 +71,6 @@ private fun sanitizeClassPathFileName(dep: String): String =
         .replace("-jvm.jar", "")
         .replace("-jvm", "")
 
-
 private fun dependenciesMatch(classpath: File, dependency: String): Boolean {
     val dep = classpath.name
     val dependencyName = sanitizeClassPathFileName(dep)
@@ -125,11 +126,6 @@ internal fun generateCompilerTest(
             ),
             com.tschuchort.compiletesting.PluginOption(
                 clp.pluginId,
-                KtorDocsCommandLineProcessor.descOption.optionName,
-                "test"
-            ),
-            com.tschuchort.compiletesting.PluginOption(
-                clp.pluginId,
                 KtorDocsCommandLineProcessor.formatOption.optionName,
                 "json"
             ),
@@ -152,6 +148,17 @@ internal fun generateCompilerTest(
                 clp.pluginId,
                 KtorDocsCommandLineProcessor.serverUrls.optionName,
                 config.servers.joinToString("||")
+            ),
+            com.tschuchort.compiletesting.PluginOption(
+                clp.pluginId,
+                KtorDocsCommandLineProcessor.initConfig.optionName,
+                Base64.encode(
+                    Json.encodeToString(
+                        config.initConfig.copy(
+                            info = config.initConfig.info?.copy(description = "test")
+                        )
+                    ).toByteArray()
+                )
             )
         )
     }

@@ -3,7 +3,7 @@ package io.github.tabilzad.ktor.k2
 import io.github.tabilzad.ktor.DocRoute
 import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.github.tabilzad.ktor.buildPluginConfiguration
-import io.github.tabilzad.ktor.k1.convertInternalToOpenSpec
+import io.github.tabilzad.ktor.output.convertInternalToOpenSpec
 import io.github.tabilzad.ktor.serializeAndWriteTo
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CommonConfigurationKeys

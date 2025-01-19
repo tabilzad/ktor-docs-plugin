@@ -7,7 +7,6 @@ import io.github.tabilzad.ktor.ContentType
 import io.github.tabilzad.ktor.OpenApiSpecParam
 import kotlinx.serialization.Serializable
 import java.nio.file.Path
-import java.security.Security
 
 internal typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
 
@@ -15,17 +14,35 @@ internal typealias BodyContent = Map<ContentType, ContentSchema>
 
 data class OpenApiSpec(
     val openapi: String = "3.1.0",
-    val info: Info,
+    val info: Info?,
     val servers: List<Server>? = null,
     val paths: Map<String, Map<String, Path>>,
     val components: OpenApiComponents,
     val security: List<Map<String, List<String>>>? = null
 ) {
+
+    @Serializable
     data class Info(
-        val title: String,
-        val description: String,
-        val version: String
-    )
+        val title: String? = null,
+        val description: String? = null,
+        val version: String? = null,
+        val contact: Contact? = null,
+        val license: License? = null,
+    ) {
+
+        @Serializable
+        data class Contact(
+            val name: String? = null,
+            val email: String? = null,
+            val url: String? = null
+        )
+
+        @Serializable
+        data class License(
+            val name: String? = null,
+            val url: String? = null
+        )
+    }
 
     data class Server(val url: String)
 
