@@ -19,3 +19,6 @@ jobs:
 
      - name: Run Tests
        run: ./gradlew :create-plugin:test
+
+     - name: Detekt
+       run: ./gradlew detekt
