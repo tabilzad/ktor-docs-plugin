@@ -2,13 +2,18 @@ package io.github.tabilzad.ktor.config
 
 import kotlinx.serialization.Serializable
 
-class SecurityConfigBuilder {
-    private val scopes = mutableMapOf<String, List<String>>()
+data class SecurityConfig(
+    val scopes: List<Map<String, List<String>>>,
+    val schemes: Map<String, Scheme>,
+)
+
+class SecurityBuilder {
+    private val requirements = mutableListOf<Map<String, List<String>>>()
     private val schemes = mutableMapOf<String, Scheme>()
 
     fun scopes(init: ScopeConfigBuilder.() -> Unit) {
         val scopeConfig = ScopeConfigBuilder().apply(init).build()
-        scopes.putAll(scopeConfig)
+        requirements.addAll(scopeConfig)
     }
 
     fun schemes(init: SchemeConfigBuilder.() -> Unit) {
@@ -16,7 +21,7 @@ class SecurityConfigBuilder {
         schemes.putAll(schemeConfig)
     }
 
-    fun build(): SecurityConfig = SecurityConfig(scopes, schemes)
+    fun build(): SecurityConfig = SecurityConfig(requirements, schemes.toMap())
 }
 
 class InfoConfigBuilder {
@@ -45,17 +50,35 @@ class InfoConfigBuilder {
 }
 
 class ScopeConfigBuilder {
-    private val configs = mutableMapOf<String, List<String>>()
+    private val items = mutableListOf<Map<String, List<String>>>()
 
-    infix fun String.to(scopes: List<String>) {
-        configs[this] = scopes
+    fun or(init: ItemBuilder.() -> Unit) {
+        val builder = ItemBuilder()
+        builder.init()
+        items.add(builder.build())
     }
+
+    fun and(init: ItemBuilder.() -> Unit) {
+        val builder = ItemBuilder()
+        builder.init()
+        items.add(builder.build())
+    }
+
+    fun build(): List<Map<String, List<String>>> = items
+}
+
+class ItemBuilder {
+    private val map = linkedMapOf<String, List<String>>()
 
     operator fun String.unaryPlus() {
-        configs[this] = emptyList()
+        map[this] = emptyList()
     }
 
-    fun build(): Map<String, List<String>> = configs
+    infix fun String.to(scopes: List<String>) {
+        map[this] = scopes
+    }
+
+    fun build(): Map<String, List<String>> = map
 }
 
 class SchemeConfigBuilder {
@@ -67,11 +90,6 @@ class SchemeConfigBuilder {
 
     fun build(): Map<String, Scheme> = configs
 }
-
-data class SecurityConfig(
-    val scopes: Map<String, List<String>>,
-    val schemes: Map<String, Scheme>
-)
 
 @Serializable
 open class Scheme(
