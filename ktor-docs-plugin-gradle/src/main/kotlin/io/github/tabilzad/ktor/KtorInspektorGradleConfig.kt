@@ -3,7 +3,7 @@ package io.github.tabilzad.ktor
 import io.github.tabilzad.ktor.config.Info
 import io.github.tabilzad.ktor.config.InfoConfigBuilder
 import io.github.tabilzad.ktor.config.Scheme
-import io.github.tabilzad.ktor.config.SecurityConfigBuilder
+import io.github.tabilzad.ktor.config.SecurityBuilder
 
 open class DocumentationOptions(
     var generateRequestSchemas: Boolean = true,
@@ -17,17 +17,13 @@ open class DocumentationOptions(
     private val securitySchemes: MutableMap<String, Scheme> = mutableMapOf()
     private var info = Info()
 
-    fun security(block: SecurityConfigBuilder.() -> Unit) {
-        val builder = SecurityConfigBuilder()
+    fun security(block: SecurityBuilder.() -> Unit) {
+        val builder = SecurityBuilder()
         builder.block()
         builder.build().let {
-            it.scopes.forEach { scope ->
-                securityConfig.add(mapOf(scope.toPair()))
-            }
+            securityConfig.addAll(it.scopes)
 
-            it.schemes.forEach { (schemeKey, scheme) ->
-                securitySchemes[schemeKey] = scheme
-            }
+            securitySchemes.putAll(it.schemes)
         }
     }
 
