@@ -1,0 +1,18 @@
+#!/bin/bash
+
+./gradlew detekt
+
+if [ $? -ne 0 ]; then
+  echo "detekt found issues. Aborting push."
+  exit 1
+fi
+
+./gradlew :create-plugin:test
+
+if [ $? -ne 0 ]; then
+  echo "create-plugin tests failed. Aborting push."
+  exit 1
+fi
+
+# Allow push to proceed
+exit 0
