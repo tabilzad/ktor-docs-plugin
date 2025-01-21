@@ -1,18 +1,18 @@
-
 import com.vanniktech.maven.publish.GradlePlugin
 import com.vanniktech.maven.publish.JavadocJar
-import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     id("java-gradle-plugin")
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.mavenPublish.base)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.mavenShadow)
 }
 
 dependencies {
     compileOnly(libs.bundles.kotlinGradle)
 
+    shadow(projects.common)
     implementation(libs.serialization.json)
     implementation(libs.serialization)
 }
@@ -33,6 +33,15 @@ val versionDirectory = "${layout.buildDirectory.asFile.get().path}/generated/ver
 sourceSets {
     main {
         java.srcDir(versionDirectory)
+    }
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+    mergeServiceFiles()
+    configurations = listOf(project.configurations.shadow.get())
+    dependencies {
+        include(dependency(projects.common))
     }
 }
 
@@ -61,37 +70,11 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
 }
 
 mavenPublishing {
-    configure(GradlePlugin(
-        javadocJar = JavadocJar.Dokka("dokkaHtml"),
-        sourcesJar = true
-    ))
-    publishToMavenCentral(SonatypeHost.S01, automaticRelease = false)
-    coordinates(
-        groupId = project.group.toString(),
-        artifactId = project.properties["POM_ARTIFACT_ID"].toString(),
-        version = project.version.toString()
+    configure(
+        GradlePlugin(
+            javadocJar = JavadocJar.Dokka("dokkaHtml"),
+            sourcesJar = true
+        )
     )
-    signAllPublications()
-    pom {
-        name.set("Ktor Swagger Gradle Plugin")
-        description.set("Provides Gradle bridge for ktor-docs-plugin")
-        url.set("https://github.com/tabilzad/ktor-docs-plugin")
-        licenses {
-            license {
-                name.set("The Apache License, Version 2.0")
-                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-        }
-        developers {
-            developer {
-                id.set("tabilzad")
-                email.set("tim.abilzade@gmail.com")
-                url.set("https://github.com/tabilzad")
-            }
-        }
-        scm {
-            url.set("https://github.com/tabilzad/ktor-docs-plugin")
-        }
-    }
 }
 

@@ -20,7 +20,7 @@ import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_PATH
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_REQUEST_BODY
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_SERVERS
 import io.github.tabilzad.ktor.SwaggerConfigurationKeys.OPTION_USE_KDOCS
-import io.github.tabilzad.ktor.input.ConfigInput
+import io.github.tabilzad.ktor.model.ConfigInput
 import kotlinx.serialization.json.Json
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption

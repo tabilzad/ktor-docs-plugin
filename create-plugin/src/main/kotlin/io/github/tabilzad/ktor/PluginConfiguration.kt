@@ -1,7 +1,7 @@
 package io.github.tabilzad.ktor
 
-import io.github.tabilzad.ktor.input.ConfigInput
-import io.github.tabilzad.ktor.output.OpenApiSpec
+import io.github.tabilzad.ktor.model.ConfigInput
+import io.github.tabilzad.ktor.model.Info
 
 // Internal
 internal data class PluginConfiguration(
@@ -43,7 +43,7 @@ internal data class PluginConfiguration(
                 initConfig = initConfig ?: ConfigInput(
                     emptyList(),
                     emptyMap(),
-                    OpenApiSpec.Info(
+                    Info(
                         title = defaultTitle,
                         description = "",
                         version = defaultVersion,

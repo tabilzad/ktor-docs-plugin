@@ -1,10 +1,10 @@
 package io.github.tabilzad.ktor
 
-import io.github.tabilzad.ktor.input.ConfigInput
 import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k2.ClassIds.TRANSIENT_ANNOTATION_FQ
 import io.github.tabilzad.ktor.k2.visitors.StringArrayLiteralVisitor
 import io.github.tabilzad.ktor.k2.visitors.StringResolutionVisitor
+import io.github.tabilzad.ktor.model.ConfigInput
 import io.github.tabilzad.ktor.output.OpenApiSpec
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.descriptors.PropertyDescriptor

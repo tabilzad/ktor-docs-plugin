@@ -1,19 +1,20 @@
-
 import com.vanniktech.maven.publish.JavadocJar
 import com.vanniktech.maven.publish.KotlinJvm
-import com.vanniktech.maven.publish.SonatypeHost
 
 plugins {
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.mavenPublish.base)
+    alias(libs.plugins.mavenShadow)
     alias(libs.plugins.dokka)
 }
 
 dependencies {
-    implementation(projects.annotations)
-
     compileOnly(libs.kotlinCompiler)
+
+    implementation(projects.annotations)
+    shadow(projects.common)
+
     implementation(libs.bundles.jackson)
     implementation(libs.kotlinReflect)
     implementation(libs.moshi)
@@ -21,6 +22,7 @@ dependencies {
     implementation(libs.serialization.json)
     implementation(libs.bundles.ktor)
 
+    testImplementation(projects.common)
     testImplementation(libs.classGraph)
     testImplementation(libs.compilerTest)
     testImplementation(libs.bundles.ktor)
@@ -33,37 +35,20 @@ tasks.test {
     useJUnitPlatform()
 }
 
-mavenPublishing {
-    configure(KotlinJvm(
-        javadocJar = JavadocJar.Dokka("dokkaHtml"),
-        sourcesJar = true
-    ))
-    publishToMavenCentral(SonatypeHost.S01, automaticRelease = false)
-    coordinates(
-        project.group.toString(),
-        project.properties["POM_ARTIFACT_ID"].toString(),
-        project.version.toString()
-    )
-    signAllPublications()
-    pom {
-        name.set("Ktor Open API specification generator")
-        description.set("Open API (Swagger) specification Generator for Ktor")
-        url.set("https://github.com/tabilzad/ktor-docs-plugin")
-        licenses {
-            license {
-                name.set("The Apache License, Version 2.0")
-                url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
-            }
-        }
-        developers {
-            developer {
-                id.set("tabilzad")
-                email.set("tim.abilzade@gmail.com")
-                url.set("https://github.com/tabilzad")
-            }
-        }
-        scm {
-            url.set("https://github.com/tabilzad/ktor-docs-plugin")
-        }
+tasks.shadowJar {
+    archiveClassifier.set("")
+    mergeServiceFiles()
+    configurations = listOf(project.configurations.shadow.get())
+    dependencies {
+        include(dependency(projects.common))
     }
+}
+
+mavenPublishing {
+    configure(
+        KotlinJvm(
+            javadocJar = JavadocJar.Dokka("dokkaHtml"),
+            sourcesJar = true
+        )
+    )
 }

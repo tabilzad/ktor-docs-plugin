@@ -1,6 +1,6 @@
 package io.github.tabilzad.ktor
 
-import io.github.tabilzad.ktor.config.ConfigInput
+import io.github.tabilzad.ktor.model.ConfigInput
 import kotlinx.serialization.json.Json
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider

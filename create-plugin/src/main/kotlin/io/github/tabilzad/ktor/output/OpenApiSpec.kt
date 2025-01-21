@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.sun.security.ntlm.Server
 import io.github.tabilzad.ktor.ContentType
 import io.github.tabilzad.ktor.OpenApiSpecParam
-import kotlinx.serialization.Serializable
+import io.github.tabilzad.ktor.model.Info
+import io.github.tabilzad.ktor.model.SecurityScheme
 import java.nio.file.Path
 
 internal typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
@@ -21,29 +22,6 @@ data class OpenApiSpec(
     val security: List<Map<String, List<String>>>? = null
 ) {
 
-    @Serializable
-    data class Info(
-        val title: String? = null,
-        val description: String? = null,
-        val version: String? = null,
-        val contact: Contact? = null,
-        val license: License? = null,
-    ) {
-
-        @Serializable
-        data class Contact(
-            val name: String? = null,
-            val email: String? = null,
-            val url: String? = null
-        )
-
-        @Serializable
-        data class License(
-            val name: String? = null,
-            val url: String? = null
-        )
-    }
-
     data class Server(val url: String)
 
     data class Path(
@@ -55,26 +33,6 @@ data class OpenApiSpec(
         val parameters: List<Parameter>? = null,
         val requestBody: RequestBody? = null,
         val security: List<Map<String, List<String>>>? = null
-    )
-
-    @Serializable
-    data class SecurityScheme(
-        val type: String, // "apiKey", "http", "oauth2", etc.
-        val scheme: String? = null, // "basic", "bearer", etc. (for "http")
-        val `in`: String? = null, // can be "header", "query" or "cookie"
-        val name: String? = null, // name of the header, query parameter or cookie
-        val bearerFormat: String? = null, // optional, arbitrary value for documentation purposes, eg. JWT
-        val description: String? = null,
-        val flows: Map<String, OAuthFlow>? = null, // Used for OAuth flow specs
-        val openIdConnectUrl: String? = null,
-    )
-
-    @Serializable
-    data class OAuthFlow(
-        val authorizationUrl: String,
-        val tokenUrl: String? = null,
-        val refreshUrl: String? = null,
-        val scopes: Map<String, String>? = null,
     )
 
     data class RequestBody(
