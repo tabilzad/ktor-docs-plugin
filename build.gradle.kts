@@ -26,7 +26,7 @@ buildscript {
 subprojects {
     apply(plugin = "org.jetbrains.dokka")
 
-    group = "io.github.tabilzad.ktor"
+    group = "io.github.tabilzad.inspektor"
     version = project.properties["VERSION_NAME"].toString()
 
     repositories {
