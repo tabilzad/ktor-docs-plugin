@@ -20,7 +20,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("gradlePlugin") {
-            id = "io.github.tabilzad.inspektor.ktor-docs-plugin-gradle"
+            id = "io.github.tabilzad.inspektor"
             displayName = "Ktor Open API specification Generator"
             description = "Open API (Swagger) specification Generator for Ktor"
             implementationClass = "io.github.tabilzad.ktor.KtorMetaPlugin"

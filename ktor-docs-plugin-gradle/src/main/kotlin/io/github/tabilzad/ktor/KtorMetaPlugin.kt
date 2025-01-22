@@ -12,14 +12,14 @@ import java.io.File
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
 
-const val PLUGIN_ID = "io.github.tabilzad.ktor-docs-plugin-gradle"
+const val PLUGIN_ID = "io.github.tabilzad.inspektor"
 
 open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun getCompilerPluginId() = PLUGIN_ID
     override fun getPluginArtifact(): SubpluginArtifact =
         SubpluginArtifact(
-            groupId = "io.github.tabilzad",
+            groupId = "io.github.tabilzad.inspektor",
             artifactId = "ktor-docs-plugin",
             version = ktorDocsVersion
         )
@@ -42,8 +42,8 @@ open class KtorMetaPlugin : KotlinCompilerPluginSupportPlugin {
         val swaggerExtension = project.extensions.findByType(KtorInspectorGradleConfig::class.java) ?: KtorInspectorGradleConfig()
 
         kotlinCompilation.dependencies {
-            compileOnly("io.github.tabilzad:ktor-docs-plugin:$ktorDocsVersion")
-            implementation("io.github.tabilzad:annotations:$ktorDocsVersion")
+            compileOnly("io.github.tabilzad.inspektor:ktor-docs-plugin:$ktorDocsVersion")
+            implementation("io.github.tabilzad.inspektor:annotations:$ktorDocsVersion")
         }
 
         val openApiOutputFile = with(swaggerExtension.pluginOptions) {
