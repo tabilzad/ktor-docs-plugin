@@ -37,7 +37,7 @@ open class DocumentationOptions(
         val builder = InfoConfigBuilder()
         builder.block()
         val infoBlock = builder.build()
-        info = infoBlock.copy(
+        info = info.copy(
             infoBlock.title ?: info.title,
             infoBlock.description ?: info.description,
             infoBlock.version ?: info.version
