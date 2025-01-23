@@ -6,12 +6,6 @@ import io.github.tabilzad.ktor.model.Info
 import io.github.tabilzad.ktor.model.SecurityScheme
 
 open class DocumentationOptions(
-    @Deprecated("Please use info { } extension instead ")
-    var docsTitle: String = "Open API Specification",
-    @Deprecated("Please use info { } extension instead ")
-    var docsDescription: String = "Generated using Ktor Docs Plugin",
-    @Deprecated("Please use info { } extension instead ")
-    var docsVersion: String = "1.0.0",
     var generateRequestSchemas: Boolean = true,
     var hideTransientFields: Boolean = true,
     var hidePrivateAndInternalFields: Boolean = true,
@@ -19,16 +13,37 @@ open class DocumentationOptions(
     var useKDocsForDescriptions: Boolean = true,
     var servers: List<String> = emptyList(),
 ) {
+
+    @Deprecated("Please use info { } extension instead ")
+    var docsTitle: String = "Open API Specification"
+        set(value) {
+            field = value
+            info = info.copy(title = value)
+        }
+
+    @Deprecated("Please use info { } extension instead ")
+    var docsDescription: String = "Generated using Ktor Docs Plugin"
+        set(value) {
+            field = value
+            info = info.copy(description = value)
+        }
+
+    @Deprecated("Please use info { } extension instead ")
+    var docsVersion: String = "1.0.0"
+        set(value) {
+            field = value
+            info = info.copy(version = value)
+        }
+
+    private var info = Info(title = docsTitle, description = docsDescription, version = docsVersion)
     private val securityConfig: MutableList<Map<String, List<String>>> = mutableListOf()
     private val securitySchemes: MutableMap<String, SecurityScheme> = mutableMapOf()
-    private var info = Info(title = docsTitle, description = docsDescription, version = docsVersion)
 
     fun security(block: SecurityBuilder.() -> Unit) {
         val builder = SecurityBuilder()
         builder.block()
         builder.build().let {
             securityConfig.addAll(it.scopes)
-
             securitySchemes.putAll(it.schemes)
         }
     }
