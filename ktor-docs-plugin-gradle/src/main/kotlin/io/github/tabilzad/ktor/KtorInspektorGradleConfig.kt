@@ -36,7 +36,12 @@ open class DocumentationOptions(
     fun info(block: InfoConfigBuilder.() -> Unit) {
         val builder = InfoConfigBuilder()
         builder.block()
-        info = builder.build()
+        val infoBlock = builder.build()
+        info = infoBlock.copy(
+            infoBlock.title ?: info.title,
+            infoBlock.description ?: info.description,
+            infoBlock.version ?: info.version
+        )
     }
 
     internal fun getInfo() = info
