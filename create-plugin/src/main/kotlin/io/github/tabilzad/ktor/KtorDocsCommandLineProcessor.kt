@@ -69,7 +69,7 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
             OPTION_PATH,
             "Custom Absolute Path",
             "Custom absolute path for generated specification",
-            false
+            true
         )
         val requestSchema = CliOption(
             OPTION_REQUEST_BODY,
@@ -125,7 +125,7 @@ class KtorDocsCommandLineProcessor : CommandLineProcessor {
     }
 
     override val pluginId: String
-        get() = "io.github.tabilzad.ktor-docs-plugin-gradle"
+        get() = "io.github.tabilzad.inspektor"
 
     override val pluginOptions: Collection<AbstractCliOption>
         get() = listOf(
