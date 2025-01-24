@@ -26,7 +26,6 @@ import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.util.PrivateForInline
-import kotlin.reflect.typeOf
 
 internal class ExpressionsVisitorK2(
     private val config: PluginConfiguration,

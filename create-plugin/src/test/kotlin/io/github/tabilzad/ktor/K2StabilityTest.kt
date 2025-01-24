@@ -322,7 +322,6 @@ class K2StabilityTest {
         result.assertWith(expected)
     }
 
-
     @Test
     fun `should handle abstract or sealed schema definitions`() {
         val (source, expected) = loadSourceAndExpected("Abstractions")

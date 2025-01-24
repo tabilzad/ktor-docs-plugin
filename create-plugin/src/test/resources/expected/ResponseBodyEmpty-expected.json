@@ -6,48 +6,48 @@
     "version" : "1.0.0"
   },
   "paths" : {
-    "/v1/noResponseBody": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "Success"
+    "/v1/noResponseBody" : {
+      "post" : {
+        "responses" : {
+          "200" : {
+            "description" : "Success"
           },
-          "500": {
-            "description": "Failure",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/sources.requests.PrivateBodyRequest"
+          "500" : {
+            "description" : "Failure",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/sources.requests.PrivateBodyRequest"
                 }
               }
             }
           }
         },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/sources.requests.SimpleRequest"
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
               }
             }
           }
         }
       }
     },
-    "/v1/implicitArgNames": {
-      "post": {
-        "responses": {
-          "204": {
-            "description": ""
+    "/v1/implicitArgNames" : {
+      "post" : {
+        "responses" : {
+          "204" : {
+            "description" : ""
           }
         },
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/sources.requests.SimpleRequest"
+        "requestBody" : {
+          "required" : true,
+          "content" : {
+            "application/json" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/sources.requests.SimpleRequest"
               }
             }
           }
