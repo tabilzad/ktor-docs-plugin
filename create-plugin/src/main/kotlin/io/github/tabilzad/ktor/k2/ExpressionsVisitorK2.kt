@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.util.PrivateForInline
+import kotlin.reflect.typeOf
 
 internal class ExpressionsVisitorK2(
     private val config: PluginConfiguration,
@@ -268,38 +269,44 @@ internal class ExpressionsVisitorK2(
                                 type = kotlinType.toString().toSwaggerType()
                             )
                         } else {
-
                             val typeRef = response.type?.generateTypeAndVisitMemberDescriptors()
                             OpenApiSpec.SchemaType(
                                 `$ref` = "${typeRef?.contentBodyRef}"
                             )
                         }
                     if (!response.isCollection) {
-                        response.status to
+                        if (kotlinType?.isNothing ?: false) {
+                            response.status to OpenApiSpec.ResponseDetails(
+                                response.descr,
+                                null,
+                            )
+                        } else {
+                            response.status to
                                 OpenApiSpec.ResponseDetails(
-                                    response.descr ?: "",
+                                    response.descr,
                                     mapOf(
                                         ContentType.APPLICATION_JSON to mapOf(
                                             "schema" to schema
                                         )
                                     )
                                 )
+                        }
                     } else {
                         response.status to
-                                OpenApiSpec.ResponseDetails(
-                                    response.descr ?: "",
-                                    mapOf(
-                                        ContentType.APPLICATION_JSON to mapOf(
-                                            "schema" to OpenApiSpec.SchemaType(
-                                                type = "array",
-                                                items = OpenApiSpec.SchemaRef(
-                                                    type = schema.type,
-                                                    `$ref` = schema.`$ref`
-                                                )
+                            OpenApiSpec.ResponseDetails(
+                                response.descr,
+                                mapOf(
+                                    ContentType.APPLICATION_JSON to mapOf(
+                                        "schema" to OpenApiSpec.SchemaType(
+                                            type = "array",
+                                            items = OpenApiSpec.SchemaRef(
+                                                type = schema.type,
+                                                `$ref` = schema.`$ref`
                                             )
                                         )
                                     )
                                 )
+                            )
                     }
                 }
 

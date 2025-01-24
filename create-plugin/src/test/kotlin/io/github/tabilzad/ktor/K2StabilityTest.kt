@@ -311,6 +311,19 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should correctly resolve Nothing class into empty response annotations`() {
+        val (source, expected) = loadSourceAndExpected("ResponseBodyEmpty")
+        generateCompilerTest(
+            testFile,
+            source,
+            PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false)
+        )
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+
+    @Test
     fun `should handle abstract or sealed schema definitions`() {
         val (source, expected) = loadSourceAndExpected("Abstractions")
         generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
