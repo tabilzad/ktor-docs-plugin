@@ -146,6 +146,7 @@ fun Route.ordersRouting() {
 
 ### Responses
 Defining response schemas and their corresponding HTTP status codes are done via `@KtorResponds` annotation on an endpoint. 
+`Nothing` is treated specially and will result in empty response body.
 
 ```kotlin
 @GenerateOpenApi
@@ -154,6 +155,7 @@ fun Route.ordersRouting() {
         @KtorResponds(
                [
                    ResponseEntry("200", Order::class, description = "Created order"),
+                   ResponseEntry("204", Nothing::class),
                    ResponseEntry("400", ErrorResponseSample::class, description = "Invalid order payload")
                ]
         )

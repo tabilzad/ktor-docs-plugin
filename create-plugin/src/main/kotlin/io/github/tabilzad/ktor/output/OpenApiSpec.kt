@@ -85,7 +85,7 @@ data class OpenApiSpec(
 
     data class ResponseDetails(
         val description: String,
-        val content: BodyContent
+        val content: BodyContent?
     )
 
     data class OpenApiComponents(
