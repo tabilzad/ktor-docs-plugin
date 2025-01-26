@@ -232,7 +232,7 @@ internal class ClassDescriptorVisitorK2(
 
 internal fun FirProperty.findDocsDescription(session: FirSession): KtorDescriptionBag? {
     val docsAnnotation =
-        findAnnotation(KtorDescription::class.simpleName) ?: findAnnotation(KtorFieldDescription::class.simpleName)
+        findAnnotationNamed(KtorDescription::class.simpleName) ?: findAnnotationNamed(KtorFieldDescription::class.simpleName)
         ?: return null
 
     val dataBag = docsAnnotation.extractDescription(session)

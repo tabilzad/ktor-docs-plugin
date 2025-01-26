@@ -275,15 +275,9 @@ internal class ExpressionsVisitorK2(
                 val type = params.firstOrNull()?.toConeTypeProjection()?.type
 
                 if (functionCall.isInPackage(ClassIds.KTOR_RESOURCES) && type.isKtorResourceAnnotated()) {
-
                     resource = type?.toRegularClassSymbol(session)
                         ?.fir
-                        ?.accept(
-                            ResourceClassVisitor(
-                                session, config, endpoint
-                            ),
-                            null
-                        )
+                        ?.accept(ResourceClassVisitor(session, config, endpoint), null)
                 } else if (functionCall.isInPackage(ClassIds.KTOR_ROUTING_PACKAGE)) {
                     body = type?.toEndpointBody()
                 }
@@ -418,7 +412,7 @@ internal data class KtorK2ResponseBag(
 private fun KtorElement?.wrapAsList() = this?.let { listOf(this) } ?: emptyList()
 
 private fun FirFunctionCall.findDocsDescription(session: FirSession): KtorDescriptionBag {
-    val docsAnnotation = findAnnotation(KtorDescription::class.simpleName!!)
+    val docsAnnotation = findAnnotationNamed(KtorDescription::class.simpleName!!)
         ?: return KtorDescriptionBag()
 
     return docsAnnotation.extractDescription(session)
@@ -426,7 +420,7 @@ private fun FirFunctionCall.findDocsDescription(session: FirSession): KtorDescri
 
 @OptIn(PrivateForInline::class)
 private fun FirFunctionCall.findRespondsAnnotation(session: FirSession): List<KtorK2ResponseBag>? {
-    val annotation = findAnnotation(KtorResponds::class.simpleName!!)
+    val annotation = findAnnotationNamed(KtorResponds::class.simpleName!!)
     return annotation?.let {
         val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(annotation, session)
         val mapping = resolved?.entries?.find { it.key.asString() == "mapping" }?.value?.result

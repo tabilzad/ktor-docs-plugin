@@ -2,9 +2,6 @@ package io.github.tabilzad.ktor.annotations
 
 import kotlin.reflect.KClass
 
-@Deprecated("Please use @GenerateOpenApi")
-typealias KtorDocs = GenerateOpenApi
-
 @Retention(AnnotationRetention.SOURCE)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.EXPRESSION)
 annotation class GenerateOpenApi

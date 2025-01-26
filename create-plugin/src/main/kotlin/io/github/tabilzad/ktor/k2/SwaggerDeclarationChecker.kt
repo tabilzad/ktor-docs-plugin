@@ -1,10 +1,7 @@
 package io.github.tabilzad.ktor.k2
 
-import io.github.tabilzad.ktor.DocRoute
-import io.github.tabilzad.ktor.annotations.GenerateOpenApi
-import io.github.tabilzad.ktor.buildPluginConfiguration
+import io.github.tabilzad.ktor.*
 import io.github.tabilzad.ktor.output.convertInternalToOpenSpec
-import io.github.tabilzad.ktor.serializeAndWriteTo
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
@@ -34,31 +31,25 @@ class SwaggerDeclarationChecker(
     private val config = configuration.buildPluginConfiguration()
 
     override fun check(declaration: FirSimpleFunction, context: CheckerContext, reporter: DiagnosticReporter) {
-        if (
-            declaration.hasAnnotation(ClassIds.KTOR_DOCS_ANNOTATION, session) ||
-            declaration.hasAnnotation(ClassIds.KTOR_GENERATE_ANNOTATION, session) ||
-            declaration.hasAnnotation(session, GenerateOpenApi::class.simpleName!!) ||
-            declaration.hasAnnotation(session, "KtorDocs")
-        ) {
+        if (declaration.hasAnnotation(ClassIds.KTOR_GENERATE_ANNOTATION, session)) {
             val expressionsVisitor = ExpressionsVisitorK2(config, context, session, log)
-            val rawRoutes = declaration.accept(expressionsVisitor, null)
-
-            val routes: List<DocRoute> = if (rawRoutes.any { it !is DocRoute }) {
-                val (routes, endpoints) = rawRoutes.partition { it is DocRoute }
-                val docRoutes = routes as List<DocRoute>
-                docRoutes.plus(DocRoute("/", endpoints.toMutableList()))
-            } else {
-                rawRoutes as List<DocRoute>
-            }
-
+            val ktorElements: List<KtorElement> = declaration.accept(expressionsVisitor, null)
             val components = expressionsVisitor.classNames
                 .associateBy { it.fqName ?: "UNKNOWN" }
 
             convertInternalToOpenSpec(
-                routes = routes,
+                routes = ktorElements.wrapLooseEndpoints(),
                 configuration = config,
                 schemas = components
             ).serializeAndWriteTo(config)
+        }
+    }
+
+    private fun List<KtorElement>.wrapLooseEndpoints(): List<DocRoute> = map {
+        when (it) {
+            is EndPoint -> DocRoute("/", mutableListOf(it))
+
+            is DocRoute -> it
         }
     }
 }

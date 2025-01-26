@@ -24,7 +24,6 @@ object ClassIds {
 
     val KTOR_TAGS_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor.annotations"), FqName("Tag"), false)
     val KTOR_GENERATE_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor.annotations"), FqName("GenerateOpenApi"), false)
-    val KTOR_DOCS_ANNOTATION = ClassId(FqName("io.github.tabilzad.ktor.annotations"), FqName("KtorDocs"), false)
     val KTOR_RESOURCE_ANNOTATION = ClassId(FqName("io.ktor.resources"), FqName("Resource"), false)
 
     val KTOR_DSL_ANNOTATION = ClassId(FqName("io.ktor.util"), FqName("KtorDsl"), false)

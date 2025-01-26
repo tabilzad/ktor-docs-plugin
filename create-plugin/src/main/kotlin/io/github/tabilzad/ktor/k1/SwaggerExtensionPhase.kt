@@ -2,7 +2,7 @@ package io.github.tabilzad.ktor.k1
 
 import io.github.tabilzad.ktor.DocRoute
 import io.github.tabilzad.ktor.PluginConfiguration
-import io.github.tabilzad.ktor.annotations.KtorDocs
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.github.tabilzad.ktor.k1.visitors.ExpressionsVisitor
 import io.github.tabilzad.ktor.output.convertInternalToOpenSpec
 import io.github.tabilzad.ktor.serializeAndWriteTo
@@ -32,7 +32,7 @@ private fun KtDeclaration.startVisiting(
     declarationCheckerContext: DeclarationCheckerContext,
     configuration: PluginConfiguration,
 ) {
-    if (hasAnnotation(KtorDocs::class.simpleName)) {
+    if (hasAnnotation(GenerateOpenApi::class.simpleName)) {
 
         val context = declarationCheckerContext.trace.bindingContext
         val expressionsVisitor = ExpressionsVisitor(configuration, context)

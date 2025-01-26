@@ -2,7 +2,6 @@ package sources
 
 import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.github.tabilzad.ktor.annotations.KtorDescription
-import io.github.tabilzad.ktor.annotations.KtorDocs
 import io.github.tabilzad.ktor.annotations.Tag
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
@@ -48,7 +47,7 @@ fun Application.testDescriptionTags() {
     }
 }
 
-@KtorDocs
+@GenerateOpenApi
 @Tag(["module2"])
 fun Application.testDescriptionTags2() {
     routing {
@@ -72,7 +71,7 @@ fun Application.testDescriptionTags2() {
     }
 }
 
-@KtorDocs
+@GenerateOpenApi
 @Tag(["subModule"])
 fun Route.subRouteWithSpecialTag(){
 

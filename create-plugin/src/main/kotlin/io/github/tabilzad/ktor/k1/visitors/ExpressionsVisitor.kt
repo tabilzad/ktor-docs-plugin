@@ -1,8 +1,8 @@
 package io.github.tabilzad.ktor.k1.visitors
 
 import io.github.tabilzad.ktor.*
+import io.github.tabilzad.ktor.annotations.GenerateOpenApi
 import io.github.tabilzad.ktor.annotations.KtorDescription
-import io.github.tabilzad.ktor.annotations.KtorDocs
 import io.github.tabilzad.ktor.annotations.KtorResponds
 import io.github.tabilzad.ktor.k1.findAnnotation
 import io.github.tabilzad.ktor.k1.hasAnnotation
@@ -428,8 +428,8 @@ internal class ExpressionsVisitor(
         val source = DescriptorToSourceUtils.getSourceFromDescriptor(descriptor)
         return if (source is KtFunction) {
             val newTags = mutableSetOf<String>()
-            if (source.hasAnnotation(KtorDocs::class.simpleName)) {
-                val annotation = source.findAnnotation(KtorDocs::class.simpleName)
+            if (source.hasAnnotation(GenerateOpenApi::class.simpleName)) {
+                val annotation = source.findAnnotation(GenerateOpenApi::class.simpleName)
                 var tags =
                     annotation?.valueArguments?.find { it.getArgumentName()?.asName?.asString() == "tags" }
 
@@ -599,8 +599,8 @@ internal class ExpressionsVisitor(
     override fun visitNamedFunction(function: KtNamedFunction, parent: KtorElement?): List<KtorElement> {
 
         var newParent = parent
-        if (function.hasAnnotation(KtorDocs::class.simpleName)) {
-            val annotation = function.findAnnotation(KtorDocs::class.simpleName)
+        if (function.hasAnnotation(GenerateOpenApi::class.simpleName)) {
+            val annotation = function.findAnnotation(GenerateOpenApi::class.simpleName)
             var tags =
                 annotation?.valueArguments?.find { it.getArgumentName()?.asName?.asString() == "tags" }
 

@@ -109,27 +109,22 @@ internal val FirTypeRef.getKotlinTypeFqName
         return classId?.internalName
     }
 
-fun FirFunction.hasAnnotation(session: FirSession, name: String): Boolean {
-    return annotations.any { it.fqName(session)?.shortName()?.asString() == name }
+fun FirFunction.hasAnnotationNamed(session: FirSession, name: String): Boolean =
+    annotations.any { it.fqName(session)?.shortName()?.asString() == name }
+
+fun FirStatement.findAnnotationNamed(name: String) = annotations.firstOrNull {
+    it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
 }
 
-fun FirStatement.findAnnotation(name: String): FirAnnotation? {
-    return annotations.firstOrNull {
-        it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
-    }
-}
-
-fun FirProperty.findAnnotation(name: String?): FirAnnotation? {
+fun FirProperty.findAnnotationNamed(name: String?): FirAnnotation? {
     if (name == null) return null
     return backingField?.annotations?.firstOrNull {
         it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
     }
 }
 
-fun FirFunction.findAnnotation(name: String): FirAnnotation? {
-    return annotations.firstOrNull {
-        it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
-    }
+fun FirFunction.getAnnotationNamed(name: String): FirAnnotation? = annotations.firstOrNull {
+    it.annotationTypeRef.coneType.fqNameStr()?.contains(name) == true
 }
 
 fun FirStatement.findAnnotation(classId: ClassId, session: FirSession): FirAnnotation? {
