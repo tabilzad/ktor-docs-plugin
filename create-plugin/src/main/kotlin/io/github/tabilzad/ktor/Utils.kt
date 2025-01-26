@@ -13,6 +13,7 @@ import org.jetbrains.kotlin.fir.declarations.FirDeclaration
 import org.jetbrains.kotlin.fir.declarations.result
 import org.jetbrains.kotlin.fir.expressions.FirAnnotation
 import org.jetbrains.kotlin.fir.expressions.FirExpressionEvaluator
+import org.jetbrains.kotlin.fir.types.*
 import org.jetbrains.kotlin.kdoc.lexer.KDocTokens
 import org.jetbrains.kotlin.lexer.KtTokens
 import org.jetbrains.kotlin.psi.stubs.elements.KtModifierListElementType
@@ -175,6 +176,9 @@ private fun mapHeaderParams(it: KtorRouteSpec): List<OpenApiSpec.Parameter>? {
         )
     }
 }
+
+internal fun ConeKotlinType.isStringOrPrimitive(): Boolean =
+    isPrimitiveOrNullablePrimitive || isString || isNullableString || isPrimitive
 
 private fun addPostBody(it: KtorRouteSpec): OpenApiSpec.RequestBody? {
     return if (it.method != "get" && it.body.contentBodyRef != null) {

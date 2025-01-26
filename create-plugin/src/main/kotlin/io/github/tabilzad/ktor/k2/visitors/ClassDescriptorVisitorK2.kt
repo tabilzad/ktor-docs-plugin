@@ -1,16 +1,13 @@
 package io.github.tabilzad.ktor.k2.visitors
 
-import io.github.tabilzad.ktor.PluginConfiguration
+import io.github.tabilzad.ktor.*
 import io.github.tabilzad.ktor.annotations.KtorDescription
 import io.github.tabilzad.ktor.annotations.KtorFieldDescription
-import io.github.tabilzad.ktor.extractDescription
-import io.github.tabilzad.ktor.getKDocComments
 import io.github.tabilzad.ktor.k1.visitors.KtorDescriptionBag
 import io.github.tabilzad.ktor.k1.visitors.toSwaggerType
 import io.github.tabilzad.ktor.k2.*
 import io.github.tabilzad.ktor.k2.ClassIds.KTOR_FIELD_DESCRIPTION
 import io.github.tabilzad.ktor.k2.JsonNameResolver.getCustomNameFromAnnotation
-import io.github.tabilzad.ktor.names
 import io.github.tabilzad.ktor.output.OpenApiSpec
 import io.github.tabilzad.ktor.output.OpenApiSpec.ObjectType
 import org.jetbrains.kotlin.fir.FirElement
@@ -68,7 +65,7 @@ internal class ClassDescriptorVisitorK2(
         val typeSymbol = toRegularClassSymbol(session)
 
         return when {
-            isPrimitive || isPrimitiveOrNullablePrimitive || isString || isNullableString -> {
+            isStringOrPrimitive() -> {
                 ObjectType(type = className()?.toSwaggerType() ?: "Unknown")
             }
 
@@ -98,9 +95,11 @@ internal class ClassDescriptorVisitorK2(
 
                 if (!classNames.names.contains(fqClassName)) {
                     val inheritorClassIds = typeSymbol.fir.sealedInheritorsAttr?.getValueOrNull()
-                    val internal = ObjectType("object",
+                    val internal = ObjectType(
+                        "object",
                         fqName = fqClassName,
-                        oneOf = inheritorClassIds?.map { OpenApiSpec.SchemaRef("#/components/schemas/${it.asFqNameString()}") })
+                        oneOf = inheritorClassIds?.map { OpenApiSpec.SchemaRef("#/components/schemas/${it.asFqNameString()}") }
+                    )
                     classNames.add(internal)
                     getMembers(session, config).forEach { nestedDescr ->
                         nestedDescr.accept(this@ClassDescriptorVisitorK2, internal)
@@ -163,7 +162,9 @@ internal class ClassDescriptorVisitorK2(
                                                 genericTypeRef = specifiedType.type,
                                                 genericName = genericType.name.asString()
                                             )
-                                        }), internal
+                                        }
+                                    ),
+                                    internal
                                 )
                             }
                     }
@@ -209,8 +210,7 @@ internal class ClassDescriptorVisitorK2(
             required?.add(name) ?: run {
                 required = mutableListOf(name)
             }
-        } else if ((isRequiredFromExplicitDesc == null &&
-                    !fir.returnTypeRef.coneType.isMarkedNullable) &&
+        } else if ((isRequiredFromExplicitDesc == null && !fir.returnTypeRef.coneType.isMarkedNullable) &&
             config.deriveFieldRequirementFromTypeNullability
         ) {
             required?.add(name) ?: run {

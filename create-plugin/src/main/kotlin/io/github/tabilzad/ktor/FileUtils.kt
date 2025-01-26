@@ -25,7 +25,6 @@ internal fun OpenApiSpec.serializeAndWriteTo(configuration: PluginConfiguration)
         val sorted = new.copy(
             components = new.components.copy(
                 schemas = new.components.schemas.toSortedMap()
-                    .filter { (key, value) -> key != "kotlin.Nothing" }
                     .mapValues {
                         it.value.copy(properties = it.value.properties?.toSortedMap())
                     }

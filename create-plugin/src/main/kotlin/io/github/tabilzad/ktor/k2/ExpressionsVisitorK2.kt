@@ -89,7 +89,7 @@ internal class ExpressionsVisitorK2(
 
             if (receiveCall != null) {
                 val kotlinType = receiveCall.resolvedType
-                if (kotlinType.isPrimitiveOrNullablePrimitive || kotlinType.isString || kotlinType.isNullableString) {
+                if (kotlinType.isStringOrPrimitive()) {
                     parent.body = OpenApiSpec.ObjectType(type = kotlinType.toString().toSwaggerType())
                 } else {
                     if (config.requestBody) {
@@ -158,7 +158,8 @@ internal class ExpressionsVisitorK2(
                     ParametersVisitor(
                         session,
                         listOf(ClassIds.KTOR_QUERY_PARAM, ClassIds.KTOR_RAW_QUERY_PARAM)
-                    ), queryParams
+                    ),
+                    queryParams
                 )
             }
         return queryParams.map { QueryParamSpec(it) }
@@ -172,7 +173,8 @@ internal class ExpressionsVisitorK2(
                     ParametersVisitor(
                         session,
                         listOf(ClassIds.KTOR_HEADER_PARAM, ClassIds.KTOR_HEADER_ACCESSOR)
-                    ), headerParams
+                    ),
+                    headerParams
                 )
             }
 
@@ -254,61 +256,7 @@ internal class ExpressionsVisitorK2(
                 }
             } else if (ExpType.METHOD.labels.contains(expName)) {
                 val descr = functionCall.findDocsDescription(session)
-                val responds = functionCall.findRespondsAnnotation(session)
-                val responses = responds?.associate { response ->
-
-                    val kotlinType = response.type
-
-                    val schema =
-                        if (kotlinType?.isPrimitiveOrNullablePrimitive == true
-                            || kotlinType?.isString == true
-                            || kotlinType?.isNullableString == true
-                        ) {
-                            OpenApiSpec.SchemaType(
-                                type = kotlinType.toString().toSwaggerType()
-                            )
-                        } else {
-                            val typeRef = response.type?.generateTypeAndVisitMemberDescriptors()
-                            OpenApiSpec.SchemaType(
-                                `$ref` = "${typeRef?.contentBodyRef}"
-                            )
-                        }
-                    if (!response.isCollection) {
-                        if (kotlinType?.isNothing ?: false) {
-                            response.status to OpenApiSpec.ResponseDetails(
-                                response.descr,
-                                null,
-                            )
-                        } else {
-                            response.status to
-                                OpenApiSpec.ResponseDetails(
-                                    response.descr,
-                                    mapOf(
-                                        ContentType.APPLICATION_JSON to mapOf(
-                                            "schema" to schema
-                                        )
-                                    )
-                                )
-                        }
-                    } else {
-                        response.status to
-                            OpenApiSpec.ResponseDetails(
-                                response.descr,
-                                mapOf(
-                                    ContentType.APPLICATION_JSON to mapOf(
-                                        "schema" to OpenApiSpec.SchemaType(
-                                            type = "array",
-                                            items = OpenApiSpec.SchemaRef(
-                                                type = schema.type,
-                                                `$ref` = schema.`$ref`
-                                            )
-                                        )
-                                    )
-                                )
-                            )
-                    }
-                }
-
+                val responses = functionCall.findRespondsAnnotation(session)?.resolveToOpenSpecFormat()
                 val params = functionCall.typeArguments
 
                 var body: OpenApiSpec.ObjectType? = null
@@ -333,7 +281,8 @@ internal class ExpressionsVisitorK2(
                         ?.accept(
                             ResourceClassVisitor(
                                 session, config, endpoint
-                            ), null
+                            ),
+                            null
                         )
                 } else if (functionCall.isInPackage(ClassIds.KTOR_ROUTING_PACKAGE)) {
                     body = type?.toEndpointBody()
@@ -382,6 +331,44 @@ internal class ExpressionsVisitorK2(
         return (resultElement ?: parent).wrapAsList()
     }
 
+    private fun List<KtorK2ResponseBag>.resolveToOpenSpecFormat() =
+        associate { response ->
+            val kotlinType = response.type
+            val schema = if (kotlinType?.isStringOrPrimitive() == true) {
+                OpenApiSpec.SchemaType(
+                    type = kotlinType.toString().toSwaggerType()
+                )
+            } else {
+                val typeRef = response.type?.generateTypeAndVisitMemberDescriptors()
+                OpenApiSpec.SchemaType(
+                    `$ref` = "${typeRef?.contentBodyRef}"
+                )
+            }
+
+            if (kotlinType?.isNothing == true) {
+                response.status to OpenApiSpec.ResponseDetails(response.descr, null)
+            } else {
+                response.status to OpenApiSpec.ResponseDetails(
+                    response.descr,
+                    mapOf(
+                        ContentType.APPLICATION_JSON to mapOf(
+                            "schema" to if (response.isCollection) {
+                                OpenApiSpec.SchemaType(
+                                    type = "array",
+                                    items = OpenApiSpec.SchemaRef(
+                                        type = schema.type,
+                                        `$ref` = schema.`$ref`
+                                    )
+                                )
+                            } else {
+                                schema
+                            }
+                        )
+                    )
+                )
+            }
+        }
+
     override fun visitReturnExpression(returnExpression: FirReturnExpression, data: KtorElement?): List<KtorElement> {
         val funCall = returnExpression.result as? FirFunctionCall
         funCall?.accept(this, data)
@@ -395,11 +382,11 @@ internal class ExpressionsVisitorK2(
 
     override fun visitAnonymousFunction(
         anonymousFunction: FirAnonymousFunction,
-        parent: KtorElement?
-    ): List<KtorElement> = anonymousFunction.body?.accept(this, parent) ?: parent.wrapAsList()
+        data: KtorElement?
+    ): List<KtorElement> = anonymousFunction.body?.accept(this, data) ?: data.wrapAsList()
 
     private fun ConeKotlinType.toEndpointBody(): OpenApiSpec.ObjectType? {
-        return if (isPrimitiveOrNullablePrimitive || isString || isNullableString) {
+        return if (isStringOrPrimitive()) {
             OpenApiSpec.ObjectType(type = toString().toSwaggerType())
         } else {
             if (config.requestBody) {

@@ -1,6 +1,7 @@
 package io.github.tabilzad.ktor.output
 
 import io.github.tabilzad.ktor.*
+import org.jetbrains.kotlin.name.StandardClassIds
 
 internal fun convertInternalToOpenSpec(
     routes: List<DocRoute>,
@@ -22,7 +23,7 @@ internal fun convertInternalToOpenSpec(
         servers = configuration.servers.map { OpenApiSpec.Server(it) }.ifEmpty { null },
         paths = reducedRoutes,
         components = OpenApiSpec.OpenApiComponents(
-            schemas = schemas,
+            schemas = schemas.filter { (k, _) -> k != StandardClassIds.Nothing.asFqNameString() },
             securitySchemes = configuration.initConfig.securitySchemes.takeIf { it.isNotEmpty() },
         ),
         security = configuration.initConfig.securityConfig.takeIf { it.isNotEmpty() }
