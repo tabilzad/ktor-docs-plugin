@@ -9,19 +9,24 @@ Take a look at the [Sample Project](https://github.com/tabilzad/ktor-inspektor-e
 
 ```groovy
 plugins {
-    id("io.github.tabilzad.ktor-docs-plugin-gradle") version "0.6.7-alpha"
+    id("io.github.tabilzad.inspektor") version "0.7.1-alpha"
 }
 
 swagger {
-
     documentation {
-        docsTitle = "Ktor Server Title"
-        docsDescription = "Ktor Server Description"
-        docsVersion = "1.0"
         generateRequestSchemas = true
         hideTransientFields = true
         hidePrivateAndInternalFields = true
         deriveFieldRequirementFromTypeNullability = true
+        info {
+            title = "Ktor Server Title"
+            description = "Ktor Server Description"
+            version = "1.0"
+            contact {
+                name = "Inspektor"
+                url = "https://github.com/tabilzad/ktor-docs-plugin"
+            }
+        }
     }
 
     pluginOptions {
