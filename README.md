@@ -53,14 +53,14 @@ swagger {
 
 | Option                         | Default Value                             | Explanation                                                                                 |
 |--------------------------------|-------------------------------------------|---------------------------------------------------------------------------------------------|
-| `docsTitle`                    | `"Open API Specification"`                | Title for the API specification that is generated                                           |
-| `docsDescription`              | `"Generated using Ktor Docs Plugin"`      | A brief description for the generated API specification                                     |
-| `docsVersion`                  | `"1.0.0"`                                 | Specifies the version for the generated API specification                                   |
+| `info.title`                   | `"Open API Specification"`                | Title for the API specification that is generated                                           |
+| `info.description`             | `"Generated using Ktor Docs Plugin"`      | A brief description for the generated API specification                                     |
+| `info.version`                 | `"1.0.0"`                                 | Specifies the version for the generated API specification                                   |
 | `generateRequestSchemas`       | `true`                                    | Determines if request body schemas should <br/>be automatically resolved and included       |
 | `hideTransientFields`          | `true`                                    | Controls whether fields marked with `@Transient` <br/> are omitted in schema outputs        |
 | `hidePrivateAndInternalFields` | `true`                                    | Opts to exclude fields with `private` or `internal` modifiers from schema outputs           |
 | `deriveFieldRequirementFromTypeNullability` | `true`                       | Automatically derive object fields' requirement from its type nullability                   |
-| `servers`                      | empty                                     | List of server URLs to be included in the spec  (ex: `listOf("http://localhost:8080")`      |
+| `servers`                      | []                                        | List of server URLs to be included in the spec  (ex: `listOf("http://localhost:8080")`      |
 
 ### Plugin options
 | Option                         | Default Value                                | Explanation                                                                                 |
@@ -151,7 +151,7 @@ fun Route.ordersRouting() {
 
 ### Responses
 Defining response schemas and their corresponding HTTP status codes are done via `@KtorResponds` annotation on an endpoint. 
-`Nothing` is treated specially and will result in empty response body.
+`kotlin.Nothing` is treated specially and will result in empty response body.
 
 ```kotlin
 @GenerateOpenApi
@@ -209,7 +209,6 @@ fun Route.ordersRouting() {
 * Support for polymorphic types with discriminators 
 * Option for an automatic tag resolution from module/route function declaration
 * Tag descriptions
-* Parsing kdocs for schema/property descriptions
 
 ## Sample Specification
 
