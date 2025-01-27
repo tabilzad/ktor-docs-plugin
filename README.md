@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="200" height="200" src="https://github.com/user-attachments/assets/da646150-24f3-43af-8b8f-188848f284a5" />
+</p>
+
 # Open API (Swagger) Plugin for Ktor
 [![Test and Publish to SonarType](https://github.com/tabilzad/ktor-docs-plugin/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/tabilzad/ktor-docs-plugin/actions/workflows/gradle-publish.yml)
 
