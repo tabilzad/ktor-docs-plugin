@@ -61,7 +61,7 @@ enum class ExpType(val labels: List<String>) {
 internal data class EndPoint(
     override var path: String?,
     val method: String = "",
-    var body: OpenApiSpec.ObjectType? = OpenApiSpec.ObjectType(type = "object"),
+    var body: OpenApiSpec.ObjectType? = null,
     var parameters: Set<ParamSpec>? = null,
     var description: String? = null,
     var operationId: String? = null,

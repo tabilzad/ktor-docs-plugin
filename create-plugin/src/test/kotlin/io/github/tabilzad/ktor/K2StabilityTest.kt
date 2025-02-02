@@ -395,6 +395,22 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should resolve endpoint spec from type-safe ktor resources with body params`() {
+        val (source, expected) = loadSourceAndExpected("ResourcesWithBody")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
+    fun `should resolve endpoint spec from type-safe ktor resources with receive calls`() {
+        val (source, expected) = loadSourceAndExpected("ResourcesWithReceive")
+        generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should resolve endpoint spec from type-safe ktor resources with query params`() {
         val (source, expected) = loadSourceAndExpected("ResourcesWithParams")
         generateCompilerTest(testFile, source, PluginConfiguration.createDefault())

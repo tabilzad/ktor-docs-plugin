@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.utils.mapToSetOrEmpty
 internal class ResourceClassVisitor(
     private val session: FirSession,
     private val config: PluginConfiguration,
-    private val pathlessEndpoint: EndPoint
+    private val pathlessEndpoint: EndPoint,
 ) : FirDefaultVisitor<KtorElement?, KtorElement?>() {
 
     override fun visitElement(element: FirElement, data: KtorElement?): KtorElement? = data
