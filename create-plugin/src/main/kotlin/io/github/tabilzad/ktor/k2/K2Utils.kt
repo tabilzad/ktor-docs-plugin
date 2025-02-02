@@ -218,3 +218,5 @@ fun FirPropertyAccessExpression.isEnum(session: FirSession): Boolean = this.disp
     ?.toResolvedCallableSymbol(session)
     ?.resolvedReturnType
     ?.toRegularClassSymbol(session)?.isEnumClass == true
+
+fun <T> T?.wrapAsList() = this?.let { listOf(this) } ?: emptyList()

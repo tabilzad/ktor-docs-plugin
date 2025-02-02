@@ -46,16 +46,6 @@ internal class ExpressionsVisitorK2(
         return parent.wrapAsList()
     }
 
-    @OptIn(PrivateForInline::class)
-    private fun FirStatement.findTags(session: FirSession): Set<String>? {
-        val annotation = findAnnotation(ClassIds.KTOR_TAGS_ANNOTATION, session) ?: return null
-        val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(annotation, session)
-        return resolved?.entries?.find { it.key.asString() == "tags" }?.value?.result?.accept(
-            StringArrayLiteralVisitor(),
-            emptyList()
-        )?.toSet()
-    }
-
     // Evaluation Order 1
     override fun visitSimpleFunction(simpleFunction: FirSimpleFunction, parent: KtorElement?): List<KtorElement> {
 
@@ -233,73 +223,72 @@ internal class ExpressionsVisitorK2(
         val expName = resolvedExp?.name?.asString() ?: ""
         val tagsFromAnnotation = functionCall.findTags(session)
 
-        val resultElement: KtorElement? =
-            if (functionCall.isARouteDefinition() || ExpType.METHOD.labels.contains(expName)) {
-                val pathValue = functionCall.resolvePath()
+        val resultElement = if (functionCall.isARouteDefinition() || ExpType.METHOD.labels.contains(expName)) {
+            val pathValue = functionCall.resolvePath()
 
-                when {
-                    ExpType.ROUTE.labels.contains(expName) -> {
-                        when (parent) {
-                            null -> {
-                                pathValue?.let {
-                                    DocRoute(it, tags = tagsFromAnnotation)
-                                } ?: DocRoute(expName, tags = tagsFromAnnotation)
-                            }
-
-                            is DocRoute -> {
-                                val newElement = DocRoute(
-                                    pathValue.toString(),
-                                    tags = parent.tags merge tagsFromAnnotation
-                                )
-                                parent.children.add(newElement)
-                                newElement
-                            }
-
-                            else -> null
+            when {
+                ExpType.ROUTE.labels.contains(expName) -> {
+                    when (parent) {
+                        null -> {
+                            pathValue?.let {
+                                DocRoute(it, tags = tagsFromAnnotation)
+                            } ?: DocRoute(expName, tags = tagsFromAnnotation)
                         }
-                    }
 
-                    ExpType.METHOD.labels.contains(expName) -> {
-                        val descr = functionCall.findDocsDescription(session)
-                        val responses = functionCall.findRespondsAnnotation(session)?.resolveToOpenSpecFormat()
-                        val params = functionCall.typeArguments
-
-                        val endpoint = EndPoint(
-                            path = null,
-                            method = expName,
-                            description = descr.description,
-                            summary = descr.summary,
-                            operationId = descr.operationId,
-                            tags = descr.tags merge tagsFromAnnotation,
-                            responses = responses
-                        )
-
-                        val resource = functionCall.findResource(endpoint)
-                        val type = params.firstOrNull()?.toConeTypeProjection()?.type
-                        val newElement = resource ?: endpoint.copy(path = pathValue, body = type?.toEndpointBody())
-                        when (parent) {
-                            null -> newElement
-                            is DocRoute -> {
-                                parent.children.add(newElement)
-                                newElement
-                            }
-
-                            else -> {
-                                log?.report(
-                                    CompilerMessageSeverity.WARNING,
-                                    "Endpoints can't have Endpoint as routes",
-                                    functionCall.getLocation()
-                                )
-                                null
-                            }
+                        is DocRoute -> {
+                            val newElement = DocRoute(
+                                pathValue.toString(),
+                                tags = parent.tags merge tagsFromAnnotation
+                            )
+                            parent.children.add(newElement)
+                            newElement
                         }
-                    }
 
-                    else -> null
+                        else -> null
+                    }
                 }
-            } else {
-                null
+
+                ExpType.METHOD.labels.contains(expName) -> {
+                    val descr = functionCall.findDocsDescription(session)
+                    val responses = functionCall.findRespondsAnnotation(session)?.resolveToOpenSpecFormat()
+                    val params = functionCall.typeArguments
+
+                    val endpoint = EndPoint(
+                        path = null,
+                        method = expName,
+                        description = descr.description,
+                        summary = descr.summary,
+                        operationId = descr.operationId,
+                        tags = descr.tags merge tagsFromAnnotation,
+                        responses = responses
+                    )
+
+                    val resource = functionCall.findResource(endpoint)
+                    val type = params.firstOrNull()?.toConeTypeProjection()?.type
+                    val newElement = resource ?: endpoint.copy(path = pathValue, body = type?.toEndpointBody())
+                    when (parent) {
+                        null -> newElement
+                        is DocRoute -> {
+                            parent.children.add(newElement)
+                            newElement
+                        }
+
+                        else -> {
+                            log?.report(
+                                CompilerMessageSeverity.WARNING,
+                                "Endpoints can't have Endpoint as routes",
+                                functionCall.getLocation()
+                            )
+                            null
+                        }
+                    }
+                }
+
+                else -> null
             }
+        } else {
+            null
+        }
 
         functionCall.findLambda()?.accept(this, resultElement ?: parent) ?: run {
             val declaration = functionCall.calleeReference.toResolvedFunctionSymbol()?.fir
@@ -462,30 +451,31 @@ internal class ExpressionsVisitorK2(
 
     private fun FirFunctionCall.isInPackage(fqName: FqName): Boolean =
         toResolvedCallableSymbol()?.callableId?.packageName == fqName
-}
 
-internal data class KtorK2ResponseBag(
-    val descr: String,
-    val status: String,
-    val type: ConeKotlinType?,
-    val isCollection: Boolean = false
-)
-
-private fun KtorElement?.wrapAsList() = this?.let { listOf(this) } ?: emptyList()
-
-private fun FirFunctionCall.findDocsDescription(session: FirSession): KtorDescriptionBag {
-    val docsAnnotation = findAnnotationNamed(KtorDescription::class.simpleName!!)
-        ?: return KtorDescriptionBag()
-
-    return docsAnnotation.extractDescription(session)
-}
-
-@OptIn(PrivateForInline::class)
-private fun FirFunctionCall.findRespondsAnnotation(session: FirSession): List<KtorK2ResponseBag>? {
-    val annotation = findAnnotationNamed(KtorResponds::class.simpleName!!)
-    return annotation?.let {
+    @OptIn(PrivateForInline::class)
+    private fun FirStatement.findTags(session: FirSession): Set<String>? {
+        val annotation = findAnnotation(ClassIds.KTOR_TAGS_ANNOTATION, session) ?: return null
         val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(annotation, session)
-        val mapping = resolved?.entries?.find { it.key.asString() == "mapping" }?.value?.result
-        mapping?.accept(RespondsAnnotationVisitor(session), null)
+        return resolved?.entries?.find { it.key.asString() == "tags" }?.value?.result?.accept(
+            StringArrayLiteralVisitor(),
+            emptyList()
+        )?.toSet()
+    }
+
+    private fun FirFunctionCall.findDocsDescription(session: FirSession): KtorDescriptionBag {
+        val docsAnnotation = findAnnotationNamed(KtorDescription::class.simpleName!!)
+            ?: return KtorDescriptionBag()
+
+        return docsAnnotation.extractDescription(session)
+    }
+
+    @OptIn(PrivateForInline::class)
+    private fun FirFunctionCall.findRespondsAnnotation(session: FirSession): List<KtorK2ResponseBag>? {
+        val annotation = findAnnotationNamed(KtorResponds::class.simpleName!!)
+        return annotation?.let {
+            val resolved = FirExpressionEvaluator.evaluateAnnotationArguments(annotation, session)
+            val mapping = resolved?.entries?.find { it.key.asString() == "mapping" }?.value?.result
+            mapping?.accept(RespondsAnnotationVisitor(session), null)
+        }
     }
 }

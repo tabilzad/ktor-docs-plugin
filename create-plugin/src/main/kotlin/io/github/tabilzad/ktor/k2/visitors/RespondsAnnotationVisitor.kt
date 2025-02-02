@@ -1,13 +1,20 @@
 package io.github.tabilzad.ktor.k2.visitors
 
-import io.github.tabilzad.ktor.k2.KtorK2ResponseBag
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.declarations.FirValueParameter
 import org.jetbrains.kotlin.fir.expressions.*
+import org.jetbrains.kotlin.fir.types.ConeKotlinType
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.fir.types.type
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitor
+
+internal data class KtorK2ResponseBag(
+    val descr: String,
+    val status: String,
+    val type: ConeKotlinType?,
+    val isCollection: Boolean = false
+)
 
 internal class RespondsAnnotationVisitor(private val session: FirSession) : FirDefaultVisitor<List<KtorK2ResponseBag>, KtorK2ResponseBag?>() {
 
