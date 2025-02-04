@@ -323,6 +323,18 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should correctly resolve Boolean class into boolean response annotations`() {
+        val (source, expected) = loadSourceAndExpected("ResponseBodyBoolean")
+        generateCompilerTest(
+            testFile,
+            source,
+            PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false)
+        )
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should handle abstract or sealed schema definitions`() {
         val (source, expected) = loadSourceAndExpected("Abstractions")
         generateCompilerTest(testFile, source, PluginConfiguration.createDefault())
