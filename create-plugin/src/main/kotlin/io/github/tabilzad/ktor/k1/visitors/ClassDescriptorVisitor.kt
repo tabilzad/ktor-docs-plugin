@@ -362,6 +362,7 @@ fun String.toSwaggerType(): String {
         "float", "kotlin/float" -> "number"
         "long", "kotlin/long" -> "integer"
         "string", "kotlin/string" -> "string"
+        "boolean", "kotlin/boolean" -> "boolean"
         else -> type
     }
 }
