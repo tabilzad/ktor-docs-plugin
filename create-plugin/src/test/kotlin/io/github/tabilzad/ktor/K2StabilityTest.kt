@@ -347,6 +347,18 @@ class K2StabilityTest {
     }
 
     @Test
+    fun `should correctly resolve kotlinx-datetime using instant class into date-time response annotations, simple response body`() {
+        val (source, expected) = loadSourceAndExpected("ResponseBodyKotlinxDatetimeInstant2")
+        generateCompilerTest(
+            testFile,
+            source,
+            PluginConfiguration.createDefault(hideTransients = false, hidePrivateFields = false)
+        )
+        val result = testFile.readText()
+        result.assertWith(expected)
+    }
+
+    @Test
     fun `should correctly resolve kotlinx-datetime using localdatetime class into date-time response annotations`() {
         val (source, expected) = loadSourceAndExpected("ResponseBodyKotlinxDatetimeLocalDateTime")
         generateCompilerTest(
