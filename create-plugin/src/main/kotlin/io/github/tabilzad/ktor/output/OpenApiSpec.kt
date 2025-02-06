@@ -2,12 +2,10 @@ package io.github.tabilzad.ktor.output
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.sun.security.ntlm.Server
 import io.github.tabilzad.ktor.ContentType
 import io.github.tabilzad.ktor.OpenApiSpecParam
 import io.github.tabilzad.ktor.model.Info
 import io.github.tabilzad.ktor.model.SecurityScheme
-import java.nio.file.Path
 
 internal typealias ContentSchema = Map<String, OpenApiSpec.SchemaType>
 
@@ -78,6 +76,7 @@ data class OpenApiSpec(
 
     data class SchemaType(
         val type: String? = null,
+        val format: String? = null,
         val items: SchemaRef? = null,
         @Suppress("ConstructorParameterNaming")
         val `$ref`: String? = null,

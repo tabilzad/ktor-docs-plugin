@@ -383,6 +383,12 @@ internal class ExpressionsVisitorK2(
                 OpenApiSpec.SchemaType(
                     type = kotlinType.toString().toSwaggerType()
                 )
+            } else if (kotlinType?.lookupTagIfAny?.name?.asString() == "Instant" ||
+                kotlinType?.lookupTagIfAny?.name?.asString() == "LocalDateTime") {
+                OpenApiSpec.SchemaType(
+                    type = "string",
+                    format = "date-time"
+                )
             } else {
                 val typeRef = response.type?.generateTypeAndVisitMemberDescriptors()
                 OpenApiSpec.SchemaType(

@@ -183,5 +183,6 @@ private val deps = arrayOf(
     "kotlinx-coroutines-core:1.10.1",
     "moshi:1.14.0",
     "kotlinx-serialization-core:2.1.0",
+    "kotlinx-datetime:0.4.0",
     "annotations:0.6.7-alpha"
 )

@@ -21,6 +21,7 @@ dependencies {
     implementation(libs.serialization)
     implementation(libs.serialization.json)
     implementation(libs.bundles.ktor)
+    implementation(libs.kotlinx.datetime)
 
     testImplementation(projects.common)
     testImplementation(libs.classGraph)
@@ -29,6 +30,7 @@ dependencies {
     testImplementation(libs.assertJ)
     testImplementation(platform(libs.junit))
     testImplementation(libs.junitJupiter)
+    testImplementation(libs.kotlinx.datetime)
 }
 
 tasks.test {
