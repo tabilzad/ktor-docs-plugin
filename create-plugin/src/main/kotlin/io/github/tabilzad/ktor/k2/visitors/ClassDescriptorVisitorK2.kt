@@ -91,7 +91,7 @@ internal class ClassDescriptorVisitorK2(
                 ObjectType(type = "string", enum = enumValues)
             }
 
-            fqClassName?.let { isDatetime(it) } == true-> {
+            fqClassName?.let { isDatetime(it) } == true -> {
                 ObjectType(type = "string", format = "date-time")
             }
 
