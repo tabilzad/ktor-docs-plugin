@@ -206,6 +206,13 @@ private fun ConeKotlinType.isBuiltinType(classId: ClassId, isNullable: Boolean?)
     return lookupTag.classId == classId && (isNullable == null || isNullableAny == isNullable)
 }
 
+@Suppress("CyclomaticComplexMethod")
+fun isDatetime(fqClassName: String): Boolean {
+    return fqClassName == "kotlinx.datetime.Instant" ||
+            fqClassName == "kotlinx.datetime.LocalDateTime" ||
+            fqClassName == "java.time.Instant"
+}
+
 fun FirRegularClassSymbol.resolveEnumEntries(): List<String> {
     return declarationSymbols.filterIsInstance<FirEnumEntrySymbol>().map { it.name.asString() }
 }

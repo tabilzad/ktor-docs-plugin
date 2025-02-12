@@ -15,6 +15,7 @@ dependencies {
     shadow(projects.common)
     implementation(libs.serialization.json)
     implementation(libs.serialization)
+    implementation(libs.kotlinx.datetime)
 }
 
 gradlePlugin {
