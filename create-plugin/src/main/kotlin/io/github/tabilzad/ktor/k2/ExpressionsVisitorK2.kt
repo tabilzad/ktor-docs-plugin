@@ -149,7 +149,10 @@ internal class ExpressionsVisitorK2(
                 it.accept(
                     ParametersVisitor(
                         session,
-                        listOf(ClassIds.KTOR_QUERY_PARAM, ClassIds.KTOR_RAW_QUERY_PARAM)
+                        listOf(ClassIds.KTOR_QUERY_PARAM,
+                            ClassIds.KTOR_RAW_QUERY_PARAM,
+                            ClassIds.KTOR_3_QUERY_PARAM,
+                            ClassIds.KTOR_3_RAW_QUERY_PARAM,)
                     ),
                     queryParams
                 )
@@ -164,7 +167,10 @@ internal class ExpressionsVisitorK2(
                 it.accept(
                     ParametersVisitor(
                         session,
-                        listOf(ClassIds.KTOR_HEADER_PARAM, ClassIds.KTOR_HEADER_ACCESSOR)
+                        listOf(ClassIds.KTOR_HEADER_PARAM,
+                            ClassIds.KTOR_3_HEADER_PARAM,
+                            ClassIds.KTOR_HEADER_ACCESSOR,
+                            ClassIds.KTOR_3_HEADER_ACCESSOR,)
                     ),
                     headerParams
                 )
