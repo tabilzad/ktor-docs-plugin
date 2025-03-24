@@ -63,7 +63,7 @@ subprojects {
             pom {
                 name.set(project.name)
                 description.set("Open API (Swagger) specification Generator for Ktor")
-                url.set("https://github.com/tabilzad/ktor-docs-plugin")
+                url.set("https://github.com/tabilzad/inspektor")
                 licenses {
                     license {
                         name.set("The Apache License, Version 2.0")
@@ -78,7 +78,7 @@ subprojects {
                     }
                 }
                 scm {
-                    url.set("https://github.com/tabilzad/ktor-docs-plugin")
+                    url.set("https://github.com/tabilzad/inspektor")
                 }
             }
         }

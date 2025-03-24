@@ -4,7 +4,7 @@
 
 # InspeKtor
 ### Open API (Swagger) generator for Ktor
-[![Test and Publish to SonarType](https://github.com/tabilzad/ktor-docs-plugin/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/tabilzad/ktor-docs-plugin/actions/workflows/gradle-publish.yml)
+[![Test and Publish to SonarType](https://github.com/tabilzad/inspektor/actions/workflows/gradle-publish.yml/badge.svg)](https://github.com/tabilzad/inspektor/actions/workflows/gradle-publish.yml)
 
 This plugin implements a plug and play solution for generating OpenAPI (Swagger) specification for your Ktor server on any platform with minimal effort - no need to modify your existing code, no special DSL wrappers etc.
 Just annotate your route(s) definitions with `@GenerateOpenApi` and `openapi.yaml` will be generated at build time.
@@ -29,7 +29,7 @@ swagger {
             version = "1.0"
             contact {
                 name = "Inspektor"
-                url = "https://github.com/tabilzad/ktor-docs-plugin"
+                url = "https://github.com/tabilzad/inspektor"
             }
         }
     }
@@ -217,7 +217,7 @@ fun Route.ordersRouting() {
 
 ## Sample Specification
 
-![sample](https://github.com/tabilzad/ktor-docs-plugin/assets/16094286/6d0b0a6a-5925-4f52-ad23-11b1c44b43a1)
+![sample](https://github.com/tabilzad/inspektor/assets/16094286/6d0b0a6a-5925-4f52-ad23-11b1c44b43a1)
 
 
 
